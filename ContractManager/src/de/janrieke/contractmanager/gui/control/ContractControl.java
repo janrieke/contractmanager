@@ -1,0 +1,474 @@
+package de.janrieke.contractmanager.gui.control;
+
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+
+import de.janrieke.contractmanager.Settings;
+import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion;
+import de.janrieke.contractmanager.gui.menu.ContractListMenu;
+import de.janrieke.contractmanager.rmi.Contract;
+import de.janrieke.contractmanager.rmi.Contract.IntervalType;
+import de.willuhn.datasource.rmi.DBIterator;
+import de.willuhn.datasource.rmi.DBService;
+import de.willuhn.jameica.gui.AbstractControl;
+import de.willuhn.jameica.gui.AbstractView;
+import de.willuhn.jameica.gui.GUI;
+import de.willuhn.jameica.gui.Part;
+import de.willuhn.jameica.gui.dialogs.CalendarDialog;
+import de.willuhn.jameica.gui.formatter.DateFormatter;
+import de.willuhn.jameica.gui.input.DecimalInput;
+import de.willuhn.jameica.gui.input.Input;
+import de.willuhn.jameica.gui.input.IntegerInput;
+import de.willuhn.jameica.gui.input.LabelInput;
+import de.willuhn.jameica.gui.input.MultiInput;
+import de.willuhn.jameica.gui.input.SelectInput;
+import de.willuhn.jameica.gui.input.TextAreaInput;
+import de.willuhn.jameica.gui.input.TextInput;
+import de.willuhn.jameica.gui.parts.TablePart;
+import de.willuhn.logging.Logger;
+import de.willuhn.util.ApplicationException;
+
+/**
+ * @author willuhn, jrieke
+ */
+public class ContractControl extends AbstractControl {
+
+	// list of all contracts
+	private TablePart contractList;
+
+	// Input fields for the contract attributes,
+	private Input name;
+	private Input comment;
+	private DateDialogInputAutoCompletion startDate;
+	private DateDialogInputAutoCompletion endDate;
+	private LabelInput nextExtension;
+
+	private MultiInput cancellationPeriodMulti;
+	private IntegerInput cancellationPeriodCount;
+	private SelectInput cancellationPeriodType;
+	
+	private Input firstMinRuntimeMulti;
+	private IntegerInput firstMinRuntimeCount;
+	private SelectInput firstMinRuntimeType;
+
+	private Input nextMinRuntimeMulti;
+	private IntegerInput nextMinRuntimeCount;
+	private SelectInput nextMinRuntimeType;
+
+	private DecimalInput moneyOnce;
+	private DecimalInput moneyPerDay;
+	private DecimalInput moneyPerWeek;
+	private DecimalInput moneyPerMonth;
+	private DecimalInput moneyPerYear;
+
+
+	// list of transactions contained in this contract
+	//private TablePart transactionList;
+
+	// this is the currently opened contract
+	private Contract contract;
+
+	private LabelInput nextCancellationDeadline;
+
+
+	/**
+	 * ct.
+	 * 
+	 * @param view
+	 *            this is our view (the welcome screen).
+	 */
+	public ContractControl(AbstractView view) {
+		super(view);
+	}
+
+	/**
+	 * Small helper method to get the current contract.
+	 * 
+	 * @return
+	 */
+	private Contract getContract() {
+		if (contract != null)
+			return contract;
+		contract = (Contract) getCurrentObject();
+		return contract;
+	}
+
+	/**
+	 * Returns the input field for the contract name.
+	 * 
+	 * @return input field.
+	 * @throws RemoteException
+	 */
+	public Input getName() throws RemoteException {
+		if (name == null)
+			name = new TextInput(getContract().getName(), 255); // "255" is the maximum length for this input field.
+		return name;
+	}
+
+	/**
+	 * Returns the input field for the contract description.
+	 * 
+	 * @return input field.
+	 * @throws RemoteException
+	 */
+	public Input getComment() throws RemoteException {
+		if (comment == null)
+			comment = new TextAreaInput(getContract().getComment());
+		return comment;
+	}
+
+	/**
+	 * Returns the input field for the contract price.
+	 * 
+	 * @return input field.
+	 * @throws RemoteException
+	 */
+	public Input getMoneyOnce() throws RemoteException {
+		if (moneyOnce == null) {
+			moneyOnce = new DecimalInput(getContract().getMoneyOnce(),
+				Settings.DECIMALFORMAT);
+			moneyOnce.setComment(Settings.CURRENCY);
+		}
+		return moneyOnce;
+	}
+
+	/**
+	 * Returns the input field for the start date.
+	 * 
+	 * @return input field.
+	 * @throws RemoteException
+	 */
+	public Input getStartDate() throws RemoteException {
+		if (startDate != null)
+			return startDate;
+
+		// this is a custom dialog that shows a calendar widget.
+		CalendarDialog d = new CalendarDialog(CalendarDialog.POSITION_MOUSE);
+		d.setTitle(Settings.i18n().tr("Choose a start date"));
+
+		// we have to add a close listener to display the chosen
+		// date in the right format.
+		d.addCloseListener(new Listener() {
+			public void handleEvent(Event event) {
+				if (event == null || event.data == null)
+					return;
+
+				startDate.setText(Settings.DATEFORMAT.format((Date) event.data));
+			}
+		});
+
+		Date initial = getContract().getStartDate();
+		String s = initial==null?"YYYY-MM-DD":Settings.DATEFORMAT.format(initial);
+
+		// Dialog-Input is an Input field that gets its data from a dialog.
+		startDate = new DateDialogInputAutoCompletion(s, d);
+
+		// we store the initial value
+		startDate.setValue(initial);
+		
+		return startDate;
+	}
+
+	/**
+	 * Returns the input field for the end date.
+	 * 
+	 * @return input field.
+	 * @throws RemoteException
+	 */
+	public Input getEndDate() throws RemoteException {
+		if (endDate != null)
+			return endDate;
+
+		CalendarDialog d = new CalendarDialog(CalendarDialog.POSITION_MOUSE);
+		d.setTitle(Settings.i18n().tr("Choose an end date"));
+		d.addCloseListener(new Listener() {
+			public void handleEvent(Event event) {
+				if (event == null || event.data == null)
+					return;
+
+				endDate.setText(Settings.DATEFORMAT.format((Date) event.data));
+			}
+		});
+		
+		Date initial = getContract().getEndDate();
+		String s = initial==null?"YYYY-MM-DD":Settings.DATEFORMAT.format(initial);
+
+		// Dialog-Input is an Input field that gets its data from a dialog.
+		endDate = new DateDialogInputAutoCompletion(s, d);
+
+		// we store the initial value
+		endDate.setValue(initial);
+
+		return endDate;
+	}
+
+	public LabelInput getNextExtension() throws RemoteException {
+		if (nextExtension != null)
+			return nextExtension;
+
+		Date ne = getContract().getNextExtension();
+		nextExtension = new LabelInput(ne == null ? ""
+				: Settings.DATEFORMAT.format(ne));
+		return nextExtension;
+	}
+
+	public LabelInput getNextCancellationDeadline() throws RemoteException {
+		if (nextCancellationDeadline != null)
+			return nextCancellationDeadline;
+
+		Date ne = getContract().getNextCancellationDeadline();
+		nextCancellationDeadline = new LabelInput(ne == null ? ""
+				: Settings.DATEFORMAT.format(ne));
+		return nextCancellationDeadline;
+	}
+	
+	public Input getCancellationPeriod() throws RemoteException {
+		if (cancellationPeriodMulti != null)
+			return cancellationPeriodMulti;
+
+		cancellationPeriodMulti = new MultiInput(getCancellationPeriodCount(), getCancellationPeriodType());
+		
+		return cancellationPeriodMulti;
+	}
+	
+	public IntegerInput getCancellationPeriodCount() throws RemoteException {
+		if (cancellationPeriodCount == null) {
+			cancellationPeriodCount = new IntegerInput(getContract().getCancellationPeriodCount());
+		}
+		return cancellationPeriodCount;
+	}
+	
+	public SelectInput getCancellationPeriodType() throws RemoteException {
+		if (cancellationPeriodType == null) {
+			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>(); 
+			list.add(Contract.IntervalType.DAYS);
+			list.add(Contract.IntervalType.MONTHS);
+			list.add(Contract.IntervalType.YEARS);
+			cancellationPeriodType = new SelectInput(list, getContract().getCancellationPeriodType());
+		}
+		return cancellationPeriodType;
+	}
+	
+	public Input getFirstMinRuntime() throws RemoteException {
+		if (firstMinRuntimeMulti != null)
+			return firstMinRuntimeMulti;
+
+		firstMinRuntimeMulti = new MultiInput(getFirstMinRuntimeCount(), getFirstMinRuntimeType());
+		
+		return firstMinRuntimeMulti;
+	}
+	
+	public IntegerInput getFirstMinRuntimeCount() throws RemoteException {
+		if (firstMinRuntimeCount == null) {
+			firstMinRuntimeCount = new IntegerInput(getContract().getFirstMinRuntimeCount());
+		}
+		return firstMinRuntimeCount;
+	}
+	
+	public SelectInput getFirstMinRuntimeType() throws RemoteException {
+		if (firstMinRuntimeType == null) {
+			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>(); 
+			list.add(Contract.IntervalType.DAYS);
+			list.add(Contract.IntervalType.MONTHS);
+			list.add(Contract.IntervalType.YEARS);
+			firstMinRuntimeType = new SelectInput(list, getContract().getFirstMinRuntimeType());
+		}
+		return firstMinRuntimeType;
+	}
+
+	public Input getNextMinRuntime() throws RemoteException {
+		if (nextMinRuntimeMulti != null)
+			return nextMinRuntimeMulti;
+
+		nextMinRuntimeMulti = new MultiInput(getNextMinRuntimeCount(), getNextMinRuntimeType());
+		
+		return nextMinRuntimeMulti;
+	}
+	
+	public IntegerInput getNextMinRuntimeCount() throws RemoteException {
+		if (nextMinRuntimeCount == null) {
+			nextMinRuntimeCount = new IntegerInput(getContract().getNextMinRuntimeCount());
+		}
+		return nextMinRuntimeCount;
+	}
+	
+	public SelectInput getNextMinRuntimeType() throws RemoteException {
+		if (nextMinRuntimeType == null) {
+			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>(); 
+			list.add(Contract.IntervalType.DAYS);
+			list.add(Contract.IntervalType.MONTHS);
+			list.add(Contract.IntervalType.YEARS);
+			nextMinRuntimeType = new SelectInput(list, getContract().getNextMinRuntimeType());
+		}
+		return nextMinRuntimeType;
+	}	
+
+	public DecimalInput getMoneyPerDay() throws RemoteException {
+		if (moneyPerDay == null) {
+			moneyPerDay = new DecimalInput(getContract().getMoneyPerDay(),
+					Settings.DECIMALFORMAT);
+			moneyPerDay.setComment(Settings.CURRENCY);
+		}
+		return moneyPerDay;
+	}
+
+	public DecimalInput getMoneyPerWeek() throws RemoteException {
+		if (moneyPerWeek == null) {
+			moneyPerWeek = new DecimalInput(getContract().getMoneyPerWeek(),
+					Settings.DECIMALFORMAT);
+			moneyPerWeek.setComment(Settings.CURRENCY);
+		}
+		return moneyPerWeek;
+	}
+
+	public DecimalInput getMoneyPerMonth() throws RemoteException {
+		if (moneyPerMonth == null) {
+			moneyPerMonth = new DecimalInput(getContract().getMoneyPerMonth(),
+					Settings.DECIMALFORMAT);
+			moneyPerMonth.setComment(Settings.CURRENCY);
+		}
+		return moneyPerMonth;
+	}
+
+	public DecimalInput getMoneyPerYear() throws RemoteException {
+		if (moneyPerYear == null) {
+			moneyPerYear = new DecimalInput(getContract().getMoneyPerYear(),
+					Settings.DECIMALFORMAT);
+			moneyPerYear.setComment(Settings.CURRENCY);
+		}
+		return moneyPerYear;
+	}
+
+	/**
+	 * Creates a table containing all contracts.
+	 * 
+	 * @return a table with contracts.
+	 * @throws RemoteException
+	 */
+	public Part getContractsTable() throws RemoteException {
+		if (contractList != null)
+			return contractList;
+
+		// 1) get the dataservice
+		DBService service = Settings.getDBService();
+
+		// 2) now we can create the contract list.
+		// We do not need to specify the implementing class for
+		// the interface "Contract". Jameica's classloader knows
+		// all classes an finds the right implementation automatically. ;)
+		DBIterator contracts = service.createList(Contract.class);
+
+		// 4) create the table
+		contractList = new TablePart(contracts,
+				new de.janrieke.contractmanager.gui.action.ShowContractDetailView());
+
+		// 5) now we have to add some columns.
+		contractList.addColumn(Settings.i18n().tr("Name of contract"), "name");
+
+		// 6) the following fields are a date fields. So we add a date
+		// formatter.
+		contractList.addColumn(Settings.i18n().tr("Start date"), "startdate",
+				new DateFormatter(Settings.DATEFORMAT));
+		contractList.addColumn(Settings.i18n().tr("End date"), "enddate",
+				new DateFormatter(Settings.DATEFORMAT));
+		contractList.addColumn(Settings.i18n().tr("Next cancellation deadline"), "nextCancellationDeadline",
+				new DateFormatter(Settings.DATEFORMAT));
+
+		// 7) we are adding a context menu
+		contractList.setContextMenu(new ContractListMenu());
+		return contractList;
+	}
+
+	/**
+	 * Returns a list of tasks in this contract.
+	 * 
+	 * @return list of tasks in this contract
+	 * @throws RemoteException
+	 */
+//	public Part getTransactionList() throws RemoteException {
+//		if (transactionList != null)
+//			return transactionList;
+//
+//		GenericIterator transactions = getContract().getTransactions();
+//		transactionList = new TablePart(transactions, new TransactionDetail());
+//		transactionList.addColumn(Settings.i18n().tr("Task name"), "name");
+//		transactionList.addColumn(Settings.i18n().tr("Effort"), "effort",
+//				new Formatter() {
+//					@Override
+//					public String format(Object o) {
+//						if (o == null)
+//							return "-";
+//						return o + " h";
+//					}
+//				});
+//
+//		TransactionListMenu tlm = new TransactionListMenu();
+//
+//		// we add an additional menu item to create tasks with predefined
+//		// contract.
+//		tlm.addItem(new ContextMenuItem(Settings.i18n().tr(
+//				"Create new task within this Contract"), new Action() {
+//			public void handleAction(Object context)
+//					throws ApplicationException {
+//				new TransactionDetail().handleAction(getContract());
+//			}
+//		}));
+//		transactionList.setContextMenu(tlm);
+//		transactionList.setSummary(false);
+//		return transactionList;
+//	}
+
+	/**
+	 * This method stores the contract using the current values.
+	 */
+	public void handleStore() {
+		try {
+			// get the current contract.
+			Contract p = getContract();
+
+			// invoke all Setters of this contract and assign the current values
+			p.setName((String) getName().getValue());
+			p.setComment((String) getComment().getValue());
+			p.setStartDate((Date) getStartDate().getValue());
+			p.setEndDate((Date) getEndDate().getValue());
+
+			p.setCancelationPeriodCount((Integer) getCancellationPeriodCount().getValue());
+			p.setCancelationPeriodType((IntervalType) getCancellationPeriodType().getValue());
+			p.setFirstMinRuntimeCount((Integer) getFirstMinRuntimeCount().getValue());
+			p.setFirstMinRuntimeType((IntervalType) getFirstMinRuntimeType().getValue());
+			p.setNextMinRuntimeCount((Integer) getNextMinRuntimeCount().getValue());
+			p.setNextMinRuntimeType((IntervalType) getNextMinRuntimeType().getValue());
+
+			Double d = (Double) getMoneyOnce().getValue();
+			p.setMoneyOnce(d == null ? 0.0 : d.doubleValue());
+			d = (Double) getMoneyPerDay().getValue();
+			p.setMoneyPerDay(d == null ? 0.0 : d.doubleValue());
+			d = (Double) getMoneyPerWeek().getValue();
+			p.setMoneyPerWeek(d == null ? 0.0 : d.doubleValue());
+			d = (Double) getMoneyPerMonth().getValue();
+			p.setMoneyPerMonth(d == null ? 0.0 : d.doubleValue());
+			d = (Double) getMoneyPerYear().getValue();
+			p.setMoneyPerYear(d == null ? 0.0 : d.doubleValue());
+
+			// Now, let's store the contract
+			// The store() method throws ApplicationExceptions if
+			// insertCheck() or updateCheck() failed.
+			try {
+				p.store();
+				GUI.getStatusBar().setSuccessText(
+						Settings.i18n().tr("Contract stored successfully"));
+			} catch (ApplicationException e) {
+				GUI.getView().setErrorText(e.getMessage());
+			}
+		} catch (RemoteException e) {
+			Logger.error("error while storing contract", e);
+			GUI.getStatusBar().setErrorText(
+					Settings.i18n().tr("Error while storing Contract"));
+		}
+	}
+}

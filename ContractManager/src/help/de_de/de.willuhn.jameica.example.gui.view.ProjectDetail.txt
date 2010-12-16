@@ -1,0 +1,10 @@
+<form>
+	<p>
+		<span color="header" font="header">Hinweis</span>
+	</p>
+
+	<p>
+		Der eingebene Stundenpreis ist Basis für die Berechnung
+		der Projekt-Aufwände.
+	</p>
+</form>
