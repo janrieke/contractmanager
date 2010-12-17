@@ -51,7 +51,7 @@ public class LicenseControl extends AbstractControl {
 	}
 
 	/**
-	 * Liefert eine Liste mit allen direkt von Hibiscus verwendeten Komponenten.
+	 * Liefert eine Liste mit allen direkt von ContractManager verwendeten Komponenten.
 	 * 
 	 * @return Liste der verwendeten Komponenten
 	 */
@@ -100,10 +100,10 @@ public class LicenseControl extends AbstractControl {
 //				}
 				buffer.append("<p>");
 				buffer.append("<b>" + ir.getName() + "</b>");
-				buffer.append("<br/>" + i18n.tr("Version") + ": "
-						+ ir.getDescription());
 				buffer.append("<br/>" + i18n.tr("Description") + ": "
-						+ infos[i].getParentFile().getAbsolutePath());
+						+ ir.getDescription());
+//				buffer.append("<br/>" + i18n.tr("Path") + ": "
+//						+ infos[i].getParentFile().getAbsolutePath());
 				buffer.append("<br/>" + i18n.tr("URL") + ": " + ir.getUrl());
 				buffer.append("<br/>" + i18n.tr("Licence") + ": "
 						+ ir.getLicense());

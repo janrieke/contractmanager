@@ -4,6 +4,6 @@
 	</p>
 
 	<p>
-	  Das ist ein Beispiel-Plugin.
+	  ContractManager v0.1
 	</p>
 </form>
