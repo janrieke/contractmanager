@@ -35,7 +35,7 @@ public class About extends AbstractDialog {
 		text.setText("<form>" + "<p><b>Contract Manager</b></p>"
 				+ "<br/>Licence: GPL (http://www.gnu.org/copyleft/gpl.html)"
 				+ "<br/><p>Copyright by Jan Rieke [it@janrieke.de]</p>"
-				+ "<p>http://www.janrieke.de/jameica</p>"
+				+ "<p>http://www.janrieke.de/projects/contractmanager</p>"
 				+ "<br/><p>Based upon Jameica Example Plugin, copyright by Olaf Willuhn [info@jameica.org]</p>"
 				+ "<p>http://www.jameica.org</p>" + "</form>");
 

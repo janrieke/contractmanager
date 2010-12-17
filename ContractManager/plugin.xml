@@ -6,7 +6,7 @@
   xsi:noNamespaceSchemaLocation="http://www.willuhn.de/schema/jameica-plugin-1.0.xsd">
 
   <description>Contract Manager for Jameica</description>
-  <url></url>
+  <url>http://www.janrieke.de/projects/contractmanager</url>
   <homepage>http://www.janrieke.de/projects/contractmanager</homepage>
   <license>GPL - http://www.gnu.org/copyleft/gpl.html</license>
 
