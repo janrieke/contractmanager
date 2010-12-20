@@ -14,7 +14,7 @@ import de.willuhn.util.ApplicationException;
  * 
  * @author willuhn
  */
-public class Welcome extends AbstractView {
+public class WelcomeView extends AbstractView {
 
 	/**
 	 * this method will be invoked when starting the view.
@@ -22,14 +22,14 @@ public class Welcome extends AbstractView {
 	 * @see de.willuhn.jameica.gui.AbstractView#bind()
 	 */
 	public void bind() throws Exception {
-		GUI.getView().setTitle(Settings.i18n().tr("Example plugin"));
+		GUI.getView().setTitle(Settings.i18n().tr("ContractManager"));
 
 		LabelGroup group = new LabelGroup(this.getParent(), Settings.i18n().tr(
 				"welcome"));
 
 		AbstractPlugin p = Application.getPluginLoader().getPlugin(
 				ContractManagerPlugin.class);
-		group.addText("Welcome to Contract Manager (v" + p.getManifest().getVersion() + ")", false);
+		group.addText("Welcome to ContractManager (v" + p.getManifest().getVersion() + ")", false);
 
 	}
 

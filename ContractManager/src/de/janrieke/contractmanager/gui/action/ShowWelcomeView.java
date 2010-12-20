@@ -14,7 +14,7 @@ public class ShowWelcomeView implements Action {
 	 */
 	public void handleAction(Object context) throws ApplicationException {
 		GUI.startView(
-				de.janrieke.contractmanager.gui.view.Welcome.class.getName(),
+				de.janrieke.contractmanager.gui.view.WelcomeView.class.getName(),
 				null);
 	}
 

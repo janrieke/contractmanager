@@ -12,7 +12,7 @@ import de.willuhn.util.ApplicationException;
 /**
  * View to show the list of existing contracts.
  */
-public class ContractList extends AbstractView {
+public class ContractListView extends AbstractView {
 
 	/**
 	 * @see de.willuhn.jameica.gui.AbstractView#bind()

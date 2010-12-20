@@ -14,14 +14,14 @@ import de.willuhn.jameica.system.Application;
 /**
  * Our "About..." dialog.
  */
-public class About extends AbstractDialog {
+public class AboutDialog extends AbstractDialog {
 
 	/**
 	 * ct.
 	 * 
 	 * @param position
 	 */
-	public About(int position) {
+	public AboutDialog(int position) {
 		super(position);
 		this.setTitle(Settings.i18n().tr("About..."));
 	}
