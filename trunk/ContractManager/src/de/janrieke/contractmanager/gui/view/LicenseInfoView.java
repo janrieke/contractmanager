@@ -28,7 +28,7 @@ import de.willuhn.util.I18N;
 /**
  * View fuer die Lizenz-Informationen
  */
-public class LicenseInfo extends AbstractView {
+public class LicenseInfoView extends AbstractView {
 
   /**
    * @see de.willuhn.jameica.gui.AbstractView#bind()

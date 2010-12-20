@@ -17,7 +17,7 @@ import de.willuhn.util.ApplicationException;
 /**
  * this is the dialog for the contract details.
  */
-public class ContractDetail extends AbstractView {
+public class ContractDetailView extends AbstractView {
 
 	/**
 	 * @see de.willuhn.jameica.gui.AbstractView#bind()

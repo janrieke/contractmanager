@@ -13,7 +13,7 @@ public class ShowAboutDialog implements Action {
 	 */
 	public void handleAction(Object context) throws ApplicationException {
 		try {
-			new de.janrieke.contractmanager.gui.view.About(
+			new de.janrieke.contractmanager.gui.view.AboutDialog(
 					AbstractDialog.POSITION_CENTER).open();
 		} catch (Exception e) {
 			Logger.error("error while opening about dialog", e);

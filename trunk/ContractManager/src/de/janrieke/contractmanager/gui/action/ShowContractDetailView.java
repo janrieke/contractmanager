@@ -34,7 +34,7 @@ public class ShowContractDetailView implements Action {
 		}
 
 		// ok, lets start the dialog
-		GUI.startView(de.janrieke.contractmanager.gui.view.ContractDetail.class
+		GUI.startView(de.janrieke.contractmanager.gui.view.ContractDetailView.class
 				.getName(), p);
 	}
 

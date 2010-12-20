@@ -30,7 +30,7 @@ public class ShowLicenseInfoView implements Action
    */
   public void handleAction(Object context) throws ApplicationException
   {
-    GUI.startView(de.janrieke.contractmanager.gui.view.LicenseInfo.class,null);
+    GUI.startView(de.janrieke.contractmanager.gui.view.LicenseInfoView.class,null);
   }
 
 }
