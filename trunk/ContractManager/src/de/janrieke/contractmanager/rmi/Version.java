@@ -54,3 +54,11 @@ public interface Version extends DBObject
   public void setVersion(int newVersion) throws RemoteException;
 
 }
+
+
+/*********************************************************************
+ * $Log: Version.java,v $
+ * Revision 1.1  2007-12-06 17:57:21  willuhn
+ * @N Erster Code fuer das neue Versionierungs-System
+ *
+ **********************************************************************/

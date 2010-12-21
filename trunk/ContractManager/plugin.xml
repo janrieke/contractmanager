@@ -55,6 +55,7 @@
 
     <item name="Contract Manager" icon-close="folder.gif" icon-open="folderopen.gif" action="de.janrieke.contractmanager.gui.action.ShowWelcomeView">
       <item name="Contracts" icon-close="page.gif" icon-open="page.gif" action="de.janrieke.contractmanager.gui.action.ShowContractListView" />
+      <item name="Settings" icon-close="page.gif" icon-open="page.gif" action="de.janrieke.contractmanager.gui.action.ShowSettingsView" />
     </item>
   </navigation>
 

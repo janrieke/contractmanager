@@ -14,6 +14,7 @@
 package de.janrieke.contractmanager.server;
 
 import java.rmi.RemoteException;
+import java.sql.SQLException;
 
 import de.janrieke.contractmanager.rmi.Setting;
 import de.willuhn.datasource.db.AbstractDBObject;
@@ -28,6 +29,8 @@ public class SettingImpl extends AbstractDBObject implements Setting {
 	 */
 	private static final long serialVersionUID = 2994333719211540630L;
 
+    private boolean upper;
+
 	/**
 	 * ct
 	 * 
@@ -37,11 +40,22 @@ public class SettingImpl extends AbstractDBObject implements Setting {
 		super();
 	}
 
+	@Override
+	protected void init() throws SQLException {
+		super.init();
+		upper = Boolean.getBoolean(getService().getClass().getName() + ".uppercase");
+	}
+
 	/**
 	 * @see de.willuhn.datasource.db.AbstractDBObject#getPrimaryAttribute()
 	 */
 	public String getPrimaryAttribute() throws RemoteException {
 		return "key";
+	}
+
+	@Override
+	protected String getIDField() {
+	    return upper ? "KEY" : "key";
 	}
 
 	/**
@@ -76,7 +90,7 @@ public class SettingImpl extends AbstractDBObject implements Setting {
 	 * @see de.willuhn.jameica.hbci.rmi.DBProperty#setValue(java.lang.String)
 	 */
 	public void setValue(String value) throws RemoteException {
-		setAttribute("content", value);
+		setAttribute("value", value);
 	}
 
 }

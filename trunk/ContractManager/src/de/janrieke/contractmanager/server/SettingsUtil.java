@@ -1,4 +1,6 @@
 /**********************************************************************
+ Copied from Hibiscus
+
  * $Source: /cvsroot/hibiscus/hibiscus/src/de/willuhn/jameica/hbci/server/DBPropertyUtil.java,v $
  * $Revision: 1.2 $
  * $Date: 2008-09-17 23:44:29 $
@@ -108,7 +110,7 @@ public class SettingsUtil
     // Mal schauen, ob wir das Property schon haben
     DBService service = Settings.getDBService();
     DBIterator i = service.createList(Setting.class);
-    i.addFilter("name = ?",new Object[]{name});
+    i.addFilter("key = ?",new Object[]{name});
     if (i.hasNext())
       return (Setting) i.next();
 
@@ -118,14 +120,3 @@ public class SettingsUtil
     return prop;
   }
 }
-
-
-/*********************************************************************
- * $Log: DBPropertyUtil.java,v $
- * Revision 1.2  2008-09-17 23:44:29  willuhn
- * @B SQL-Query fuer MaxUsage-Abfrage korrigiert
- *
- * Revision 1.1  2008/05/30 14:23:48  willuhn
- * @N Vollautomatisches und versioniertes Speichern der BPD und UPD in der neuen Property-Tabelle
- *
- **********************************************************************/
