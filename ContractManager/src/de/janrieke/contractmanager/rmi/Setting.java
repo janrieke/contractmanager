@@ -28,16 +28,10 @@ CREATE TABLE settings (
  * java.rmi.StubNotFoundException) #
  * #############################################################################
  * 
- * @author willuhn, jrieke
+ * @author jrieke
  */
 public interface Setting extends DBObject {
 	
-	/**
-	 * Returns the name of the contract.
-	 * 
-	 * @return name of the contract.
-	 * @throws RemoteException
-	 */
 	public String getKey() throws RemoteException;
 	public void setKey(String key) throws RemoteException;
 	
