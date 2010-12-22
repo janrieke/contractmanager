@@ -64,6 +64,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	 */
 	public ContractDBServiceImpl(String driverClass) throws RemoteException {
 		super();
+		System.setProperty(ContractDBServiceImpl.class.getName() + ".schema","PUBLIC");
 		MultipleClassLoader cl = Application.getPluginLoader()
 				.getPlugin(ContractManagerPlugin.class).getResources()
 				.getClassLoader();
