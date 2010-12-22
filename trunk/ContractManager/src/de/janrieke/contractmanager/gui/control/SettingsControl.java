@@ -9,6 +9,7 @@ import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.input.IntegerInput;
+import de.willuhn.jameica.gui.input.MultiInput;
 import de.willuhn.jameica.gui.input.TextInput;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
@@ -27,6 +28,8 @@ public class SettingsControl extends AbstractControl {
 	private TextInput city;
 	private TextInput state;
 	private TextInput country;
+	private Input streetNumber;
+	private MultiInput zipcodeCity;
 
 	/**
 	 * ct.
@@ -62,6 +65,15 @@ public class SettingsControl extends AbstractControl {
 		return number;
 	}
 	
+	public Input getStreetNumber() throws RemoteException {
+		if (streetNumber != null)
+			return streetNumber;
+
+		streetNumber = new MultiInput(getStreet(), getNumber());
+		
+		return streetNumber;
+	}
+	
 	public Input getExtra() throws RemoteException {
 		if (extra == null)
 			extra = new TextInput(SettingsUtil.get("extra", ""), 255);
@@ -78,6 +90,15 @@ public class SettingsControl extends AbstractControl {
 		if (city == null)
 			city = new TextInput(SettingsUtil.get("city", ""), 255);
 		return city;
+	}
+
+	public Input getZipcodeCity() throws RemoteException {
+		if (zipcodeCity != null)
+			return zipcodeCity;
+
+		zipcodeCity = new MultiInput(getZipcode(), getCity());
+		
+		return zipcodeCity;
 	}
 	
 	public Input getState() throws RemoteException {
