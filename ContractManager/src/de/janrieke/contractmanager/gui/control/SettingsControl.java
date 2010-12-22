@@ -19,14 +19,14 @@ import de.willuhn.util.ApplicationException;
 public class SettingsControl extends AbstractControl {
 
 	// Input fields for the attributes
-	private Input name;
-	private Input street;
+	private TextInput name;
+	private TextInput street;
 	private IntegerInput number;
-	private Input extra;
-	private IntegerInput zipcode;
-	private Input city;
-	private Input state;
-	private Input country;
+	private TextInput extra;
+	private TextInput zipcode;
+	private TextInput city;
+	private TextInput state;
+	private TextInput country;
 
 	/**
 	 * ct.
@@ -50,12 +50,61 @@ public class SettingsControl extends AbstractControl {
 		return name;
 	}
 
+	public Input getStreet() throws RemoteException {
+		if (street == null)
+			street = new TextInput(SettingsUtil.get("street", ""), 255);
+		return street;
+	}
+	
+	public Input getNumber() throws RemoteException {
+		if (number == null)
+			number = new IntegerInput(Integer.parseInt(SettingsUtil.get("number", "0")));
+		return number;
+	}
+	
+	public Input getExtra() throws RemoteException {
+		if (extra == null)
+			extra = new TextInput(SettingsUtil.get("extra", ""), 255);
+		return extra;
+	}
+	
+	public Input getZipcode() throws RemoteException {
+		if (zipcode == null)
+			zipcode = new TextInput(SettingsUtil.get("zipcode", ""), 255);
+		return zipcode;
+	}
+	
+	public Input getCity() throws RemoteException {
+		if (city == null)
+			city = new TextInput(SettingsUtil.get("city", ""), 255);
+		return city;
+	}
+	
+	public Input getState() throws RemoteException {
+		if (state == null)
+			state = new TextInput(SettingsUtil.get("state", ""), 255);
+		return state;
+	}
+	
+	public Input getCountry() throws RemoteException {
+		if (country == null)
+			country = new TextInput(SettingsUtil.get("country", ""), 255);
+		return country;
+	}
+	
 	/**
 	 * This method stores the contract using the current values.
 	 */
 	public void handleStore() {
 		try {
 			SettingsUtil.set("name", (String) getName().getValue());
+			SettingsUtil.set("street", (String) getStreet().getValue());
+			SettingsUtil.set("number", (String) getNumber().getValue());
+			SettingsUtil.set("extra", (String) getExtra().getValue());
+			SettingsUtil.set("zipcode", (String) getZipcode().getValue());
+			SettingsUtil.set("city", (String) getCity().getValue());
+			SettingsUtil.set("state", (String) getState().getValue());
+			SettingsUtil.set("country", (String) getCountry().getValue());
 			GUI.getStatusBar().setSuccessText(
 					Settings.i18n().tr("Settings saved."));
 		} catch (ApplicationException e) {
