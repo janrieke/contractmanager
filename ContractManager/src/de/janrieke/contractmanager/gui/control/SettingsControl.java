@@ -8,7 +8,6 @@ import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.input.Input;
-import de.willuhn.jameica.gui.input.IntegerInput;
 import de.willuhn.jameica.gui.input.MultiInput;
 import de.willuhn.jameica.gui.input.TextInput;
 import de.willuhn.logging.Logger;
@@ -22,7 +21,7 @@ public class SettingsControl extends AbstractControl {
 	// Input fields for the attributes
 	private TextInput name;
 	private TextInput street;
-	private IntegerInput number;
+	private TextInput number;
 	private TextInput extra;
 	private TextInput zipcode;
 	private TextInput city;
@@ -30,6 +29,8 @@ public class SettingsControl extends AbstractControl {
 	private TextInput country;
 	private Input streetNumber;
 	private MultiInput zipcodeCity;
+	private TextInput email;
+	private TextInput phone;
 
 	/**
 	 * ct.
@@ -61,7 +62,7 @@ public class SettingsControl extends AbstractControl {
 	
 	public Input getNumber() throws RemoteException {
 		if (number == null)
-			number = new IntegerInput(Integer.parseInt(SettingsUtil.get("number", "0")));
+			number = new TextInput(SettingsUtil.get("number", ""));
 		return number;
 	}
 	
@@ -112,6 +113,17 @@ public class SettingsControl extends AbstractControl {
 			country = new TextInput(SettingsUtil.get("country", ""), 255);
 		return country;
 	}
+
+	public Input getEmail() throws RemoteException {
+		if (email == null)
+			email = new TextInput(SettingsUtil.get("email", ""), 255);
+		return email;
+	}
+	public Input getPhone() throws RemoteException {
+		if (phone == null)
+			phone = new TextInput(SettingsUtil.get("phone", ""), 255);
+		return phone;
+	}
 	
 	/**
 	 * This method stores the contract using the current values.
@@ -126,6 +138,8 @@ public class SettingsControl extends AbstractControl {
 			SettingsUtil.set("city", (String) getCity().getValue());
 			SettingsUtil.set("state", (String) getState().getValue());
 			SettingsUtil.set("country", (String) getCountry().getValue());
+			SettingsUtil.set("email", (String) getEmail().getValue());
+			SettingsUtil.set("phone", (String) getPhone().getValue());
 			GUI.getStatusBar().setSuccessText(
 					Settings.i18n().tr("Settings saved."));
 		} catch (ApplicationException e) {

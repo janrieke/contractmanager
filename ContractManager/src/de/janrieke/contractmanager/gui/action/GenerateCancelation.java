@@ -15,6 +15,7 @@ import org.w3c.dom.NodeList;
 import de.janrieke.contractmanager.ContractManagerPlugin;
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
+import de.janrieke.contractmanager.server.SettingsUtil;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.util.ApplicationException;
@@ -58,20 +59,35 @@ public class GenerateCancelation implements Action {
 		try {
 			//retrieve variable values
 			Map<String, String> values = new HashMap<String, String>();
+
 			values.put("NAME", "");
-			values.put("EXTRA", "");
 			values.put("STREET", "");
 			values.put("NUMBER", "");
+			values.put("EXTRA", "");
 			values.put("ZIPCODE", "");
 			values.put("CITY", "");
+			values.put("STATE", "");
 			values.put("COUNTRY", "");
-			values.put("FROM_NAME", "");
-			values.put("FROM_ADDRESS", "");
-			values.put("FROM_PHONE", "");
-			values.put("FROM_EMAIL", "");
+
+			values.put("FROM_NAME", SettingsUtil.get("name", ""));
+			values.put("FROM_STREET", SettingsUtil.get("street", ""));
+			values.put("FROM_NUMBER", SettingsUtil.get("number", ""));
+			values.put("FROM_EXTRA", SettingsUtil.get("extra", ""));
+			values.put("FROM_ZIPCODE", SettingsUtil.get("zipcode", ""));
+			values.put("FROM_CITY", SettingsUtil.get("city", ""));
+			values.put("FROM_STATE", SettingsUtil.get("state", ""));
+			values.put("FROM_COUNTRY", SettingsUtil.get("country", ""));
+			values.put("FROM_EMAIL", SettingsUtil.get("email", ""));
+			values.put("FROM_PHONE", SettingsUtil.get("phone", ""));
+
 			values.put("TODAY", Settings.DATEFORMAT.format(new Date()));
 			values.put("CONTRACT_NAME", p.getName());
-			values.put("CANCELLATION_DATE", Settings.DATEFORMAT.format(p.getNextExtension()));
+			
+			Date nextExtension = p.getNextExtension();
+			if (nextExtension != null)
+				values.put("CANCELLATION_DATE", Settings.DATEFORMAT.format(nextExtension));
+			else
+				values.put("CANCELLATION_DATE", Settings.DATEFORMAT.format(new Date()));
 
 
 			// open template document from plugin directory
