@@ -41,6 +41,8 @@ public class SettingsView extends AbstractView {
 	    left.addLabelPair(Settings.i18n().tr("City"), control.getZipcodeCity());
 	    left.addLabelPair(Settings.i18n().tr("State"), control.getState());
 	    left.addLabelPair(Settings.i18n().tr("Country"), control.getCountry());
+	    left.addLabelPair(Settings.i18n().tr("Email"), control.getEmail());
+	    left.addLabelPair(Settings.i18n().tr("Phone"), control.getPhone());
 
 		// add some buttons
 	    ButtonArea buttons = new ButtonArea(getParent(), 4);
