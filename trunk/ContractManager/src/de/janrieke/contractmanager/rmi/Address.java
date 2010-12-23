@@ -25,14 +25,14 @@ public interface Address extends DBObject {
 	public String getStreet() throws RemoteException;
 	public void setStreet(String street) throws RemoteException;
 	
-	public int getNumber() throws RemoteException;
-	public void setNumber(int number) throws RemoteException;
+	public String getNumber() throws RemoteException;
+	public void setNumber(String number) throws RemoteException;
 	
 	public String getExtra() throws RemoteException;
 	public void setExtra(String extra) throws RemoteException;
 	
-	public int getZipcode() throws RemoteException;
-	public void setZipcode(int zipcode) throws RemoteException;
+	public String getZipcode() throws RemoteException;
+	public void setZipcode(String zipcode) throws RemoteException;
 	
 	public String getCity() throws RemoteException;
 	public void setCity(String city) throws RemoteException;

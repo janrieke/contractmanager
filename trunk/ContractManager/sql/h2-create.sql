@@ -33,9 +33,9 @@ CREATE TABLE address (
   id IDENTITY,
   name varchar(255) NOT NULL,
   street varchar(255),
-  number int(5),
+  number varchar(5),
   extra varchar(255),
-  zipcode int(5),
+  zipcode varchar(5),
   city varchar(255),
   state varchar(255),
   country varchar(255),
@@ -51,4 +51,4 @@ CREATE TABLE settings (
 );
 
 ALTER TABLE contract ADD CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES address (id) DEFERRABLE;
-ALTER TABLE umsaetze ADD CONSTRAINT fk_contract FOREIGN KEY (contract_id) REFERENCES contract (id) DEFERRABLE;
+ALTER TABLE transactions ADD CONSTRAINT fk_contract FOREIGN KEY (contract_id) REFERENCES contract (id) DEFERRABLE;

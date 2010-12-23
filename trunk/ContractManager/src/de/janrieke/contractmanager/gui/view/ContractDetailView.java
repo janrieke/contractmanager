@@ -60,6 +60,14 @@ public class ContractDetailView extends AbstractView {
 		buttons.addButton(Settings.i18n().tr("Generate Cancelation"), new GenerateCancelation(), control.getCurrentObject());
 
 	    SimpleContainer right = new SimpleContainer(columns.getComposite(), true);
+	    right.addHeadline(Settings.i18n().tr("Contractual Partner Address"));
+	    right.addLabelPair(Settings.i18n().tr("Name/Company"), control.getPartnerName());
+	    right.addLabelPair(Settings.i18n().tr("Street"), control.getPartnerStreetNumber());
+	    right.addLabelPair(Settings.i18n().tr("Extra"), control.getPartnerExtra());
+	    right.addLabelPair(Settings.i18n().tr("City"), control.getPartnerZipcodeCity());
+	    right.addLabelPair(Settings.i18n().tr("State"), control.getPartnerState());
+	    right.addLabelPair(Settings.i18n().tr("Country"), control.getPartnerCountry());
+	    
 	    right.addHeadline(Settings.i18n().tr("Comment"));
 	    right.addPart(control.getComment());
 	    
