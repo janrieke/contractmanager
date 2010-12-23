@@ -12,23 +12,27 @@ import de.willuhn.datasource.rmi.DBObject;
  * 
  * <pre>
  * CREATE TABLE contract (
- *  id NUMERIC default UNIQUEKEY('contract'),
- *  name varchar(255) NOT NULL,
- *  address_id int(4),
- *  comment text,
- *  start date,
- *  end date,
- *  next_extension date,
- *  deadline int(4),
- *  first_min_runtime int(4),
- *  next_min_runtime int(4),
- *  money_once double,
- *  money_per_day double,
- *  money_per_week double,
- *  money_per_month double,
- *  money_per_year double,
- *  UNIQUE (id),
- *  PRIMARY KEY (id)
+ *   id IDENTITY,
+ *   name varchar(255) NOT NULL,
+ *   contract_no varchar(255),
+ *   customer_no varchar(255),
+ *   address_id int(5),
+ *   comment varchar(10000),
+ *   startdate date,
+ *   enddate date,
+ *   cancelation_period_count int(4),
+ *   cancelation_period_type int(4),
+ *   first_min_runtime_count int(4),
+ *   first_min_runtime_type int(4),
+ *   next_min_runtime_count int(4),
+ *   next_min_runtime_type int(4),
+ *   money_once double,
+ *   money_per_day double,
+ *   money_per_week double,
+ *   money_per_month double,
+ *   money_per_year double,
+ *   UNIQUE (id),
+ *   PRIMARY KEY (id)
  * );
  * </pre>
  * 
@@ -66,6 +70,12 @@ public interface Contract extends DBObject {
 	 */
 	public String getName() throws RemoteException;
 	public void setName(String name) throws RemoteException;
+	
+	public String getContractNumber() throws RemoteException;
+	public void setContractNumber(String contractNo) throws RemoteException;
+	
+	public String getCustomerNumber() throws RemoteException;
+	public void setCustomerNumber(String customerNo) throws RemoteException;
 	
 	public Address getAddress() throws RemoteException;
 	public void setAddress(Address address) throws RemoteException;

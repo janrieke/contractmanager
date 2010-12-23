@@ -39,6 +39,8 @@ public class ContractDetailView extends AbstractView {
 
 		// all all input fields to the group.
 	    left.addLabelPair(Settings.i18n().tr("Name"), control.getName());
+	    left.addLabelPair(Settings.i18n().tr("Contract Number"), control.getContractNumber());
+	    left.addLabelPair(Settings.i18n().tr("Customer Number"), control.getCustomerNumber());
 
 	    left.addHeadline(Settings.i18n().tr("Financial Details"));
 	    left.addLabelPair(Settings.i18n().tr("One-time costs"), control.getMoneyOnce());

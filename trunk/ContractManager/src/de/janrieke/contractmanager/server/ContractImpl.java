@@ -184,6 +184,26 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		return (String) getAttribute("name"); // "name" is the sql field name
 	}
 
+	@Override
+	public String getContractNumber() throws RemoteException {
+		return (String) getAttribute("contract_no");
+	}
+
+	@Override
+	public void setContractNumber(String contractNo) throws RemoteException {
+		setAttribute("contract_no", contractNo);
+	}
+
+	@Override
+	public String getCustomerNumber() throws RemoteException {
+		return (String) getAttribute("customer_no");
+	}
+
+	@Override
+	public void setCustomerNumber(String customerNo) throws RemoteException {
+		setAttribute("customer_no", customerNo);
+	}
+
 	/**
 	 * @see de.janrieke.contractmanager.rmi.Contract#getDescription()
 	 */
