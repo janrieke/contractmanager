@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Listener;
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion;
 import de.janrieke.contractmanager.gui.menu.ContractListMenu;
+import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
 import de.willuhn.datasource.rmi.DBIterator;
@@ -68,6 +69,17 @@ public class ContractControl extends AbstractControl {
 	private DecimalInput moneyPerMonth;
 	private DecimalInput moneyPerYear;
 
+	private Input partnerName;
+	private Input partnerStreet;
+	private Input partnerNumber;
+	private Input partnerStreetNumber;
+	private Input partnerExtra;
+	private Input partnerZipcode;
+	private Input partnerCity;
+	private Input partnerZipcodeCity;
+	private Input partnerState;
+	private Input partnerCountry;
+	
 
 	// list of transactions contained in this contract
 	//private TablePart transactionList;
@@ -357,6 +369,72 @@ public class ContractControl extends AbstractControl {
 		}
 		return moneyPerYear;
 	}
+	
+	public Input getPartnerName() throws RemoteException {
+		if (partnerName == null)
+			partnerName = new TextInput(getContract().getAddress().getName(), 255);
+		return partnerName;
+	}
+
+	public Input getPartnerStreet() throws RemoteException {
+		if (partnerStreet == null)
+			partnerStreet = new TextInput(getContract().getAddress().getStreet(), 255);
+		return partnerStreet;
+	}
+
+	public Input getPartnerNumber() throws RemoteException {
+		if (partnerNumber == null)
+			partnerNumber = new TextInput(getContract().getAddress().getNumber(), 255);
+		return partnerNumber;
+	}
+
+	public Input getPartnerStreetNumber() throws RemoteException {
+		if (partnerStreetNumber != null)
+			return partnerStreetNumber;
+
+		partnerStreetNumber = new MultiInput(getPartnerStreet(), getPartnerNumber());
+		
+		return partnerStreetNumber;
+	}
+
+	public Input getPartnerExtra() throws RemoteException {
+		if (partnerExtra == null)
+			partnerExtra = new TextInput(getContract().getAddress().getExtra(), 255);
+		return partnerExtra;
+	}
+
+	public Input getPartnerZipcode() throws RemoteException {
+		if (partnerZipcode == null)
+			partnerZipcode = new TextInput(getContract().getAddress().getZipcode(), 255);
+		return partnerZipcode;
+	}
+
+	public Input getPartnerCity() throws RemoteException {
+		if (partnerCity == null)
+			partnerCity = new TextInput(getContract().getAddress().getCity(), 255);
+		return partnerCity;
+	}
+
+	public Input getPartnerZipcodeCity() throws RemoteException {
+		if (partnerZipcodeCity != null)
+			return partnerZipcodeCity;
+
+		partnerZipcodeCity = new MultiInput(getPartnerZipcode(), getPartnerCity());
+		
+		return partnerZipcodeCity;
+	}
+
+	public Input getPartnerState() throws RemoteException {
+		if (partnerState == null)
+			partnerState = new TextInput(getContract().getAddress().getState(), 255);
+		return partnerState;
+	}
+
+	public Input getPartnerCountry() throws RemoteException {
+		if (partnerCountry == null)
+			partnerCountry = new TextInput(getContract().getAddress().getCountry(), 255);
+		return partnerCountry;
+	}
 
 	/**
 	 * Creates a table containing all contracts.
@@ -471,10 +549,22 @@ public class ContractControl extends AbstractControl {
 			d = (Double) getMoneyPerYear().getValue();
 			p.setMoneyPerYear(d == null ? 0.0 : d.doubleValue());
 
-			// Now, let's store the contract
+
+			Address a = getContract().getAddress();
+			a.setName((String) getPartnerName().getValue());
+			a.setStreet((String) getPartnerStreet().getValue());
+			a.setNumber((String) getPartnerNumber().getValue());
+			a.setExtra((String) getPartnerExtra().getValue());
+			a.setZipcode((String) getPartnerZipcode().getValue());
+			a.setCity((String) getPartnerCity().getValue());
+			a.setState((String) getPartnerState().getValue());
+			a.setCountry((String) getPartnerCountry().getValue());
+			
+			// Now, let's store the contract and its address.
 			// The store() method throws ApplicationExceptions if
 			// insertCheck() or updateCheck() failed.
 			try {
+				a.store();
 				p.store();
 				GUI.getStatusBar().setSuccessText(
 						Settings.i18n().tr("Contract stored successfully"));

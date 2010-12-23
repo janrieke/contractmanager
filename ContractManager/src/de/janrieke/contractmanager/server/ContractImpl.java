@@ -280,11 +280,24 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		// Yes, we can cast this directly to Project, because
 		// getForeignObject(String)
 		// contains the mapping for this attribute.
+		Address result;
 		try {
-			return (Address) getAttribute("address_id");
+			result = (Address) getAttribute("address_id");
 		} catch (ObjectNotFoundException e) {
-			return null;
+			result = null;
 		}
+		if (result == null) {
+			try {
+				result = (Address) Settings.getDBService().createObject(
+						Address.class, null);
+			} catch (RemoteException e) {
+				throw new RemoteException(Settings.i18n().tr(
+						"error while creating new address"), e);
+			}
+			setAddress(result);
+		}
+			
+		return result;
 	}
 
 	/**
@@ -309,7 +322,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public IntervalType getCancellationPeriodType() throws RemoteException {
 		Object type = getAttribute("cancelation_period_type");
-		return type==null?null:IntervalType.values()[(Integer) getAttribute("cancelation_period_type")];
+		return type==null?IntervalType.DAYS:IntervalType.values()[(Integer) getAttribute("cancelation_period_type")];
 	}
 
 	@Override
@@ -331,7 +344,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public Integer getFirstMinRuntimeCount() throws RemoteException {
 		Integer i = (Integer) getAttribute("first_min_runtime_count");
-		return i == null ? -1 : i;
+		return i == null ? 0 : i;
 	}
 
 	@Override
@@ -342,7 +355,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public IntervalType getFirstMinRuntimeType() throws RemoteException {
 		Object type = getAttribute("first_min_runtime_type");
-		return type==null?null:IntervalType.values()[(Integer) getAttribute("first_min_runtime_type")];
+		return type==null?IntervalType.DAYS:IntervalType.values()[(Integer) getAttribute("first_min_runtime_type")];
 	}
 
 	@Override
@@ -353,7 +366,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public Integer getNextMinRuntimeCount() throws RemoteException {
 		Integer i = (Integer) getAttribute("next_min_runtime_count");
-		return i == null ? -1 : i;
+		return i == null ? 0 : i;
 	}
 
 	@Override
@@ -364,7 +377,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public IntervalType getNextMinRuntimeType() throws RemoteException {
 		Object type = getAttribute("next_min_runtime_type");
-		return type==null?null:IntervalType.values()[(Integer) getAttribute("next_min_runtime_type")];
+		return type==null?IntervalType.DAYS:IntervalType.values()[(Integer) getAttribute("next_min_runtime_type")];
 	}
 
 	@Override

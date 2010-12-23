@@ -125,12 +125,12 @@ public class AddressImpl extends AbstractDBObject implements Address {
 	}
 
 	@Override
-	public int getNumber() throws RemoteException {
-		return ((Integer) getAttribute("number")).intValue();
+	public String getNumber() throws RemoteException {
+		return (String) getAttribute("number");
 	}
 
 	@Override
-	public void setNumber(int number) throws RemoteException {
+	public void setNumber(String number) throws RemoteException {
 		setAttribute("number", number);
 	}
 
@@ -145,12 +145,12 @@ public class AddressImpl extends AbstractDBObject implements Address {
 	}
 
 	@Override
-	public int getZipcode() throws RemoteException {
-		return ((Integer) getAttribute("zipcode")).intValue();
+	public String getZipcode() throws RemoteException {
+		return (String) getAttribute("zipcode");
 	}
 
 	@Override
-	public void setZipcode(int zipcode) throws RemoteException {
+	public void setZipcode(String zipcode) throws RemoteException {
 		setAttribute("zipcode", zipcode);
 	}
 
