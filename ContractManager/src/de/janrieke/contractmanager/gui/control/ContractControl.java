@@ -43,6 +43,8 @@ public class ContractControl extends AbstractControl {
 
 	// Input fields for the contract attributes,
 	private Input name;
+	private Input contractNo;
+	private Input customerNo;
 	private Input comment;
 	private DateDialogInputAutoCompletion startDate;
 	private DateDialogInputAutoCompletion endDate;
@@ -108,6 +110,18 @@ public class ContractControl extends AbstractControl {
 		if (name == null)
 			name = new TextInput(getContract().getName(), 255); // "255" is the maximum length for this input field.
 		return name;
+	}
+
+	public Input getContractNumber() throws RemoteException {
+		if (contractNo == null)
+			contractNo = new TextInput(getContract().getContractNumber(), 255); // "255" is the maximum length for this input field.
+		return contractNo;
+	}
+
+	public Input getCustomerNumber() throws RemoteException {
+		if (customerNo == null)
+			customerNo = new TextInput(getContract().getCustomerNumber(), 255); // "255" is the maximum length for this input field.
+		return customerNo;
 	}
 
 	/**
@@ -433,6 +447,8 @@ public class ContractControl extends AbstractControl {
 
 			// invoke all Setters of this contract and assign the current values
 			p.setName((String) getName().getValue());
+			p.setContractNumber((String) getContractNumber().getValue());
+			p.setCustomerNumber((String) getCustomerNumber().getValue());
 			p.setComment((String) getComment().getValue());
 			p.setStartDate((Date) getStartDate().getValue());
 			p.setEndDate((Date) getEndDate().getValue());

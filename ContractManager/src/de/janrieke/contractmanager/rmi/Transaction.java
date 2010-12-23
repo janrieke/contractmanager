@@ -11,7 +11,6 @@ import de.willuhn.datasource.rmi.DBObject;
  * );
  */
 public interface Transaction extends DBObject {
-
 	public Contract getContract();
 	public void setContract(Contract contract);
 }

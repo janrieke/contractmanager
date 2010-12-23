@@ -22,11 +22,11 @@ CREATE TABLE contract (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE umsaetze (
-  umsatz_id int(5),
+CREATE TABLE transactions (
+  transaction_id int(5),
   contract_id int(5),
-  UNIQUE (umsatz_id),
-  PRIMARY KEY (umsatz_id)
+  UNIQUE (transaction_id),
+  PRIMARY KEY (transaction_id)
 );
 
 CREATE TABLE address (
