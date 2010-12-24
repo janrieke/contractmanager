@@ -54,7 +54,7 @@ public class ContractControl extends AbstractControl {
 	private MultiInput cancellationPeriodMulti;
 	private IntegerInput cancellationPeriodCount;
 	private SelectInput cancellationPeriodType;
-	
+
 	private Input firstMinRuntimeMulti;
 	private IntegerInput firstMinRuntimeCount;
 	private SelectInput firstMinRuntimeType;
@@ -79,16 +79,14 @@ public class ContractControl extends AbstractControl {
 	private Input partnerZipcodeCity;
 	private Input partnerState;
 	private Input partnerCountry;
-	
 
 	// list of transactions contained in this contract
-	//private TablePart transactionList;
+	// private TablePart transactionList;
 
 	// this is the currently opened contract
 	private Contract contract;
 
 	private LabelInput nextCancellationDeadline;
-
 
 	/**
 	 * ct.
@@ -120,19 +118,39 @@ public class ContractControl extends AbstractControl {
 	 */
 	public Input getName() throws RemoteException {
 		if (name == null)
-			name = new TextInput(getContract().getName(), 255); // "255" is the maximum length for this input field.
+			name = new TextInput(getContract().getName(), 255); // "255" is the
+																// maximum
+																// length for
+																// this input
+																// field.
 		return name;
 	}
 
 	public Input getContractNumber() throws RemoteException {
 		if (contractNo == null)
-			contractNo = new TextInput(getContract().getContractNumber(), 255); // "255" is the maximum length for this input field.
+			contractNo = new TextInput(getContract().getContractNumber(), 255); // "255"
+																				// is
+																				// the
+																				// maximum
+																				// length
+																				// for
+																				// this
+																				// input
+																				// field.
 		return contractNo;
 	}
 
 	public Input getCustomerNumber() throws RemoteException {
 		if (customerNo == null)
-			customerNo = new TextInput(getContract().getCustomerNumber(), 255); // "255" is the maximum length for this input field.
+			customerNo = new TextInput(getContract().getCustomerNumber(), 255); // "255"
+																				// is
+																				// the
+																				// maximum
+																				// length
+																				// for
+																				// this
+																				// input
+																				// field.
 		return customerNo;
 	}
 
@@ -157,7 +175,7 @@ public class ContractControl extends AbstractControl {
 	public Input getMoneyOnce() throws RemoteException {
 		if (moneyOnce == null) {
 			moneyOnce = new DecimalInput(getContract().getMoneyOnce(),
-				Settings.DECIMALFORMAT);
+					Settings.DECIMALFORMAT);
 			moneyOnce.setComment(Settings.CURRENCY);
 		}
 		return moneyOnce;
@@ -189,14 +207,15 @@ public class ContractControl extends AbstractControl {
 		});
 
 		Date initial = getContract().getStartDate();
-		String s = initial==null?"YYYY-MM-DD":Settings.DATEFORMAT.format(initial);
+		String s = initial == null ? "YYYY-MM-DD" : Settings.DATEFORMAT
+				.format(initial);
 
 		// Dialog-Input is an Input field that gets its data from a dialog.
 		startDate = new DateDialogInputAutoCompletion(s, d);
 
 		// we store the initial value
 		startDate.setValue(initial);
-		
+
 		return startDate;
 	}
 
@@ -220,9 +239,10 @@ public class ContractControl extends AbstractControl {
 				endDate.setText(Settings.DATEFORMAT.format((Date) event.data));
 			}
 		});
-		
+
 		Date initial = getContract().getEndDate();
-		String s = initial==null?"YYYY-MM-DD":Settings.DATEFORMAT.format(initial);
+		String s = initial == null ? "YYYY-MM-DD" : Settings.DATEFORMAT
+				.format(initial);
 
 		// Dialog-Input is an Input field that gets its data from a dialog.
 		endDate = new DateDialogInputAutoCompletion(s, d);
@@ -252,57 +272,63 @@ public class ContractControl extends AbstractControl {
 				: Settings.DATEFORMAT.format(ne));
 		return nextCancellationDeadline;
 	}
-	
+
 	public Input getCancellationPeriod() throws RemoteException {
 		if (cancellationPeriodMulti != null)
 			return cancellationPeriodMulti;
 
-		cancellationPeriodMulti = new MultiInput(getCancellationPeriodCount(), getCancellationPeriodType());
-		
+		cancellationPeriodMulti = new MultiInput(getCancellationPeriodCount(),
+				getCancellationPeriodType());
+
 		return cancellationPeriodMulti;
 	}
-	
+
 	public IntegerInput getCancellationPeriodCount() throws RemoteException {
 		if (cancellationPeriodCount == null) {
-			cancellationPeriodCount = new IntegerInput(getContract().getCancellationPeriodCount());
+			cancellationPeriodCount = new IntegerInput(getContract()
+					.getCancellationPeriodCount());
 		}
 		return cancellationPeriodCount;
 	}
-	
+
 	public SelectInput getCancellationPeriodType() throws RemoteException {
 		if (cancellationPeriodType == null) {
-			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>(); 
+			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>();
 			list.add(Contract.IntervalType.DAYS);
 			list.add(Contract.IntervalType.MONTHS);
 			list.add(Contract.IntervalType.YEARS);
-			cancellationPeriodType = new SelectInput(list, getContract().getCancellationPeriodType());
+			cancellationPeriodType = new SelectInput(list, getContract()
+					.getCancellationPeriodType());
 		}
 		return cancellationPeriodType;
 	}
-	
+
 	public Input getFirstMinRuntime() throws RemoteException {
 		if (firstMinRuntimeMulti != null)
 			return firstMinRuntimeMulti;
 
-		firstMinRuntimeMulti = new MultiInput(getFirstMinRuntimeCount(), getFirstMinRuntimeType());
-		
+		firstMinRuntimeMulti = new MultiInput(getFirstMinRuntimeCount(),
+				getFirstMinRuntimeType());
+
 		return firstMinRuntimeMulti;
 	}
-	
+
 	public IntegerInput getFirstMinRuntimeCount() throws RemoteException {
 		if (firstMinRuntimeCount == null) {
-			firstMinRuntimeCount = new IntegerInput(getContract().getFirstMinRuntimeCount());
+			firstMinRuntimeCount = new IntegerInput(getContract()
+					.getFirstMinRuntimeCount());
 		}
 		return firstMinRuntimeCount;
 	}
-	
+
 	public SelectInput getFirstMinRuntimeType() throws RemoteException {
 		if (firstMinRuntimeType == null) {
-			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>(); 
+			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>();
 			list.add(Contract.IntervalType.DAYS);
 			list.add(Contract.IntervalType.MONTHS);
 			list.add(Contract.IntervalType.YEARS);
-			firstMinRuntimeType = new SelectInput(list, getContract().getFirstMinRuntimeType());
+			firstMinRuntimeType = new SelectInput(list, getContract()
+					.getFirstMinRuntimeType());
 		}
 		return firstMinRuntimeType;
 	}
@@ -311,28 +337,31 @@ public class ContractControl extends AbstractControl {
 		if (nextMinRuntimeMulti != null)
 			return nextMinRuntimeMulti;
 
-		nextMinRuntimeMulti = new MultiInput(getNextMinRuntimeCount(), getNextMinRuntimeType());
-		
+		nextMinRuntimeMulti = new MultiInput(getNextMinRuntimeCount(),
+				getNextMinRuntimeType());
+
 		return nextMinRuntimeMulti;
 	}
-	
+
 	public IntegerInput getNextMinRuntimeCount() throws RemoteException {
 		if (nextMinRuntimeCount == null) {
-			nextMinRuntimeCount = new IntegerInput(getContract().getNextMinRuntimeCount());
+			nextMinRuntimeCount = new IntegerInput(getContract()
+					.getNextMinRuntimeCount());
 		}
 		return nextMinRuntimeCount;
 	}
-	
+
 	public SelectInput getNextMinRuntimeType() throws RemoteException {
 		if (nextMinRuntimeType == null) {
-			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>(); 
+			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>();
 			list.add(Contract.IntervalType.DAYS);
 			list.add(Contract.IntervalType.MONTHS);
 			list.add(Contract.IntervalType.YEARS);
-			nextMinRuntimeType = new SelectInput(list, getContract().getNextMinRuntimeType());
+			nextMinRuntimeType = new SelectInput(list, getContract()
+					.getNextMinRuntimeType());
 		}
 		return nextMinRuntimeType;
-	}	
+	}
 
 	public DecimalInput getMoneyPerDay() throws RemoteException {
 		if (moneyPerDay == null) {
@@ -369,22 +398,25 @@ public class ContractControl extends AbstractControl {
 		}
 		return moneyPerYear;
 	}
-	
+
 	public Input getPartnerName() throws RemoteException {
 		if (partnerName == null)
-			partnerName = new TextInput(getContract().getAddress().getName(), 255);
+			partnerName = new TextInput(getContract().getAddress().getName(),
+					255);
 		return partnerName;
 	}
 
 	public Input getPartnerStreet() throws RemoteException {
 		if (partnerStreet == null)
-			partnerStreet = new TextInput(getContract().getAddress().getStreet(), 255);
+			partnerStreet = new TextInput(getContract().getAddress()
+					.getStreet(), 255);
 		return partnerStreet;
 	}
 
 	public Input getPartnerNumber() throws RemoteException {
 		if (partnerNumber == null)
-			partnerNumber = new TextInput(getContract().getAddress().getNumber(), 255);
+			partnerNumber = new TextInput(getContract().getAddress()
+					.getNumber(), 255);
 		return partnerNumber;
 	}
 
@@ -392,26 +424,30 @@ public class ContractControl extends AbstractControl {
 		if (partnerStreetNumber != null)
 			return partnerStreetNumber;
 
-		partnerStreetNumber = new MultiInput(getPartnerStreet(), getPartnerNumber());
-		
+		partnerStreetNumber = new MultiInput(getPartnerStreet(),
+				getPartnerNumber());
+
 		return partnerStreetNumber;
 	}
 
 	public Input getPartnerExtra() throws RemoteException {
 		if (partnerExtra == null)
-			partnerExtra = new TextInput(getContract().getAddress().getExtra(), 255);
+			partnerExtra = new TextInput(getContract().getAddress().getExtra(),
+					255);
 		return partnerExtra;
 	}
 
 	public Input getPartnerZipcode() throws RemoteException {
 		if (partnerZipcode == null)
-			partnerZipcode = new TextInput(getContract().getAddress().getZipcode(), 255);
+			partnerZipcode = new TextInput(getContract().getAddress()
+					.getZipcode(), 255);
 		return partnerZipcode;
 	}
 
 	public Input getPartnerCity() throws RemoteException {
 		if (partnerCity == null)
-			partnerCity = new TextInput(getContract().getAddress().getCity(), 255);
+			partnerCity = new TextInput(getContract().getAddress().getCity(),
+					255);
 		return partnerCity;
 	}
 
@@ -419,20 +455,23 @@ public class ContractControl extends AbstractControl {
 		if (partnerZipcodeCity != null)
 			return partnerZipcodeCity;
 
-		partnerZipcodeCity = new MultiInput(getPartnerZipcode(), getPartnerCity());
-		
+		partnerZipcodeCity = new MultiInput(getPartnerZipcode(),
+				getPartnerCity());
+
 		return partnerZipcodeCity;
 	}
 
 	public Input getPartnerState() throws RemoteException {
 		if (partnerState == null)
-			partnerState = new TextInput(getContract().getAddress().getState(), 255);
+			partnerState = new TextInput(getContract().getAddress().getState(),
+					255);
 		return partnerState;
 	}
 
 	public Input getPartnerCountry() throws RemoteException {
 		if (partnerCountry == null)
-			partnerCountry = new TextInput(getContract().getAddress().getCountry(), 255);
+			partnerCountry = new TextInput(getContract().getAddress()
+					.getCountry(), 255);
 		return partnerCountry;
 	}
 
@@ -456,7 +495,8 @@ public class ContractControl extends AbstractControl {
 		DBIterator contracts = service.createList(Contract.class);
 
 		// 4) create the table
-		contractList = new TablePart(contracts,
+		contractList = new TablePart(
+				contracts,
 				new de.janrieke.contractmanager.gui.action.ShowContractDetailView());
 
 		// 5) now we have to add some columns.
@@ -468,8 +508,10 @@ public class ContractControl extends AbstractControl {
 				new DateFormatter(Settings.DATEFORMAT));
 		contractList.addColumn(Settings.i18n().tr("End date"), "enddate",
 				new DateFormatter(Settings.DATEFORMAT));
-		contractList.addColumn(Settings.i18n().tr("Next cancellation deadline"), "nextCancellationDeadline",
-				new DateFormatter(Settings.DATEFORMAT));
+		contractList.addColumn(
+				Settings.i18n().tr("Next cancellation deadline"),
+				"nextCancellationDeadline", new DateFormatter(
+						Settings.DATEFORMAT));
 
 		// 7) we are adding a context menu
 		contractList.setContextMenu(new ContractListMenu());
@@ -482,38 +524,38 @@ public class ContractControl extends AbstractControl {
 	 * @return list of tasks in this contract
 	 * @throws RemoteException
 	 */
-//	public Part getTransactionList() throws RemoteException {
-//		if (transactionList != null)
-//			return transactionList;
-//
-//		GenericIterator transactions = getContract().getTransactions();
-//		transactionList = new TablePart(transactions, new TransactionDetail());
-//		transactionList.addColumn(Settings.i18n().tr("Task name"), "name");
-//		transactionList.addColumn(Settings.i18n().tr("Effort"), "effort",
-//				new Formatter() {
-//					@Override
-//					public String format(Object o) {
-//						if (o == null)
-//							return "-";
-//						return o + " h";
-//					}
-//				});
-//
-//		TransactionListMenu tlm = new TransactionListMenu();
-//
-//		// we add an additional menu item to create tasks with predefined
-//		// contract.
-//		tlm.addItem(new ContextMenuItem(Settings.i18n().tr(
-//				"Create new task within this Contract"), new Action() {
-//			public void handleAction(Object context)
-//					throws ApplicationException {
-//				new TransactionDetail().handleAction(getContract());
-//			}
-//		}));
-//		transactionList.setContextMenu(tlm);
-//		transactionList.setSummary(false);
-//		return transactionList;
-//	}
+	// public Part getTransactionList() throws RemoteException {
+	// if (transactionList != null)
+	// return transactionList;
+	//
+	// GenericIterator transactions = getContract().getTransactions();
+	// transactionList = new TablePart(transactions, new TransactionDetail());
+	// transactionList.addColumn(Settings.i18n().tr("Task name"), "name");
+	// transactionList.addColumn(Settings.i18n().tr("Effort"), "effort",
+	// new Formatter() {
+	// @Override
+	// public String format(Object o) {
+	// if (o == null)
+	// return "-";
+	// return o + " h";
+	// }
+	// });
+	//
+	// TransactionListMenu tlm = new TransactionListMenu();
+	//
+	// // we add an additional menu item to create tasks with predefined
+	// // contract.
+	// tlm.addItem(new ContextMenuItem(Settings.i18n().tr(
+	// "Create new task within this Contract"), new Action() {
+	// public void handleAction(Object context)
+	// throws ApplicationException {
+	// new TransactionDetail().handleAction(getContract());
+	// }
+	// }));
+	// transactionList.setContextMenu(tlm);
+	// transactionList.setSummary(false);
+	// return transactionList;
+	// }
 
 	/**
 	 * This method stores the contract using the current values.
@@ -531,12 +573,18 @@ public class ContractControl extends AbstractControl {
 			p.setStartDate((Date) getStartDate().getValue());
 			p.setEndDate((Date) getEndDate().getValue());
 
-			p.setCancelationPeriodCount((Integer) getCancellationPeriodCount().getValue());
-			p.setCancelationPeriodType((IntervalType) getCancellationPeriodType().getValue());
-			p.setFirstMinRuntimeCount((Integer) getFirstMinRuntimeCount().getValue());
-			p.setFirstMinRuntimeType((IntervalType) getFirstMinRuntimeType().getValue());
-			p.setNextMinRuntimeCount((Integer) getNextMinRuntimeCount().getValue());
-			p.setNextMinRuntimeType((IntervalType) getNextMinRuntimeType().getValue());
+			p.setCancelationPeriodCount((Integer) getCancellationPeriodCount()
+					.getValue());
+			p.setCancelationPeriodType((IntervalType) getCancellationPeriodType()
+					.getValue());
+			p.setFirstMinRuntimeCount((Integer) getFirstMinRuntimeCount()
+					.getValue());
+			p.setFirstMinRuntimeType((IntervalType) getFirstMinRuntimeType()
+					.getValue());
+			p.setNextMinRuntimeCount((Integer) getNextMinRuntimeCount()
+					.getValue());
+			p.setNextMinRuntimeType((IntervalType) getNextMinRuntimeType()
+					.getValue());
 
 			Double d = (Double) getMoneyOnce().getValue();
 			p.setMoneyOnce(d == null ? 0.0 : d.doubleValue());
@@ -549,7 +597,6 @@ public class ContractControl extends AbstractControl {
 			d = (Double) getMoneyPerYear().getValue();
 			p.setMoneyPerYear(d == null ? 0.0 : d.doubleValue());
 
-
 			Address a = getContract().getAddress();
 			a.setName((String) getPartnerName().getValue());
 			a.setStreet((String) getPartnerStreet().getValue());
@@ -559,12 +606,15 @@ public class ContractControl extends AbstractControl {
 			a.setCity((String) getPartnerCity().getValue());
 			a.setState((String) getPartnerState().getValue());
 			a.setCountry((String) getPartnerCountry().getValue());
-			
+
 			// Now, let's store the contract and its address.
 			// The store() method throws ApplicationExceptions if
 			// insertCheck() or updateCheck() failed.
 			try {
 				a.store();
+				// We have to set the address here, because a new, unstored
+				// object has no ID, yet.
+				p.setAddress(a);
 				p.store();
 				GUI.getStatusBar().setSuccessText(
 						Settings.i18n().tr("Contract stored successfully"));

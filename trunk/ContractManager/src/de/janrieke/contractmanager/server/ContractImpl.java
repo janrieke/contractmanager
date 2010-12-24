@@ -95,7 +95,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			if (getStartDate() == null && getEndDate() != null)
 				throw new ApplicationException(Settings.i18n().tr(
 						"Start date must be set if end date is."));
-			
+
 			if (getStartDate() != null && getEndDate() != null
 					&& getStartDate().after(getEndDate()))
 				throw new ApplicationException(Settings.i18n().tr(
@@ -136,7 +136,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			return Address.class;
 		return null;
 	}
-	
+
 	/**
 	 * We overwrite the delete method to delete all assigned transactions too.
 	 * 
@@ -172,8 +172,13 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		}
 	}
 
+	// FIELD DATA ACCESS
+	public Object getAttribute(String arg0) throws RemoteException {
+		// if ("address_id".equals(arg0))
+		// return getAddress();
 
-	//FIELD DATA ACCESS
+		return super.getAttribute(arg0);
+	}
 
 	/**
 	 * @see de.janrieke.contractmanager.rmi.Contract#getName()
@@ -274,7 +279,6 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		}
 	}
 
-
 	@Override
 	public Address getAddress() throws RemoteException {
 		// Yes, we can cast this directly to Project, because
@@ -294,9 +298,11 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 				throw new RemoteException(Settings.i18n().tr(
 						"error while creating new address"), e);
 			}
-			setAddress(result);
+			// setAddress(result);
+			// we set that later during store, because a new, unstored object
+			// has no ID, yet.
 		}
-			
+
 		return result;
 	}
 
@@ -322,11 +328,13 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public IntervalType getCancellationPeriodType() throws RemoteException {
 		Object type = getAttribute("cancelation_period_type");
-		return type==null?IntervalType.DAYS:IntervalType.values()[(Integer) getAttribute("cancelation_period_type")];
+		return type == null ? IntervalType.DAYS
+				: IntervalType.values()[(Integer) getAttribute("cancelation_period_type")];
 	}
 
 	@Override
-	public void setCancelationPeriodType(IntervalType type) throws RemoteException {
+	public void setCancelationPeriodType(IntervalType type)
+			throws RemoteException {
 		setAttribute("cancelation_period_type", type.ordinal());
 	}
 
@@ -355,11 +363,13 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public IntervalType getFirstMinRuntimeType() throws RemoteException {
 		Object type = getAttribute("first_min_runtime_type");
-		return type==null?IntervalType.DAYS:IntervalType.values()[(Integer) getAttribute("first_min_runtime_type")];
+		return type == null ? IntervalType.DAYS
+				: IntervalType.values()[(Integer) getAttribute("first_min_runtime_type")];
 	}
 
 	@Override
-	public void setFirstMinRuntimeType(IntervalType type) throws RemoteException {
+	public void setFirstMinRuntimeType(IntervalType type)
+			throws RemoteException {
 		setAttribute("first_min_runtime_type", type.ordinal());
 	}
 
@@ -377,7 +387,8 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public IntervalType getNextMinRuntimeType() throws RemoteException {
 		Object type = getAttribute("next_min_runtime_type");
-		return type==null?IntervalType.DAYS:IntervalType.values()[(Integer) getAttribute("next_min_runtime_type")];
+		return type == null ? IntervalType.DAYS
+				: IntervalType.values()[(Integer) getAttribute("next_min_runtime_type")];
 	}
 
 	@Override
@@ -440,90 +451,99 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		setAttribute("money_per_year", new Double(money));
 	}
 
-	private Date calculatePeriods(boolean minusCancellationPeriod) throws RemoteException {
+	private Date calculatePeriods(boolean minusCancellationPeriod)
+			throws RemoteException {
 		if (getEndDate() != null)
-			return null; //if the end is already set, there is no need for further cancellations
-		
+			return null; // if the end is already set, there is no need for
+							// further cancellations
+
 		Date startDate = getStartDate();
 		if (startDate == null)
 			return null;
-        Calendar today = Calendar.getInstance();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(startDate);
-        
-        if (minusCancellationPeriod) {
-            IntervalType cancellationPeriodType = getCancellationPeriodType();
-            Integer cancellationPeriodCount = getCancellationPeriodCount()+1; //one more day, as this is a deadline
+		Calendar today = Calendar.getInstance();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(startDate);
 
-            //if the period is invalid, assume there is none
-            if (cancellationPeriodType != null && cancellationPeriodCount != null && cancellationPeriodCount > 0) {
-            	switch (cancellationPeriodType) {
-            	case DAYS:
-            		calendar.add(Calendar.DAY_OF_MONTH, -cancellationPeriodCount);
-            		break;
-            	case MONTHS:
-            		calendar.add(Calendar.MONTH, -cancellationPeriodCount);
-            		break;
-            	case YEARS:
-            		calendar.add(Calendar.YEAR, -cancellationPeriodCount);
-            		break;
-            	}
-            }
-        }
-        
-        IntervalType firstMinRuntimeType = getFirstMinRuntimeType();
-        Integer firstMinRuntimeCount = getFirstMinRuntimeCount();
-        IntervalType nextMinRuntimeType = getNextMinRuntimeType();
-        Integer nextMinRuntimeCount = getNextMinRuntimeCount();
+		if (minusCancellationPeriod) {
+			IntervalType cancellationPeriodType = getCancellationPeriodType();
+			// one more day, as this is a deadline
+			Integer cancellationPeriodCount = getCancellationPeriodCount() + 1;
 
-        //if one of the runtime definition is invalid, use the other one
-        if (firstMinRuntimeType == null || firstMinRuntimeCount == null || firstMinRuntimeCount < 0) {
-        	firstMinRuntimeCount = nextMinRuntimeCount;
-        	firstMinRuntimeType = nextMinRuntimeType;
-        }
-        if (nextMinRuntimeType == null || nextMinRuntimeCount == null || nextMinRuntimeCount < 0) {
-        	nextMinRuntimeCount = firstMinRuntimeCount;
-        	nextMinRuntimeType = firstMinRuntimeType;
-        }
-        //do nothing if both are invalid
-        if (nextMinRuntimeType == null || nextMinRuntimeCount == null || nextMinRuntimeCount < 0)
-        	return null;
-        
-        if (firstMinRuntimeCount == 0)
-        	return null; //"0" encodes a daily runtime extension
-        
-        boolean first = true;
-		
-        while (calendar.before(today)) {
-        	if (first) {
-        		switch (firstMinRuntimeType) {
-        		case DAYS:
-        			calendar.add(Calendar.DAY_OF_MONTH, firstMinRuntimeCount);
-        			break;
-        		case MONTHS:
-        			calendar.add(Calendar.MONTH, firstMinRuntimeCount);
-        			break;
-        		case YEARS:
-        			calendar.add(Calendar.YEAR, firstMinRuntimeCount);
-        			break;
-        		}
-        		first = false;
-        	} else {
-                if (nextMinRuntimeCount == 0)
-                	return null; //"0" encodes a daily runtime extension
-        		switch (nextMinRuntimeType) {
-        		case DAYS:
-        			calendar.add(Calendar.DAY_OF_MONTH, nextMinRuntimeCount);
-        			break;
-        		case MONTHS:
-        			calendar.add(Calendar.MONTH, nextMinRuntimeCount);
-        			break;
-        		case YEARS:
-        			calendar.add(Calendar.YEAR, nextMinRuntimeCount);
-        			break;
-        		}
-        	}
-        }
+			// if the period is invalid, assume there is none
+			if (cancellationPeriodType != null
+					&& cancellationPeriodCount != null
+					&& cancellationPeriodCount > 0) {
+				switch (cancellationPeriodType) {
+				case DAYS:
+					calendar.add(Calendar.DAY_OF_MONTH,
+							-cancellationPeriodCount);
+					break;
+				case MONTHS:
+					calendar.add(Calendar.MONTH, -cancellationPeriodCount);
+					break;
+				case YEARS:
+					calendar.add(Calendar.YEAR, -cancellationPeriodCount);
+					break;
+				}
+			}
+		}
+
+		IntervalType firstMinRuntimeType = getFirstMinRuntimeType();
+		Integer firstMinRuntimeCount = getFirstMinRuntimeCount();
+		IntervalType nextMinRuntimeType = getNextMinRuntimeType();
+		Integer nextMinRuntimeCount = getNextMinRuntimeCount();
+
+		// if one of the runtime definition is invalid, use the other one
+		if (firstMinRuntimeType == null || firstMinRuntimeCount == null
+				|| firstMinRuntimeCount < 0) {
+			firstMinRuntimeCount = nextMinRuntimeCount;
+			firstMinRuntimeType = nextMinRuntimeType;
+		}
+		if (nextMinRuntimeType == null || nextMinRuntimeCount == null
+				|| nextMinRuntimeCount < 0) {
+			nextMinRuntimeCount = firstMinRuntimeCount;
+			nextMinRuntimeType = firstMinRuntimeType;
+		}
+		// do nothing if both are invalid
+		if (nextMinRuntimeType == null || nextMinRuntimeCount == null
+				|| nextMinRuntimeCount < 0)
+			return null;
+
+		if (firstMinRuntimeCount == 0)
+			return null; // "0" encodes a daily runtime extension
+
+		boolean first = true;
+
+		while (calendar.before(today)) {
+			if (first) {
+				switch (firstMinRuntimeType) {
+				case DAYS:
+					calendar.add(Calendar.DAY_OF_MONTH, firstMinRuntimeCount);
+					break;
+				case MONTHS:
+					calendar.add(Calendar.MONTH, firstMinRuntimeCount);
+					break;
+				case YEARS:
+					calendar.add(Calendar.YEAR, firstMinRuntimeCount);
+					break;
+				}
+				first = false;
+			} else {
+				if (nextMinRuntimeCount == 0)
+					return null; // "0" encodes a daily runtime extension
+				switch (nextMinRuntimeType) {
+				case DAYS:
+					calendar.add(Calendar.DAY_OF_MONTH, nextMinRuntimeCount);
+					break;
+				case MONTHS:
+					calendar.add(Calendar.MONTH, nextMinRuntimeCount);
+					break;
+				case YEARS:
+					calendar.add(Calendar.YEAR, nextMinRuntimeCount);
+					break;
+				}
+			}
+		}
 
 		return calendar.getTime();
 	}
