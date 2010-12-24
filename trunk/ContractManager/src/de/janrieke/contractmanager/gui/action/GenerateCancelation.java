@@ -60,14 +60,14 @@ public class GenerateCancelation implements Action {
 			//retrieve variable values
 			Map<String, String> values = new HashMap<String, String>();
 
-			values.put("NAME", "");
-			values.put("STREET", "");
-			values.put("NUMBER", "");
-			values.put("EXTRA", "");
-			values.put("ZIPCODE", "");
-			values.put("CITY", "");
-			values.put("STATE", "");
-			values.put("COUNTRY", "");
+			values.put("NAME", p.getAddress().getName());
+			values.put("STREET", p.getAddress().getStreet());
+			values.put("NUMBER", p.getAddress().getNumber());
+			values.put("EXTRA", p.getAddress().getExtra());
+			values.put("ZIPCODE", p.getAddress().getZipcode());
+			values.put("CITY", p.getAddress().getCity());
+			values.put("STATE", p.getAddress().getState());
+			values.put("COUNTRY", p.getAddress().getCountry());
 
 			values.put("FROM_NAME", SettingsUtil.get("name", ""));
 			values.put("FROM_STREET", SettingsUtil.get("street", ""));

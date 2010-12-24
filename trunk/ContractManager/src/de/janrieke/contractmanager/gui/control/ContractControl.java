@@ -624,7 +624,7 @@ public class ContractControl extends AbstractControl {
 		} catch (RemoteException e) {
 			Logger.error("error while storing contract", e);
 			GUI.getStatusBar().setErrorText(
-					Settings.i18n().tr("Error while storing Contract"));
+					Settings.i18n().tr("Error while storing contract"));
 		}
 	}
 }
