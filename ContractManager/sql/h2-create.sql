@@ -50,5 +50,5 @@ CREATE TABLE settings (
   PRIMARY KEY (key)
 );
 
-ALTER TABLE contract ADD CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES address (id) DEFERRABLE;
+ALTER TABLE contract     ADD CONSTRAINT fk_address  FOREIGN KEY (address_id)  REFERENCES address (id)  DEFERRABLE;
 ALTER TABLE transactions ADD CONSTRAINT fk_contract FOREIGN KEY (contract_id) REFERENCES contract (id) DEFERRABLE;
