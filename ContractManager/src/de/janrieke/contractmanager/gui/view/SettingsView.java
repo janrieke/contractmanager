@@ -44,6 +44,11 @@ public class SettingsView extends AbstractView {
 	    left.addLabelPair(Settings.i18n().tr("Email"), control.getEmail());
 	    left.addLabelPair(Settings.i18n().tr("Phone"), control.getPhone());
 
+	    SimpleContainer right = new SimpleContainer(columns.getComposite());
+	    right.addHeadline(Settings.i18n().tr("Miscellaneous"));
+	    right.addLabelPair(Settings.i18n().tr("Extension warning time"), control.getWarningTime());
+
+	    
 		// add some buttons
 	    ButtonArea buttons = new ButtonArea(getParent(), 4);
 
