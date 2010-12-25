@@ -8,69 +8,32 @@
   <description>Contract Manager for Jameica</description>
   <url>http://www.janrieke.de/projects/contractmanager</url>
   <homepage>http://www.janrieke.de/projects/contractmanager</homepage>
-  <license>GPL - http://www.gnu.org/copyleft/gpl.html</license>
+  <license>GPL 2.0 - http://www.gnu.org/licenses/gpl-2.0.txt</license>
 
-  <!-- Define regex wildcards for the classes and jars the classfinder should load -->
+  <requires jameica="1.10+">
+    <!--  <import plugin="hibiscus" version="1.12+" required="false" /> //-->
+  </requires>
+
   <classfinder>
     <include>contractmanager\.jar</include>
     <include>.*\.class</include>
   </classfinder>
 
-  <!-- The content of the following tag is displayed in the menu bar. //-->
   <menu>
-
-    <!-- 
-      
-      Every item must have a "name" and an "action" attribute.
-      the class defined in the attribute "action" has to be a java class name
-      which implements from de.willuhn.jameica.gui.Action.
-      
-      Additionally you can specify a shortcut using "CTRL" or "ALT"
-      as modifier key followed by "+" and a single key.
-      
-      Hint: You can create submenus by cascading "item" tags
-      
-      <item name="entry name"
-            action="com.foo.bar.gui.actions.ExampleAction"
-            shortcut="CTRL+E"/>
-      
-    //-->
     <item name="Contract Manager">
-
-
-      <item name="New Contract" shortcut="ALT+C" action="de.janrieke.contractmanager.gui.action.ShowContractDetailView" />
-
-      <!-- use "-" as name to create a separator //-->
+      <item name="New Contract" shortcut="ALT+C" icon="document-new.png" action="de.janrieke.contractmanager.gui.action.ShowContractDetailView" />
       <item name="-" />
-
-      <item id="de.janrieke.contractmanager.menu.license"      name="Lizenzinformationen"      icon="text-x-generic.png"        action="de.janrieke.contractmanager.gui.action.ShowLicenseInfoView" />
-      <item id="de.janrieke.contractmanager.menu.about"        name="About"                    icon="Information_icon.png"      action="de.janrieke.contractmanager.gui.action.ShowAboutDialog" />
+      <item id="de.janrieke.contractmanager.menu.license"      name="Lizenzinformationen"      icon="text-x-generic.png"      action="de.janrieke.contractmanager.gui.action.ShowLicenseInfoView" />
+      <item id="de.janrieke.contractmanager.menu.about"        name="About"                    icon="gtk-info.png"            action="de.janrieke.contractmanager.gui.action.ShowAboutDialog" />
     </item>
   </menu>
 
-  <!-- the content of this tag will appear within the navigation tree on the left hand //-->
   <navigation>
-
-    <!-- Same procedure as in the menu tag //-->
-
     <item name="Contract Manager" icon-close="folder.gif" icon-open="folderopen.gif" action="de.janrieke.contractmanager.gui.action.ShowWelcomeView">
-      <item name="Contracts" icon-close="page.gif" icon-open="page.gif" action="de.janrieke.contractmanager.gui.action.ShowContractListView" />
-      <item name="Settings" icon-close="page.gif" icon-open="page.gif" action="de.janrieke.contractmanager.gui.action.ShowSettingsView" />
+      <item name="Contracts" icon-close="edit-copy.png" icon-open="edit-copy.png" action="de.janrieke.contractmanager.gui.action.ShowContractListView" />
+      <item name="Settings" icon-close="document-properties.png" icon-open="document-properties.png" action="de.janrieke.contractmanager.gui.action.ShowSettingsView" />
     </item>
   </navigation>
-
-  <!--
-    Here you can define your service classes. This is typically a
-    database connection. You can list more than one service in this
-    section. By using the depends attribute you can define a startup order
-    for your services. Example:
-    
-    <services>
-    <service name="base-service" depends="" autostart="true" class="BaseService" />
-    <service name="extended-service" depends="base-service" autostart="true" class="ExtendedService" />
-    </services>
-    
-    //-->
 
   <services>
     <service name="contract_db" depends="" autostart="true"

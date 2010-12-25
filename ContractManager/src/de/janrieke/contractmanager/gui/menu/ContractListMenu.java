@@ -20,7 +20,7 @@ public class ContractListMenu extends ContextMenu {
 		// CheckedContextMenuItems will be disabled, if the user clicks into an
 		// empty space of the table
 		addItem(new CheckedContextMenuItem(Settings.i18n().tr("Open..."),
-				new ShowContractDetailView()));
+				new ShowContractDetailView(), "document-open.png"));
 
 		// separator
 		addItem(ContextMenuItem.SEPARATOR);
@@ -36,11 +36,11 @@ public class ContractListMenu extends ContextMenu {
 						// project in any case
 						new ShowContractDetailView().handleAction(null);
 					}
-				}));
+				}, "document-new.png"));
 
 		addItem(ContextMenuItem.SEPARATOR);
 		addItem(new CheckedContextMenuItem(
-				Settings.i18n().tr("Delete contract"), new DeleteContract()));
+				Settings.i18n().tr("Delete contract"), new DeleteContract(), "window-close.png"));
 
 	}
 }
