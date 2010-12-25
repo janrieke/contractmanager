@@ -8,6 +8,7 @@ import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.input.Input;
+import de.willuhn.jameica.gui.input.IntegerInput;
 import de.willuhn.jameica.gui.input.MultiInput;
 import de.willuhn.jameica.gui.input.TextInput;
 import de.willuhn.logging.Logger;
@@ -31,6 +32,8 @@ public class SettingsControl extends AbstractControl {
 	private MultiInput zipcodeCity;
 	private TextInput email;
 	private TextInput phone;
+
+	private IntegerInput warningTime;
 
 	/**
 	 * ct.
@@ -119,12 +122,21 @@ public class SettingsControl extends AbstractControl {
 			email = new TextInput(SettingsUtil.get("email", ""), 255);
 		return email;
 	}
+
 	public Input getPhone() throws RemoteException {
 		if (phone == null)
 			phone = new TextInput(SettingsUtil.get("phone", ""), 255);
 		return phone;
 	}
-	
+
+	public IntegerInput getWarningTime() throws RemoteException {
+		if (warningTime == null) {
+			warningTime = new IntegerInput(Integer.parseInt(SettingsUtil.get("extension_warning_time", "30")));
+			warningTime.setComment(Settings.i18n().tr("Days"));
+		}
+		return warningTime;
+	}
+
 	/**
 	 * This method stores the contract using the current values.
 	 */
@@ -140,6 +152,7 @@ public class SettingsControl extends AbstractControl {
 			SettingsUtil.set("country", (String) getCountry().getValue());
 			SettingsUtil.set("email", (String) getEmail().getValue());
 			SettingsUtil.set("phone", (String) getPhone().getValue());
+			SettingsUtil.set("extension_warning_time", ((Integer)getWarningTime().getValue()).toString());
 			GUI.getStatusBar().setSuccessText(
 					Settings.i18n().tr("Settings saved."));
 		} catch (ApplicationException e) {
