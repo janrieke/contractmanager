@@ -1,13 +1,13 @@
 package de.janrieke.contractmanager.gui.view;
 
 import de.janrieke.contractmanager.Settings;
-import de.janrieke.contractmanager.gui.action.NavigateBack;
 import de.janrieke.contractmanager.gui.action.DeleteContract;
 import de.janrieke.contractmanager.gui.action.GenerateCancelation;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
+import de.willuhn.jameica.gui.internal.buttons.Back;
 import de.willuhn.jameica.gui.util.ButtonArea;
 import de.willuhn.jameica.gui.util.ColumnLayout;
 import de.willuhn.jameica.gui.util.Headline;
@@ -74,7 +74,7 @@ public class ContractDetailView extends AbstractView {
 		// add some buttons
 		buttons = new ButtonArea(getParent(), 4);
 
-		buttons.addButton(Settings.i18n().tr("<< Back"), new NavigateBack());
+		buttons.addButton(new Back(false));
 //		buttons.addButton(Settings.i18n().tr("New Task within this Project"),
 //				new TaskDetail(), control.getCurrentObject());
 		buttons.addButton(Settings.i18n().tr("Delete Project"),
