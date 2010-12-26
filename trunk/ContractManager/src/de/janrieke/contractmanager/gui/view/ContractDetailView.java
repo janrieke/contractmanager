@@ -11,6 +11,7 @@ import de.willuhn.jameica.gui.internal.buttons.Back;
 import de.willuhn.jameica.gui.util.ButtonArea;
 import de.willuhn.jameica.gui.util.ColumnLayout;
 import de.willuhn.jameica.gui.util.Headline;
+import de.willuhn.jameica.gui.util.ScrolledContainer;
 import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.util.ApplicationException;
 
@@ -28,8 +29,10 @@ public class ContractDetailView extends AbstractView {
 
 		// instanciate controller
 		final ContractControl control = new ContractControl(this);
+
+	    ScrolledContainer scroller = new ScrolledContainer(getParent());
 		
-	    ColumnLayout columns = new ColumnLayout(getParent(),2);
+	    ColumnLayout columns = new ColumnLayout(scroller.getComposite(), 2);
 	    SimpleContainer left = new SimpleContainer(columns.getComposite());
 
 	    left.addHeadline(Settings.i18n().tr("Contract Information"));
@@ -74,9 +77,9 @@ public class ContractDetailView extends AbstractView {
 
 		buttons.addButton(new Back(false));
 		buttons.addButton(Settings.i18n().tr("Generate Cancelation"), new GenerateCancelation(), control.getCurrentObject(), false, "document-print.png");
-		buttons.addButton(Settings.i18n().tr("Delete Project"),
+		buttons.addButton(Settings.i18n().tr("Delete Contract"),
 				new DeleteContract(), control.getCurrentObject(), false, "window-close.png");
-		buttons.addButton(Settings.i18n().tr("Store Project"), new Action() {
+		buttons.addButton(Settings.i18n().tr("Store Contract"), new Action() {
 			public void handleAction(Object context)
 					throws ApplicationException {
 				control.handleStore();
