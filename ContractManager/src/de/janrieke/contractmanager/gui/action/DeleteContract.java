@@ -1,6 +1,7 @@
 package de.janrieke.contractmanager.gui.action;
 
 import de.janrieke.contractmanager.Settings;
+import de.janrieke.contractmanager.gui.view.ContractDetailView;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
@@ -46,6 +47,9 @@ public class DeleteContract implements Action {
 			throw new ApplicationException(Settings.i18n().tr(
 					"Error while deleting contract"));
 		}
+		
+		if (GUI.getCurrentView() instanceof ContractDetailView)
+			GUI.startPreviousView();
 	}
 
 }

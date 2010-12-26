@@ -1,5 +1,7 @@
 package de.janrieke.contractmanager.rmi;
 
+import java.rmi.RemoteException;
+
 import de.willuhn.datasource.rmi.DBObject;
 
 /*
@@ -11,6 +13,6 @@ import de.willuhn.datasource.rmi.DBObject;
  * );
  */
 public interface Transaction extends DBObject {
-	public Contract getContract();
-	public void setContract(Contract contract);
+	public Contract getContract() throws RemoteException;
+	public void setContract(Contract contract) throws RemoteException;
 }

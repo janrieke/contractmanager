@@ -154,8 +154,8 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 				Transaction t = (Transaction) transactions.next();
 				t.delete();
 			}
-			getAddress().delete();
 			super.delete(); // we delete the contract itself
+			getAddress().delete();
 
 			// everything seems to be ok, lets commit the transaction
 			this.transactionCommit();
