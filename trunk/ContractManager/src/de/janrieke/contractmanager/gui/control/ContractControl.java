@@ -118,39 +118,19 @@ public class ContractControl extends AbstractControl {
 	 */
 	public Input getName() throws RemoteException {
 		if (name == null)
-			name = new TextInput(getContract().getName(), 255); // "255" is the
-																// maximum
-																// length for
-																// this input
-																// field.
+			name = new TextInput(getContract().getName(), 255);
 		return name;
 	}
 
 	public Input getContractNumber() throws RemoteException {
 		if (contractNo == null)
-			contractNo = new TextInput(getContract().getContractNumber(), 255); // "255"
-																				// is
-																				// the
-																				// maximum
-																				// length
-																				// for
-																				// this
-																				// input
-																				// field.
+			contractNo = new TextInput(getContract().getContractNumber(), 255);
 		return contractNo;
 	}
 
 	public Input getCustomerNumber() throws RemoteException {
 		if (customerNo == null)
-			customerNo = new TextInput(getContract().getCustomerNumber(), 255); // "255"
-																				// is
-																				// the
-																				// maximum
-																				// length
-																				// for
-																				// this
-																				// input
-																				// field.
+			customerNo = new TextInput(getContract().getCustomerNumber(), 255);
 		return customerNo;
 	}
 
@@ -425,6 +405,7 @@ public class ContractControl extends AbstractControl {
 			return partnerStreetNumber;
 
 		partnerStreetNumber = new MultiInput(getPartnerStreet(),
+				new LabelInput(Settings.i18n().tr("Number")),
 				getPartnerNumber());
 
 		return partnerStreetNumber;
@@ -456,7 +437,7 @@ public class ContractControl extends AbstractControl {
 			return partnerZipcodeCity;
 
 		partnerZipcodeCity = new MultiInput(getPartnerZipcode(),
-				getPartnerCity());
+				new LabelInput(Settings.i18n().tr("City")), getPartnerCity());
 
 		return partnerZipcodeCity;
 	}

@@ -58,7 +58,7 @@ public class SettingsView extends AbstractView {
 					throws ApplicationException {
 				control.handleStore();
 			}
-		}, null, true); // "true" defines this button as the default button
+		}, null, true, "ok.png");
 	}
 
 	/**
