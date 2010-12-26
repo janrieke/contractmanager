@@ -21,6 +21,7 @@ import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.Part;
 import de.willuhn.jameica.gui.dialogs.CalendarDialog;
+import de.willuhn.jameica.gui.formatter.CurrencyFormatter;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
 import de.willuhn.jameica.gui.input.DecimalInput;
 import de.willuhn.jameica.gui.input.Input;
@@ -495,7 +496,7 @@ public class ContractControl extends AbstractControl {
 						Settings.DATEFORMAT));
 		contractList.addColumn(
 				Settings.i18n().tr("Costs per Period"),
-				"costsPerPeriod");
+				"costsPerPeriod", new CurrencyFormatter(Settings.CURRENCY, Settings.DECIMALFORMAT));
 
 		// 7) we are adding a context menu
 		contractList.setContextMenu(new ContractListMenu());

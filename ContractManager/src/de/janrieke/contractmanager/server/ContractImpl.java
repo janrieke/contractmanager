@@ -175,13 +175,13 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	// FIELD DATA ACCESS
 	public Object getAttribute(String arg0) throws RemoteException {
-		//check derived fields
+		// check derived fields
 		if ("nextCancellationDeadline".equals(arg0))
 			return getNextCancellationDeadline();
 		else if ("nextExtension".equals(arg0))
 			return getNextExtension();
-	    else if ("costsPerPeriod".equals(arg0))
-	        return getCostsPerPeriod();
+		else if ("costsPerPeriod".equals(arg0))
+			return getCostsPerPeriod();
 		else
 			return super.getAttribute(arg0);
 	}
@@ -564,8 +564,50 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		return calculatePeriods(true);
 	}
 
+	private int getNextRuntimeDays() throws RemoteException {
+		if (getEndDate() != null)
+			return 0; // if the end is already set, there is no need for
+						// further cancellations
+
+		Date startDate = getStartDate();
+		if (startDate == null)
+			return 0;
+		IntervalType firstMinRuntimeType = getFirstMinRuntimeType();
+		Integer firstMinRuntimeCount = getFirstMinRuntimeCount();
+		IntervalType nextMinRuntimeType = getNextMinRuntimeType();
+		Integer nextMinRuntimeCount = getNextMinRuntimeCount();
+
+		// if one of the runtime definition is invalid, use the other one
+		if (firstMinRuntimeType == null || firstMinRuntimeCount == null
+				|| firstMinRuntimeCount < 0) {
+			firstMinRuntimeCount = nextMinRuntimeCount;
+			firstMinRuntimeType = nextMinRuntimeType;
+		}
+		if (nextMinRuntimeType == null || nextMinRuntimeCount == null
+				|| nextMinRuntimeCount < 0) {
+			nextMinRuntimeCount = firstMinRuntimeCount;
+			nextMinRuntimeType = firstMinRuntimeType;
+		}
+		// do nothing if both are invalid
+		if (nextMinRuntimeType == null || nextMinRuntimeCount == null
+				|| nextMinRuntimeCount < 0)
+			return 0;
+
+		switch (nextMinRuntimeType) {
+		case DAYS:
+			return nextMinRuntimeCount;
+		case MONTHS:
+			return nextMinRuntimeCount * 30;
+		case YEARS:
+			return nextMinRuntimeCount * 365;
+		}
+		return 0;
+	}
+
 	@Override
 	public double getCostsPerPeriod() throws RemoteException {
-	    return 0d;
+		return (getMoneyPerDay() + getMoneyPerMonth() / 30 + getMoneyPerWeek()
+				/ 7 + getMoneyPerYear() / 365)
+				* getNextRuntimeDays();
 	}
 }
