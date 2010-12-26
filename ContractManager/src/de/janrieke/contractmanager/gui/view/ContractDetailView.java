@@ -56,15 +56,13 @@ public class ContractDetailView extends AbstractView {
 	    left.addLabelPair(Settings.i18n().tr("Following minimum terms"), control.getNextMinRuntime());
 	    left.addLabelPair(Settings.i18n().tr("Next term extension"), control.getNextExtension());
 	    left.addLabelPair(Settings.i18n().tr("Deadline for next cancellation "), control.getNextCancellationDeadline());
-	    ButtonArea buttons = new ButtonArea(getParent(), 1);
-		buttons.addButton(Settings.i18n().tr("Generate Cancelation"), new GenerateCancelation(), control.getCurrentObject());
 
 	    SimpleContainer right = new SimpleContainer(columns.getComposite(), true);
 	    right.addHeadline(Settings.i18n().tr("Contractual Partner Address"));
 	    right.addLabelPair(Settings.i18n().tr("Name/Company"), control.getPartnerName());
 	    right.addLabelPair(Settings.i18n().tr("Street"), control.getPartnerStreetNumber());
 	    right.addLabelPair(Settings.i18n().tr("Extra"), control.getPartnerExtra());
-	    right.addLabelPair(Settings.i18n().tr("City"), control.getPartnerZipcodeCity());
+	    right.addLabelPair(Settings.i18n().tr("Zipcode"), control.getPartnerZipcodeCity());
 	    right.addLabelPair(Settings.i18n().tr("State"), control.getPartnerState());
 	    right.addLabelPair(Settings.i18n().tr("Country"), control.getPartnerCountry());
 	    
@@ -72,19 +70,18 @@ public class ContractDetailView extends AbstractView {
 	    right.addPart(control.getComment());
 	    
 		// add some buttons
-		buttons = new ButtonArea(getParent(), 4);
+		ButtonArea buttons = new ButtonArea(getParent(), 4);
 
 		buttons.addButton(new Back(false));
-//		buttons.addButton(Settings.i18n().tr("New Task within this Project"),
-//				new TaskDetail(), control.getCurrentObject());
+		buttons.addButton(Settings.i18n().tr("Generate Cancelation"), new GenerateCancelation(), control.getCurrentObject(), false, "document-print.png");
 		buttons.addButton(Settings.i18n().tr("Delete Project"),
-				new DeleteContract(), control.getCurrentObject());
+				new DeleteContract(), control.getCurrentObject(), false, "window-close.png");
 		buttons.addButton(Settings.i18n().tr("Store Project"), new Action() {
 			public void handleAction(Object context)
 					throws ApplicationException {
 				control.handleStore();
 			}
-		}, null, true); // "true" defines this button as the default button
+		}, null, true, "document-save.png"); // "true" defines this button as the default button
 
 		// show transactions of this contract
 		new Headline(getParent(), Settings.i18n().tr(

@@ -30,7 +30,7 @@ public class ContractListView extends AbstractView {
 
 		// the last parameter "true" makes the button the default one
 		buttons.addButton(Settings.i18n().tr("Create new contract"),
-				new ShowContractDetailView(), null, true);
+				new ShowContractDetailView(), null, true, "document-new.png");
 
 	}
 
