@@ -127,4 +127,5 @@ public interface Contract extends DBObject {
 	//these are derived features
 	public Date getNextExtension() throws RemoteException;
 	public Date getNextCancellationDeadline() throws RemoteException;
+	public double getCostsPerPeriod() throws RemoteException;
 }

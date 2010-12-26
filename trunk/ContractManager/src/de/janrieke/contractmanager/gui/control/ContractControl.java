@@ -493,6 +493,9 @@ public class ContractControl extends AbstractControl {
 				Settings.i18n().tr("Next cancellation deadline"),
 				"nextCancellationDeadline", new DateFormatter(
 						Settings.DATEFORMAT));
+		contractList.addColumn(
+				Settings.i18n().tr("Costs per Period"),
+				"costsPerPeriod");
 
 		// 7) we are adding a context menu
 		contractList.setContextMenu(new ContractListMenu());

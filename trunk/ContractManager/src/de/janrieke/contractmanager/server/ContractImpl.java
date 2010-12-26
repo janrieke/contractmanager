@@ -175,10 +175,15 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	// FIELD DATA ACCESS
 	public Object getAttribute(String arg0) throws RemoteException {
-		// if ("address_id".equals(arg0))
-		// return getAddress();
-
-		return super.getAttribute(arg0);
+		//check derived fields
+		if ("nextCancellationDeadline".equals(arg0))
+			return getNextCancellationDeadline();
+		else if ("nextExtension".equals(arg0))
+			return getNextExtension();
+	    else if ("costsPerPeriod".equals(arg0))
+	        return getCostsPerPeriod();
+		else
+			return super.getAttribute(arg0);
 	}
 
 	/**
@@ -557,5 +562,10 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public Date getNextCancellationDeadline() throws RemoteException {
 		return calculatePeriods(true);
+	}
+
+	@Override
+	public double getCostsPerPeriod() throws RemoteException {
+	    return 0d;
 	}
 }
