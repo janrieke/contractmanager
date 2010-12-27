@@ -506,7 +506,7 @@ public class ContractControl extends AbstractControl {
 						Settings.DECIMALFORMAT));
 
 		// 7) we are adding a context menu
-		contractList.setContextMenu(new ContractListMenu());
+		contractList.setContextMenu(new ContractListMenu(true));
 
 		contractList.setFormatter(new TableFormatter() {
 
@@ -585,7 +585,7 @@ public class ContractControl extends AbstractControl {
 						Settings.DECIMALFORMAT));
 
 		// 7) we are adding a context menu
-		contractList.setContextMenu(new ContractListMenu());
+		contractList.setContextMenu(new ContractListMenu(false));
 
 		contractList.setFormatter(new TableFormatter() {
 
