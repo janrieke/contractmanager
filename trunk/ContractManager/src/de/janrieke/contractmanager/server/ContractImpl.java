@@ -573,8 +573,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		return calculatePeriods(true);
 	}
 
-	@Override
-	public double getCostsPerTerm() throws RemoteException {
+	private int getNextRuntimeDays() throws RemoteException {
 		//FIXME: Calculate costs based on a real calendar 
 		if (getEndDate() != null)
 			return 0; // if the end is already set, there is no need for
@@ -604,43 +603,24 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 				|| nextMinRuntimeCount < 0)
 			return 0;
 
-		
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(getNextExtension());
 		switch (nextMinRuntimeType) {
 		case DAYS:
-			cal.add(Calendar.DAY_OF_YEAR, nextMinRuntimeCount);
+			return nextMinRuntimeCount;
 		case WEEKS:
-			cal.add(Calendar.WEEK_OF_YEAR, nextMinRuntimeCount);
+			return nextMinRuntimeCount * 7;
 		case MONTHS:
-			cal.add(Calendar.MONTH, nextMinRuntimeCount);
+			return nextMinRuntimeCount * 30;
 		case YEARS:
-			cal.add(Calendar.YEAR, nextMinRuntimeCount);
+			return nextMinRuntimeCount * 365;
 		}
-		
-		double costs = 0;
-		
-		Calendar calcCal = Calendar.getInstance();
-		while (calcCal.before(cal)) {
-			calcCal.add(Calendar.DAY_OF_YEAR, 1);
-			costs += getMoneyPerDay();
-		}
-		calcCal.setTime(new Date());
-		while (calcCal.before(cal)) {
-			calcCal.add(Calendar.WEEK_OF_YEAR, 1);
-			costs += getMoneyPerWeek();
-		}
-		calcCal.setTime(new Date());
-		while (calcCal.before(cal)) {
-			calcCal.add(Calendar.MONTH, 1);
-			costs += getMoneyPerMonth();
-		}
-		calcCal.setTime(new Date());
-		while (calcCal.before(cal)) {
-			calcCal.add(Calendar.YEAR, 1);
-			costs += getMoneyPerYear();
-		}
+		return 0;
+	}
 
-		return costs;
+	@Override
+	public double getCostsPerTerm() throws RemoteException {
+		//FIXME: Calculate costs based on a real calendar 
+		return (getMoneyPerDay() + getMoneyPerMonth() / 30 + getMoneyPerWeek()
+				/ 7 + getMoneyPerYear() / 365)
+				* getNextRuntimeDays();
 	}
 }

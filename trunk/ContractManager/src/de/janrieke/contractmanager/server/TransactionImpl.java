@@ -18,7 +18,6 @@ public class TransactionImpl extends AbstractDBObject implements Transaction {
 
 	public TransactionImpl() throws RemoteException {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -60,7 +59,6 @@ public class TransactionImpl extends AbstractDBObject implements Transaction {
 
 	@Override
 	public String getPrimaryAttribute() throws RemoteException {
-		// TODO Auto-generated method stub
 		return "transaction_id";
 	}
 
