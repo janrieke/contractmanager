@@ -34,30 +34,31 @@ public class GenerateCancelation implements Action {
 		if (context == null || !(context instanceof Contract))
 			throw new ApplicationException(Settings.i18n().tr(
 					"Please choose a contract"));
-		
+
 		Contract p = (Contract) context;
-		
-	    FileDialog fd = new FileDialog(GUI.getShell(),SWT.SAVE);
-	    fd.setText(Settings.i18n().tr("Select Filename for Cancellation"));
-	    fd.setOverwrite(true);
-	    try {
-			fd.setFileName(Settings.i18n().tr("cancellation-{0}-{1}.odt",Settings.DATEFORMAT.format(new Date()), p.getName()));
+
+		FileDialog fd = new FileDialog(GUI.getShell(), SWT.SAVE);
+		fd.setText(Settings.i18n().tr("Select Filename for Cancellation"));
+		fd.setOverwrite(true);
+		try {
+			fd.setFileName(Settings.i18n().tr("cancellation-{0}-{1}.odt",
+					Settings.DATEFORMAT.format(new Date()), p.getName()));
 		} catch (RemoteException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			throw new ApplicationException(Settings.i18n().tr(
+					"Error while accessing contract."), e1);
 		}
 
-//	    String path = System.getProperty("user.home");
-//	    if (path != null && path.length() > 0)
-//	      fd.setFilterPath(path);
+		// String path = System.getProperty("user.home");
+		// if (path != null && path.length() > 0)
+		// fd.setFilterPath(path);
 
-	    final String filename = fd.open();
-	    
-	    if (filename == null || filename.length() == 0)
-	      return;
+		final String filename = fd.open();
+
+		if (filename == null || filename.length() == 0)
+			return;
 
 		try {
-			//retrieve variable values
+			// retrieve variable values
 			Map<String, String> values = new HashMap<String, String>();
 
 			values.put("NAME", p.getAddress().getName());
@@ -82,19 +83,22 @@ public class GenerateCancelation implements Action {
 
 			values.put("TODAY", Settings.DATEFORMAT.format(new Date()));
 			values.put("CONTRACT_NAME", p.getName());
-			
+
 			Date nextExtension = p.getNextExtension();
 			if (nextExtension != null)
-				values.put("CANCELLATION_DATE", Settings.DATEFORMAT.format(nextExtension));
+				values.put("CANCELLATION_DATE",
+						Settings.DATEFORMAT.format(nextExtension));
 			else
-				values.put("CANCELLATION_DATE", Settings.DATEFORMAT.format(new Date()));
-
+				values.put("CANCELLATION_DATE",
+						Settings.DATEFORMAT.format(new Date()));
 
 			// open template document from plugin directory
-			FileInputStream fis = new FileInputStream(ContractManagerPlugin.getInstance().getManifest().getPluginDir() + "/templates/Kuendigung.odt");
+			FileInputStream fis = new FileInputStream(ContractManagerPlugin
+					.getInstance().getManifest().getPluginDir()
+					+ "/templates/Kuendigung.odt");
 			OdfDocument doc = OdfDocument.loadDocument(fis);
-			
-			//set the values of the variables 
+
+			// set the values of the variables
 			NodeList nodes = doc.getOfficeBody().getElementsByTagName(
 					OdfTextUserFieldDecl.ELEMENT_NAME.getQName());
 			for (int i = 0; i < nodes.getLength(); i++) {
@@ -105,12 +109,12 @@ public class GenerateCancelation implements Action {
 							.getTextNameAttribute()));
 				}
 			}
-			
-			//save the file with a new file name
+
+			// save the file with a new file name
 			doc.save(filename);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ApplicationException(Settings.i18n().tr(
+				"Error while storing document."), e);
 		}
 	}
 
