@@ -1,8 +1,2 @@
 Tango Desktop Project (PD, http://tango.freedesktop.org/):
- text-x-generic.png
- document-new.png
- preferences-system.png
  edit-copy.png
-
-El T (PD, http://commons.wikimedia.org/wiki/File:Information_icon.svg):
- Information_icon.svg
