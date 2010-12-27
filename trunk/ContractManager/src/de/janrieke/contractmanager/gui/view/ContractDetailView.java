@@ -76,8 +76,8 @@ public class ContractDetailView extends AbstractView {
 		ButtonArea buttons = new ButtonArea(getParent(), 4);
 
 		buttons.addButton(new Back(false));
-		buttons.addButton(Settings.i18n().tr("Generate Cancelation"), new GenerateCancelation(), control.getCurrentObject(), false, "document-print.png");
-		buttons.addButton(Settings.i18n().tr("Delete Contract"),
+		buttons.addButton(Settings.i18n().tr("Generate Cancelation..."), new GenerateCancelation(), control.getCurrentObject(), false, "document-print.png");
+		buttons.addButton(Settings.i18n().tr("Delete Contract..."),
 				new DeleteContract(), control.getCurrentObject(), false, "window-close.png");
 		buttons.addButton(Settings.i18n().tr("Store Contract"), new Action() {
 			public void handleAction(Object context)

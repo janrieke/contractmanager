@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 import de.janrieke.contractmanager.rmi.ContractDBService;
+import de.janrieke.contractmanager.server.SettingsUtil;
 import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
@@ -105,6 +106,22 @@ public class Settings {
 				.getPlugin(ContractManagerPlugin.class).getResources()
 				.getI18N();
 		return i18n;
+	}
+
+	public static int getExtensionWarningTime() throws RemoteException {
+		return Integer.parseInt(SettingsUtil.get("extension_warning_time", "7"));
+	}
+
+	public static void setExtensionWarningTime(int time) throws RemoteException, ApplicationException {
+		SettingsUtil.set("extension_warning_time", ((Integer)time).toString());
+	}
+
+	public static int getExtensionNoticeTime() throws RemoteException {
+		return Integer.parseInt(SettingsUtil.get("extension_notice_time", "30"));
+	}
+
+	public static void setExtensionNoticeTime(int time) throws RemoteException, ApplicationException {
+		SettingsUtil.set("extension_notice_time", ((Integer)time).toString());
 	}
 
 }

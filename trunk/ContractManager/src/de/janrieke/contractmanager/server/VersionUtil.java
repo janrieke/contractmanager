@@ -17,10 +17,10 @@ package de.janrieke.contractmanager.server;
 
 import java.rmi.RemoteException;
 
-import de.willuhn.datasource.rmi.DBIterator;
-import de.willuhn.datasource.rmi.DBService;
 import de.janrieke.contractmanager.ContractManagerPlugin;
 import de.janrieke.contractmanager.rmi.Version;
+import de.willuhn.datasource.rmi.DBIterator;
+import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;

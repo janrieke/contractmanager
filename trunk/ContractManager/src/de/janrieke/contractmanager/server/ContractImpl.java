@@ -181,7 +181,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		else if ("nextExtension".equals(arg0))
 			return getNextExtension();
 		else if ("costsPerPeriod".equals(arg0))
-			return getCostsPerPeriod();
+			return getCostsPerTerm();
 		else
 			return super.getAttribute(arg0);
 	}
@@ -481,8 +481,11 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 					&& cancellationPeriodCount > 0) {
 				switch (cancellationPeriodType) {
 				case DAYS:
-					calendar.add(Calendar.DAY_OF_MONTH,
+					calendar.add(Calendar.DAY_OF_YEAR,
 							-cancellationPeriodCount);
+					break;
+				case WEEKS:
+					calendar.add(Calendar.WEEK_OF_YEAR, -cancellationPeriodCount);
 					break;
 				case MONTHS:
 					calendar.add(Calendar.MONTH, -cancellationPeriodCount);
@@ -524,7 +527,10 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			if (first) {
 				switch (firstMinRuntimeType) {
 				case DAYS:
-					calendar.add(Calendar.DAY_OF_MONTH, firstMinRuntimeCount);
+					calendar.add(Calendar.DAY_OF_YEAR, firstMinRuntimeCount);
+					break;
+				case WEEKS:
+					calendar.add(Calendar.WEEK_OF_YEAR, firstMinRuntimeCount);
 					break;
 				case MONTHS:
 					calendar.add(Calendar.MONTH, firstMinRuntimeCount);
@@ -539,7 +545,10 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 					return null; // "0" encodes a daily runtime extension
 				switch (nextMinRuntimeType) {
 				case DAYS:
-					calendar.add(Calendar.DAY_OF_MONTH, nextMinRuntimeCount);
+					calendar.add(Calendar.DAY_OF_YEAR, nextMinRuntimeCount);
+					break;
+				case WEEKS:
+					calendar.add(Calendar.WEEK_OF_YEAR, nextMinRuntimeCount);
 					break;
 				case MONTHS:
 					calendar.add(Calendar.MONTH, nextMinRuntimeCount);
@@ -565,6 +574,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	private int getNextRuntimeDays() throws RemoteException {
+		//FIXME: Calculate costs based on a real calendar 
 		if (getEndDate() != null)
 			return 0; // if the end is already set, there is no need for
 						// further cancellations
@@ -596,6 +606,8 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		switch (nextMinRuntimeType) {
 		case DAYS:
 			return nextMinRuntimeCount;
+		case WEEKS:
+			return nextMinRuntimeCount * 7;
 		case MONTHS:
 			return nextMinRuntimeCount * 30;
 		case YEARS:
@@ -605,7 +617,8 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	@Override
-	public double getCostsPerPeriod() throws RemoteException {
+	public double getCostsPerTerm() throws RemoteException {
+		//FIXME: Calculate costs based on a real calendar 
 		return (getMoneyPerDay() + getMoneyPerMonth() / 30 + getMoneyPerWeek()
 				/ 7 + getMoneyPerYear() / 365)
 				* getNextRuntimeDays();

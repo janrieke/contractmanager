@@ -52,7 +52,7 @@ import de.willuhn.datasource.rmi.DBObject;
 public interface Contract extends DBObject {
 	
 	public enum IntervalType {
-		DAYS, MONTHS, YEARS;
+		DAYS, WEEKS, MONTHS, YEARS;
 		
 		@Override
 		public String toString() {
@@ -127,5 +127,5 @@ public interface Contract extends DBObject {
 	//these are derived features
 	public Date getNextExtension() throws RemoteException;
 	public Date getNextCancellationDeadline() throws RemoteException;
-	public double getCostsPerPeriod() throws RemoteException;
+	public double getCostsPerTerm() throws RemoteException;
 }

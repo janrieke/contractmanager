@@ -2,6 +2,7 @@ package de.janrieke.contractmanager.gui.menu;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.DeleteContract;
+import de.janrieke.contractmanager.gui.action.GenerateCancelation;
 import de.janrieke.contractmanager.gui.action.ShowContractDetailView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
@@ -22,13 +23,16 @@ public class ContractListMenu extends ContextMenu {
 		addItem(new CheckedContextMenuItem(Settings.i18n().tr("Open..."),
 				new ShowContractDetailView(), "document-open.png"));
 
+		addItem(new CheckedContextMenuItem(Settings.i18n().tr("Generate Cancellation..."),
+				new GenerateCancelation(), "document-print.png"));
+
 		// separator
 		addItem(ContextMenuItem.SEPARATOR);
 
 //		addItem(new CheckedContextMenuItem(Settings.i18n().tr(
 //				"Add new task within this project"), new TaskDetail()));
 
-		addItem(new ContextMenuItem(Settings.i18n().tr("Create a new contract"),
+		addItem(new ContextMenuItem(Settings.i18n().tr("Create a new contract..."),
 				new Action() {
 					public void handleAction(Object context)
 							throws ApplicationException {
@@ -40,7 +44,7 @@ public class ContractListMenu extends ContextMenu {
 
 		addItem(ContextMenuItem.SEPARATOR);
 		addItem(new CheckedContextMenuItem(
-				Settings.i18n().tr("Delete contract"), new DeleteContract(), "window-close.png"));
+				Settings.i18n().tr("Delete contract..."), new DeleteContract(), "window-close.png"));
 
 	}
 }

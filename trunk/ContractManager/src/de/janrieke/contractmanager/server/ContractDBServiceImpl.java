@@ -21,8 +21,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import de.janrieke.contractmanager.ContractManagerPlugin;
-import de.janrieke.contractmanager.rmi.DBSupport;
 import de.janrieke.contractmanager.rmi.ContractDBService;
+import de.janrieke.contractmanager.rmi.DBSupport;
 import de.willuhn.datasource.db.DBServiceImpl;
 import de.willuhn.jameica.messaging.QueryMessage;
 import de.willuhn.jameica.plugin.Manifest;
