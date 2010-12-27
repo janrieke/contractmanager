@@ -16,35 +16,38 @@ import de.willuhn.util.ApplicationException;
 public class ContractListMenu extends ContextMenu {
 	/**
 	 * ct.
+	 * 
+	 * @param showNew
 	 */
-	public ContractListMenu() {
+	public ContractListMenu(boolean showNew) {
 		// CheckedContextMenuItems will be disabled, if the user clicks into an
 		// empty space of the table
 		addItem(new CheckedContextMenuItem(Settings.i18n().tr("Open..."),
 				new ShowContractDetailView(), "document-open.png"));
 
-		addItem(new CheckedContextMenuItem(Settings.i18n().tr("Generate Cancellation..."),
-				new GenerateCancelation(), "document-print.png"));
+		addItem(new CheckedContextMenuItem(Settings.i18n().tr(
+				"Generate Cancellation..."), new GenerateCancelation(),
+				"document-print.png"));
 
-		// separator
-		addItem(ContextMenuItem.SEPARATOR);
+		if (showNew) {
+			// separator
+			addItem(ContextMenuItem.SEPARATOR);
+			
+			addItem(new ContextMenuItem(Settings.i18n().tr(
+					"Create a new contract..."), new Action() {
+				public void handleAction(Object context)
+						throws ApplicationException {
+					// we force the context to be null to create a new
+					// project in any case
+					new ShowContractDetailView().handleAction(null);
+				}
+			}, "document-new.png"));
 
-//		addItem(new CheckedContextMenuItem(Settings.i18n().tr(
-//				"Add new task within this project"), new TaskDetail()));
-
-		addItem(new ContextMenuItem(Settings.i18n().tr("Create a new contract..."),
-				new Action() {
-					public void handleAction(Object context)
-							throws ApplicationException {
-						// we force the context to be null to create a new
-						// project in any case
-						new ShowContractDetailView().handleAction(null);
-					}
-				}, "document-new.png"));
-
-		addItem(ContextMenuItem.SEPARATOR);
-		addItem(new CheckedContextMenuItem(
-				Settings.i18n().tr("Delete contract..."), new DeleteContract(), "window-close.png"));
+			addItem(ContextMenuItem.SEPARATOR);
+			addItem(new CheckedContextMenuItem(Settings.i18n().tr(
+					"Delete contract..."), new DeleteContract(),
+					"window-close.png"));
+		}
 
 	}
 }
