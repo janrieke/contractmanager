@@ -34,6 +34,7 @@ public class SettingsControl extends AbstractControl {
 	private TextInput phone;
 
 	private IntegerInput warningTime;
+	private IntegerInput noticeTime;
 
 	/**
 	 * ct.
@@ -131,10 +132,18 @@ public class SettingsControl extends AbstractControl {
 
 	public IntegerInput getWarningTime() throws RemoteException {
 		if (warningTime == null) {
-			warningTime = new IntegerInput(Integer.parseInt(SettingsUtil.get("extension_warning_time", "30")));
+			warningTime = new IntegerInput(Settings.getExtensionWarningTime());
 			warningTime.setComment(Settings.i18n().tr("Days"));
 		}
 		return warningTime;
+	}
+
+	public IntegerInput getNoticeTime() throws RemoteException {
+		if (noticeTime == null) {
+			noticeTime = new IntegerInput(Settings.getExtensionNoticeTime());
+			noticeTime.setComment(Settings.i18n().tr("Days"));
+		}
+		return noticeTime;
 	}
 
 	/**
@@ -152,7 +161,8 @@ public class SettingsControl extends AbstractControl {
 			SettingsUtil.set("country", (String) getCountry().getValue());
 			SettingsUtil.set("email", (String) getEmail().getValue());
 			SettingsUtil.set("phone", (String) getPhone().getValue());
-			SettingsUtil.set("extension_warning_time", ((Integer)getWarningTime().getValue()).toString());
+			Settings.setExtensionNoticeTime((Integer)getNoticeTime().getValue());
+			Settings.setExtensionWarningTime((Integer)getWarningTime().getValue());
 			GUI.getStatusBar().setSuccessText(
 					Settings.i18n().tr("Settings saved."));
 		} catch (ApplicationException e) {

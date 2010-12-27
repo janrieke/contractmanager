@@ -14,13 +14,12 @@ public class CancellationReminder extends AbstractView implements Box {
 	@Override
 	public void paint(Composite parent) throws RemoteException {
 		ContractControl control = new ContractControl(this);
-		control.getContractsTable().paint(parent);
+		control.getContractsExtensionWarningTable().paint(parent);
 	}
 
 	@Override
 	public void bind() throws Exception {
-		ContractControl control = new ContractControl(this);
-		control.getContractsTable().paint(this.getParent());
+		paint(this.getParent());
 	}
 
 	@Override

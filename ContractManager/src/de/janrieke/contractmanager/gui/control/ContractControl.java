@@ -2,11 +2,13 @@ package de.janrieke.contractmanager.gui.control;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.TableItem;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion;
@@ -23,6 +25,7 @@ import de.willuhn.jameica.gui.Part;
 import de.willuhn.jameica.gui.dialogs.CalendarDialog;
 import de.willuhn.jameica.gui.formatter.CurrencyFormatter;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
+import de.willuhn.jameica.gui.formatter.TableFormatter;
 import de.willuhn.jameica.gui.input.DecimalInput;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.input.IntegerInput;
@@ -32,6 +35,7 @@ import de.willuhn.jameica.gui.input.SelectInput;
 import de.willuhn.jameica.gui.input.TextAreaInput;
 import de.willuhn.jameica.gui.input.TextInput;
 import de.willuhn.jameica.gui.parts.TablePart;
+import de.willuhn.jameica.gui.util.Color;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
@@ -276,6 +280,7 @@ public class ContractControl extends AbstractControl {
 		if (cancellationPeriodType == null) {
 			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>();
 			list.add(Contract.IntervalType.DAYS);
+			list.add(Contract.IntervalType.WEEKS);
 			list.add(Contract.IntervalType.MONTHS);
 			list.add(Contract.IntervalType.YEARS);
 			cancellationPeriodType = new SelectInput(list, getContract()
@@ -306,6 +311,7 @@ public class ContractControl extends AbstractControl {
 		if (firstMinRuntimeType == null) {
 			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>();
 			list.add(Contract.IntervalType.DAYS);
+			list.add(Contract.IntervalType.WEEKS);
 			list.add(Contract.IntervalType.MONTHS);
 			list.add(Contract.IntervalType.YEARS);
 			firstMinRuntimeType = new SelectInput(list, getContract()
@@ -336,6 +342,7 @@ public class ContractControl extends AbstractControl {
 		if (nextMinRuntimeType == null) {
 			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>();
 			list.add(Contract.IntervalType.DAYS);
+			list.add(Contract.IntervalType.WEEKS);
 			list.add(Contract.IntervalType.MONTHS);
 			list.add(Contract.IntervalType.YEARS);
 			nextMinRuntimeType = new SelectInput(list, getContract()
@@ -494,12 +501,142 @@ public class ContractControl extends AbstractControl {
 				Settings.i18n().tr("Next cancellation deadline"),
 				"nextCancellationDeadline", new DateFormatter(
 						Settings.DATEFORMAT));
-		contractList.addColumn(
-				Settings.i18n().tr("Costs per Period"),
-				"costsPerPeriod", new CurrencyFormatter(Settings.CURRENCY, Settings.DECIMALFORMAT));
+		contractList.addColumn(Settings.i18n().tr("Costs per Term"),
+				"costsPerPeriod", new CurrencyFormatter(Settings.CURRENCY,
+						Settings.DECIMALFORMAT));
 
 		// 7) we are adding a context menu
 		contractList.setContextMenu(new ContractListMenu());
+
+		contractList.setFormatter(new TableFormatter() {
+
+			@Override
+			public void format(TableItem item) {
+				if (item.getData() instanceof Contract) {
+					Contract contract = (Contract) item.getData();
+
+					Calendar today = Calendar.getInstance();
+					Calendar calendar = Calendar.getInstance();
+					try {
+						calendar.setTime(contract.getNextCancellationDeadline());
+						calendar.add(Calendar.DAY_OF_YEAR,
+								-Settings.getExtensionWarningTime());
+						if (calendar.before(today))
+							item.setBackground(Color.ERROR.getSWTColor());
+						else {
+							calendar.setTime(contract
+									.getNextCancellationDeadline());
+							calendar.add(Calendar.DAY_OF_YEAR,
+									-Settings.getExtensionNoticeTime());
+							if (calendar.before(today))
+								item.setBackground(Color.MANDATORY_BG
+										.getSWTColor());
+						}
+					} catch (RemoteException e) {
+					}
+				}
+			}
+		});
+		return contractList;
+	}
+
+	static int index = 0;
+
+	/**
+	 * Creates a table containing all contracts in extension warning or notice
+	 * time.
+	 * 
+	 * @return a table with contracts.
+	 * @throws RemoteException
+	 */
+	public Part getContractsExtensionWarningTable() throws RemoteException {
+		if (contractList != null)
+			return contractList;
+
+		// 1) get the dataservice
+		DBService service = Settings.getDBService();
+
+		// 2) now we can create the contract list.
+		// We do not need to specify the implementing class for
+		// the interface "Contract". Jameica's classloader knows
+		// all classes an finds the right implementation automatically. ;)
+		DBIterator contracts = service.createList(Contract.class);
+
+		// 4) create the table
+		contractList = new TablePart(
+				contracts,
+				new de.janrieke.contractmanager.gui.action.ShowContractDetailView());
+
+		// 5) now we have to add some columns.
+		contractList.addColumn(Settings.i18n().tr("Name of contract"), "name");
+
+		// 6) the following fields are a date fields. So we add a date
+		// formatter.
+		contractList.addColumn(Settings.i18n().tr("Start date"), "startdate",
+				new DateFormatter(Settings.DATEFORMAT));
+		contractList.addColumn(Settings.i18n().tr("End date"), "enddate",
+				new DateFormatter(Settings.DATEFORMAT));
+		contractList.addColumn(
+				Settings.i18n().tr("Next cancellation deadline"),
+				"nextCancellationDeadline", new DateFormatter(
+						Settings.DATEFORMAT));
+		contractList.addColumn(Settings.i18n().tr("Costs per Term"),
+				"costsPerPeriod", new CurrencyFormatter(Settings.CURRENCY,
+						Settings.DECIMALFORMAT));
+
+		// 7) we are adding a context menu
+		contractList.setContextMenu(new ContractListMenu());
+
+		contractList.setFormatter(new TableFormatter() {
+
+			@Override
+			public void format(TableItem item) {
+				if (item.getData() instanceof Contract) {
+					Contract contract = (Contract) item.getData();
+
+					Calendar today = Calendar.getInstance();
+					Calendar calendar = Calendar.getInstance();
+					try {
+						calendar.setTime(contract.getNextCancellationDeadline());
+						calendar.add(Calendar.DAY_OF_YEAR,
+								-Settings.getExtensionNoticeTime());
+						if (calendar.before(today)) {
+							calendar.setTime(contract
+									.getNextCancellationDeadline());
+							calendar.add(Calendar.DAY_OF_YEAR,
+									-Settings.getExtensionWarningTime());
+							if (calendar.before(today))
+								item.setBackground(Color.ERROR.getSWTColor());
+							else
+								item.setBackground(Color.MANDATORY_BG.getSWTColor());
+						} else {
+							TableItem[] items = item.getParent().getItems();
+							boolean found = false;
+							index = index < items.length ? index : 0;
+							for (int i = index; i < items.length; i++) {
+								if (item.equals(items[i])) {
+									index = i;
+									found = true;
+									break;
+								}
+							}
+							if (!found) {
+								for (int i = 0; i < index; i++) {
+									if (item.equals(items[i])) {
+										index = i;
+										found = true;
+										break;
+									}
+								}
+							}
+							if (found)
+								item.getParent().remove(index);
+						}
+					} catch (RemoteException e) {
+					}
+				}
+			}
+		});
 		return contractList;
 	}
 

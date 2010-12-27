@@ -31,6 +31,9 @@ public class WelcomeView extends AbstractView {
 				ContractManagerPlugin.class);
 		group.addText("Welcome to ContractManager (v" + p.getManifest().getVersion() + ")", false);
 
+		group = new LabelGroup(this.getParent(), Settings.i18n().tr(
+				"Contract Cancellation Reminder"));
+		group.addPart(new CancellationReminder());
 	}
 
 	/**
