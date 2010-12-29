@@ -125,7 +125,8 @@ public interface Contract extends DBObject {
 	public DBIterator getTransactions() throws RemoteException;
 
 	//these are derived features
-	public Date getNextExtension() throws RemoteException;
+	public Date getNextTermBegin() throws RemoteException;
+	public Date getNextTermEnd() throws RemoteException;
 	public Date getNextCancellationDeadline() throws RemoteException;
 	public double getCostsPerTerm() throws RemoteException;
 }

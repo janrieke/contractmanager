@@ -54,11 +54,13 @@ public class ContractDetailView extends AbstractView {
 	    left.addHeadline(Settings.i18n().tr("Runtime"));
 	    left.addLabelPair(Settings.i18n().tr("Start date"),	control.getStartDate());
 	    left.addLabelPair(Settings.i18n().tr("End date"), control.getEndDate());
+	    //TODO: Show how long the contract is already running
 	    left.addLabelPair(Settings.i18n().tr("Cancellation period"), control.getCancellationPeriod());
 	    left.addLabelPair(Settings.i18n().tr("First minimum term"), control.getFirstMinRuntime());
 	    left.addLabelPair(Settings.i18n().tr("Following minimum terms"), control.getNextMinRuntime());
-	    left.addLabelPair(Settings.i18n().tr("Next term extension"), control.getNextExtension());
-	    left.addLabelPair(Settings.i18n().tr("Deadline for next cancellation "), control.getNextCancellationDeadline());
+	    //TODO: Show complete term instead of only beginning
+	    left.addLabelPair(Settings.i18n().tr("Next term"), control.getNextTerm());
+	    left.addLabelPair(Settings.i18n().tr("Deadline for next cancellation"), control.getNextCancellationDeadline());
 
 	    SimpleContainer right = new SimpleContainer(columns.getComposite(), true);
 	    right.addHeadline(Settings.i18n().tr("Contractual Partner Address"));

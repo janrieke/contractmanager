@@ -179,7 +179,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		if ("nextCancellationDeadline".equals(arg0))
 			return getNextCancellationDeadline();
 		else if ("nextExtension".equals(arg0))
-			return getNextExtension();
+			return getNextTermBegin();
 		else if ("costsPerPeriod".equals(arg0))
 			return getCostsPerTerm();
 		else
@@ -564,8 +564,29 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	@Override
-	public Date getNextExtension() throws RemoteException {
+	public Date getNextTermBegin() throws RemoteException {
 		return calculatePeriods(false);
+	}
+
+	public Date getNextTermEnd() throws RemoteException {
+		Date begin = getNextTermBegin();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(begin);
+		switch (getNextMinRuntimeType()) {
+		case DAYS:
+			calendar.add(Calendar.DAY_OF_YEAR, getNextMinRuntimeCount());
+			break;
+		case WEEKS:
+			calendar.add(Calendar.WEEK_OF_YEAR, getNextMinRuntimeCount());
+			break;
+		case MONTHS:
+			calendar.add(Calendar.MONTH, getNextMinRuntimeCount());
+			break;
+		case YEARS:
+			calendar.add(Calendar.YEAR, getNextMinRuntimeCount());
+			break;
+		}
+		return calendar.getTime();
 	}
 
 	@Override
