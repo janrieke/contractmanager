@@ -25,7 +25,7 @@ public class WelcomeView extends AbstractView {
 		GUI.getView().setTitle(Settings.i18n().tr("ContractManager"));
 
 		LabelGroup group = new LabelGroup(this.getParent(), Settings.i18n().tr(
-				"welcome"));
+				"Welcome"));
 
 		AbstractPlugin p = Application.getPluginLoader().getPlugin(
 				ContractManagerPlugin.class);

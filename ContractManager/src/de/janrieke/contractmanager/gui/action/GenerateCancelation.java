@@ -34,6 +34,8 @@ public class GenerateCancelation implements Action {
 		if (context == null || !(context instanceof Contract))
 			throw new ApplicationException(Settings.i18n().tr(
 					"Please choose a contract"));
+		
+		//TODO: Also generate PDFs
 
 		Contract p = (Contract) context;
 
@@ -84,7 +86,7 @@ public class GenerateCancelation implements Action {
 			values.put("TODAY", Settings.DATEFORMAT.format(new Date()));
 			values.put("CONTRACT_NAME", p.getName());
 
-			Date nextExtension = p.getNextExtension();
+			Date nextExtension = p.getNextTermBegin();
 			if (nextExtension != null)
 				values.put("CANCELLATION_DATE",
 						Settings.DATEFORMAT.format(nextExtension));

@@ -54,7 +54,7 @@ public class ContractControl extends AbstractControl {
 	private Input comment;
 	private DateDialogInputAutoCompletion startDate;
 	private DateDialogInputAutoCompletion endDate;
-	private LabelInput nextExtension;
+	private Input nextExtension;
 
 	private MultiInput cancellationPeriodMulti;
 	private IntegerInput cancellationPeriodCount;
@@ -238,13 +238,19 @@ public class ContractControl extends AbstractControl {
 		return endDate;
 	}
 
-	public LabelInput getNextExtension() throws RemoteException {
+	public Input getNextTerm() throws RemoteException {
 		if (nextExtension != null)
 			return nextExtension;
 
-		Date ne = getContract().getNextExtension();
-		nextExtension = new LabelInput(ne == null ? ""
-				: Settings.DATEFORMAT.format(ne));
+		Date ntb = getContract().getNextTermBegin();
+		Date nte = getContract().getNextTermEnd();
+		if (ntb != null && nte != null) {
+			nextExtension = new MultiInput(new LabelInput(
+					Settings.DATEFORMAT.format(ntb) + " "
+							+ Settings.i18n().tr("to") + " "
+							+ Settings.DATEFORMAT.format(nte)));
+		} else
+		nextExtension = new LabelInput("");
 		return nextExtension;
 	}
 
