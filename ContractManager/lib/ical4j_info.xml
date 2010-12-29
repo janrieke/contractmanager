@@ -1,0 +1,6 @@
+<info>
+  <name>iCal4j 1.0-rc3</name>
+  <description>A Java library for reading and writing iCalendar (*.ics) files</description>
+  <url>http://m2.modularity.net.au/projects/ical4j/</url>
+  <license>BSD License - http://m2.modularity.net.au/projects/ical4j/license.html</license>
+</info>
