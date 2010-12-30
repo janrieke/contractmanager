@@ -3,12 +3,12 @@ package de.janrieke.contractmanager.gui.control;
 import java.rmi.RemoteException;
 
 import de.janrieke.contractmanager.Settings;
+import de.janrieke.contractmanager.gui.input.FileInput;
 import de.janrieke.contractmanager.server.SettingsUtil;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.input.CheckboxInput;
-import de.willuhn.jameica.gui.input.FileInput;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.input.IntegerInput;
 import de.willuhn.jameica.gui.input.MultiInput;
@@ -167,7 +167,11 @@ public class SettingsControl extends AbstractControl {
 
 	public FileInput getICalFileLocation() throws RemoteException {
 		if (iCalFileLocation == null) {
-			iCalFileLocation = new FileInput(Settings.getICalFileLocation());
+			String[] names = {
+					Settings.i18n().tr("iCalendar file" + " (*.ics)"),
+					Settings.i18n().tr("All files") + " (*.*)" };
+			String[] filters = { "*.ics", "*.*" };
+			iCalFileLocation = new FileInput(Settings.getICalFileLocation(), true, names, filters);
 		}
 		return iCalFileLocation;
 	}
