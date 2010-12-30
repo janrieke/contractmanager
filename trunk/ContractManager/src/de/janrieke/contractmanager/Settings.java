@@ -124,4 +124,28 @@ public class Settings {
 		SettingsUtil.set("extension_notice_time", ((Integer)time).toString());
 	}
 
+	public static boolean getICalAutoExport() throws RemoteException {
+		return Boolean.parseBoolean(SettingsUtil.get("ical_auto_export", "false"));
+	}
+
+	public static void setICalAutoExport(boolean export) throws RemoteException, ApplicationException {
+		SettingsUtil.set("ical_auto_export", ((Boolean)export).toString());
+	}
+	
+	public static String getICalFileLocation() throws RemoteException {
+		return SettingsUtil.get("ical_file", "");
+	}
+
+	public static void setICalFileLocation(String file) throws RemoteException, ApplicationException {
+		SettingsUtil.set("ical_file", file);
+	}
+
+	public static boolean getNamedICalExport() throws RemoteException {
+		return Boolean.parseBoolean(SettingsUtil.get("ical_name_export", "false"));
+	}
+
+	public static void setNamedICalExport(boolean name) throws RemoteException, ApplicationException {
+		SettingsUtil.set("ical_name_export", Boolean.toString(name));
+	}
+
 }
