@@ -6,9 +6,6 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Date;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.FileDialog;
-
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.ValidationException;
@@ -17,6 +14,10 @@ import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.util.UidGenerator;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.FileDialog;
+
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.willuhn.datasource.rmi.DBIterator;
@@ -92,8 +93,7 @@ public class ExportCancelationReminders implements Action {
 								contract.getName()) : Settings.i18n().tr(
 								"Check cancellation"));
 
-				// Generate a UID for the event..
-				UidGenerator ug = new UidGenerator("1");
+				UidGenerator ug = new UidGenerator(Thread.currentThread().toString());
 				cancellation.getProperties().add(ug.generateUid());
 
 				ical.getComponents().add(cancellation);
