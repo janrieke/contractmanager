@@ -7,6 +7,8 @@ import de.janrieke.contractmanager.server.SettingsUtil;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
+import de.willuhn.jameica.gui.input.CheckboxInput;
+import de.willuhn.jameica.gui.input.FileInput;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.input.IntegerInput;
 import de.willuhn.jameica.gui.input.MultiInput;
@@ -35,6 +37,9 @@ public class SettingsControl extends AbstractControl {
 
 	private IntegerInput warningTime;
 	private IntegerInput noticeTime;
+	private FileInput iCalFileLocation;
+	private CheckboxInput iCalAutoExport;
+	private CheckboxInput anonICalExport;
 
 	/**
 	 * ct.
@@ -63,34 +68,34 @@ public class SettingsControl extends AbstractControl {
 			street = new TextInput(SettingsUtil.get("street", ""), 255);
 		return street;
 	}
-	
+
 	public Input getNumber() throws RemoteException {
 		if (number == null)
 			number = new TextInput(SettingsUtil.get("number", ""));
 		return number;
 	}
-	
+
 	public Input getStreetNumber() throws RemoteException {
 		if (streetNumber != null)
 			return streetNumber;
 
 		streetNumber = new MultiInput(getStreet(), getNumber());
-		
+
 		return streetNumber;
 	}
-	
+
 	public Input getExtra() throws RemoteException {
 		if (extra == null)
 			extra = new TextInput(SettingsUtil.get("extra", ""), 255);
 		return extra;
 	}
-	
+
 	public Input getZipcode() throws RemoteException {
 		if (zipcode == null)
 			zipcode = new TextInput(SettingsUtil.get("zipcode", ""), 255);
 		return zipcode;
 	}
-	
+
 	public Input getCity() throws RemoteException {
 		if (city == null)
 			city = new TextInput(SettingsUtil.get("city", ""), 255);
@@ -102,16 +107,16 @@ public class SettingsControl extends AbstractControl {
 			return zipcodeCity;
 
 		zipcodeCity = new MultiInput(getZipcode(), getCity());
-		
+
 		return zipcodeCity;
 	}
-	
+
 	public Input getState() throws RemoteException {
 		if (state == null)
 			state = new TextInput(SettingsUtil.get("state", ""), 255);
 		return state;
 	}
-	
+
 	public Input getCountry() throws RemoteException {
 		if (country == null)
 			country = new TextInput(SettingsUtil.get("country", ""), 255);
@@ -146,6 +151,27 @@ public class SettingsControl extends AbstractControl {
 		return noticeTime;
 	}
 
+	public CheckboxInput getICalAutoExport() throws RemoteException {
+		if (iCalAutoExport == null) {
+			iCalAutoExport = new CheckboxInput(Settings.getICalAutoExport());
+		}
+		return iCalAutoExport;
+	}
+
+	public CheckboxInput getNamedICalExport() throws RemoteException {
+		if (anonICalExport == null) {
+			anonICalExport = new CheckboxInput(Settings.getNamedICalExport());
+		}
+		return anonICalExport;
+	}
+
+	public FileInput getICalFileLocation() throws RemoteException {
+		if (iCalFileLocation == null) {
+			iCalFileLocation = new FileInput(Settings.getICalFileLocation());
+		}
+		return iCalFileLocation;
+	}
+
 	/**
 	 * This method stores the contract using the current values.
 	 */
@@ -161,8 +187,15 @@ public class SettingsControl extends AbstractControl {
 			SettingsUtil.set("country", (String) getCountry().getValue());
 			SettingsUtil.set("email", (String) getEmail().getValue());
 			SettingsUtil.set("phone", (String) getPhone().getValue());
-			Settings.setExtensionNoticeTime((Integer)getNoticeTime().getValue());
-			Settings.setExtensionWarningTime((Integer)getWarningTime().getValue());
+			Settings.setExtensionNoticeTime((Integer) getNoticeTime()
+					.getValue());
+			Settings.setExtensionWarningTime((Integer) getWarningTime()
+					.getValue());
+			Settings.setICalAutoExport((Boolean) getICalAutoExport().getValue());
+			Settings.setNamedICalExport((Boolean) getNamedICalExport().getValue());
+			Settings.setICalFileLocation((String) getICalFileLocation()
+					.getValue());
+			
 			GUI.getStatusBar().setSuccessText(
 					Settings.i18n().tr("Settings saved."));
 		} catch (ApplicationException e) {
