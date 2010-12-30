@@ -52,7 +52,7 @@ public class ExportCancelationReminders implements Action {
 				FileDialog fd = new FileDialog(GUI.getShell(), SWT.SAVE);
 				fd.setText(Settings.i18n().tr(
 						"Select iCal file for cancellation reminders"));
-				fd.setOverwrite(true);
+				//fd.setOverwrite(true);
 				if (filename != null && !filename.isEmpty())
 					fd.setFileName(filename);
 				filename = fd.open();
