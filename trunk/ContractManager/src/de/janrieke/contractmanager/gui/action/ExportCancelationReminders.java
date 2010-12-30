@@ -52,9 +52,15 @@ public class ExportCancelationReminders implements Action {
 				FileDialog fd = new FileDialog(GUI.getShell(), SWT.SAVE);
 				fd.setText(Settings.i18n().tr(
 						"Select iCal file for cancellation reminders"));
-				//fd.setOverwrite(true);
+				fd.setOverwrite(true);
 				if (filename != null && !filename.isEmpty())
 					fd.setFileName(filename);
+				String[] names = {
+						Settings.i18n().tr("iCalendar file" + " (*.ics)"),
+						Settings.i18n().tr("All files") + " (*.*)" };
+				fd.setFilterNames(names);
+				String[] filters = { "*.ics", "*.*" };
+				fd.setFilterExtensions(filters);
 				filename = fd.open();
 				if (filename == null)
 					return;
@@ -93,8 +99,7 @@ public class ExportCancelationReminders implements Action {
 				ical.getComponents().add(cancellation);
 			}
 
-			FileOutputStream fout = new FileOutputStream(
-					Settings.getICalFileLocation());
+			FileOutputStream fout = new FileOutputStream(filename);
 
 			CalendarOutputter outputter = new CalendarOutputter();
 			outputter.output(ical, fout);
