@@ -2,9 +2,11 @@ package de.janrieke.contractmanager;
 
 import java.rmi.RemoteException;
 
+import de.janrieke.contractmanager.gui.action.ExportCancelationReminders;
 import de.janrieke.contractmanager.rmi.ContractDBService;
 import de.janrieke.contractmanager.server.ContractDBServiceImpl;
 import de.janrieke.contractmanager.server.DBSupportH2Impl;
+import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
@@ -38,6 +40,42 @@ public class ContractManagerPlugin extends AbstractPlugin {
 	 */
 	public void init() throws ApplicationException {
 		instance = this;
+
+//		Application.getMessagingFactory().registerMessageConsumer(
+//				new MessageConsumer() {
+//
+//					@Override
+//					public void handleMessage(Message message) throws Exception {
+//						if (((SystemMessage) message).getStatusCode() == SystemMessage.SYSTEM_SHUTDOWN) {
+//							try {
+//								if (Settings.getICalAutoExport()) {
+//									new ExportCancelationReminders()
+//											.handleAction(null);
+//								}
+//							} catch (RemoteException e) {
+//								GUI.getStatusBar()
+//										.setErrorText(
+//												Settings.i18n()
+//														.tr("Error during cancellation reminder export."));
+//							} catch (ApplicationException e) {
+//								GUI.getStatusBar()
+//										.setErrorText(
+//												Settings.i18n()
+//														.tr("Error during cancellation reminder export."));
+//							}
+//						}
+//					}
+//
+//					@Override
+//					public Class<?>[] getExpectedMessageTypes() {
+//						return new Class[] { SystemMessage.class };
+//					}
+//
+//					@Override
+//					public boolean autoRegister() {
+//						return false;
+//					}
+//				});
 	}
 
 	/**
@@ -49,13 +87,13 @@ public class ContractManagerPlugin extends AbstractPlugin {
 	 */
 	public void install() throws ApplicationException {
 
-	    call(new ServiceCall() {
-	        
-	        public void call(ContractDBService service) throws ApplicationException, RemoteException
-	        {
-	          service.install();
-	        }
-	      });		
+		call(new ServiceCall() {
+
+			public void call(ContractDBService service)
+					throws ApplicationException, RemoteException {
+				service.install();
+			}
+		});
 	}
 
 	/**
@@ -73,6 +111,22 @@ public class ContractManagerPlugin extends AbstractPlugin {
 	 * @see de.willuhn.jameica.plugin.AbstractPlugin#shutDown()
 	 */
 	public void shutDown() {
+		try {
+			if (Settings.getICalAutoExport()) {
+				new ExportCancelationReminders()
+				.handleAction(null);
+			}
+		} catch (RemoteException e) {
+			GUI.getStatusBar()
+			.setErrorText(
+					Settings.i18n()
+					.tr("Error during cancellation reminder export."));
+		} catch (ApplicationException e) {
+			GUI.getStatusBar()
+			.setErrorText(
+					Settings.i18n()
+					.tr("Error during cancellation reminder export."));
+		}
 	}
 
 	public static ContractManagerPlugin getInstance() {
@@ -88,8 +142,8 @@ public class ContractManagerPlugin extends AbstractPlugin {
 		 * @throws ApplicationException
 		 * @throws RemoteException
 		 */
-		public void call(ContractDBService service) throws ApplicationException,
-				RemoteException;
+		public void call(ContractDBService service)
+				throws ApplicationException, RemoteException;
 	}
 
 	/**

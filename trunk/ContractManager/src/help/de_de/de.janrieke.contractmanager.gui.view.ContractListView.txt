@@ -1,0 +1,16 @@
+<form>
+	<p>
+		<span color="header" font="header">Vertragsliste</span>
+	</p>
+
+	<li>
+		Hier finden Sie die Übersicht aller Verträge.
+		Gelb und rot hinterlegte Vertäge sind kurz vor einer Kündigungsfrist. 
+	</li>
+	<li>
+		Doppelklicken Sie auf einen Vertrag, um die Vertragsdetails anzuzeigen. 
+	</li>
+	<li>
+		Verwenden Sie die Schaltflächen am unteren Rand, um neue Verträge zu erstellen oder manuell Erinnerungen in eine iCalendar-Datei zu exportieren. 
+	</li>
+</form>

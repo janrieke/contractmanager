@@ -128,5 +128,6 @@ public interface Contract extends DBObject {
 	public Date getNextTermBegin() throws RemoteException;
 	public Date getNextTermEnd() throws RemoteException;
 	public Date getNextCancellationDeadline() throws RemoteException;
+	public Date getNextCancellationDeadline(Date after) throws RemoteException;
 	public double getCostsPerTerm() throws RemoteException;
 }

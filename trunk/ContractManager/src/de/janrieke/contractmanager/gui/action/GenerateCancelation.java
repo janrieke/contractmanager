@@ -114,6 +114,8 @@ public class GenerateCancelation implements Action {
 
 			// save the file with a new file name
 			doc.save(filename);
+			GUI.getStatusBar().setSuccessText(
+					Settings.i18n().tr("Cancellation successfully generated."));
 		} catch (Exception e) {
 			throw new ApplicationException(Settings.i18n().tr(
 				"Error while storing document."), e);

@@ -1,0 +1,12 @@
+<form>
+	<p>
+		<span color="header" font="header">Willkommen bei ContractManager</span>
+	</p>
+
+	<p>
+	  ContractManager ist eine Vertragsverwaltungssoftware für Privatpersonen.
+	  Sie können Ihre Verträge erfassen, und ContractManager erinnert Sie automatisch kurz vor Vertragsverlängerungen, so dass Sie rechtzeitig kündigen können.
+	  Wenn gewünscht, kann direkt ein Kündigungsschreiben generiert werden.
+	  Erinnerungen können auch exportiert werden, so dass sie direkt in Ihrer Kalender-Anwendung (wie z.B. Thunderbird/Lightning) angezeigt werden.
+	</p>
+</form>

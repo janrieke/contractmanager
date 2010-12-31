@@ -1,4 +1,6 @@
 /**********************************************************************
+ * Copied from Jameica.
+ * 
  * $Source: /cvsroot/jameica/jameica/src/de/willuhn/jameica/gui/input/FileInput.java,v $
  * $Revision: 1.16 $
  * $Date: 2008-07-17 08:47:12 $
@@ -74,6 +76,8 @@ public class FileInput extends ButtonInput
           dialog.setFilterExtensions(extensions);
         if (filters != null && filters.length > 0)
             dialog.setFilterNames(filters);
+        if (save)
+        	dialog.setOverwrite(true);
         dialog.setText(Application.getI18n().tr("Bitte wählen Sie die Datei aus"));
         dialog.setFileName(value);
         setValue(dialog.open());
@@ -123,59 +127,3 @@ public class FileInput extends ButtonInput
   }
 
 }
-
-/*********************************************************************
- * $Log: FileInput.java,v $
- * Revision 1.16  2008-07-17 08:47:12  willuhn
- * @N Heiners Patch zum expliziten Vorgeben von Dateiendungen im Dialog
- *
- * Revision 1.15  2008/02/29 01:12:30  willuhn
- * @N Erster Code fuer neues Backup-System
- * @N DirectoryInput
- * @B Fixes an FileInput, TextInput
- *
- * Revision 1.14  2006/12/28 15:35:52  willuhn
- * @N Farbige Pflichtfelder
- *
- * Revision 1.13  2006/04/20 08:44:03  web0
- * @C s/Childs/Children/
- *
- * Revision 1.12  2005/11/14 11:36:23  web0
- * *** empty log message ***
- *
- * Revision 1.11  2005/03/09 01:06:36  web0
- * @D javadoc fixes
- *
- * Revision 1.10  2005/01/18 23:00:32  willuhn
- * @C Default focus to actual file
- *
- * Revision 1.9  2004/11/12 18:23:59  willuhn
- * *** empty log message ***
- *
- * Revision 1.8  2004/07/27 23:41:30  willuhn
- * *** empty log message ***
- *
- * Revision 1.7  2004/07/09 00:12:47  willuhn
- * @C Redesign
- *
- * Revision 1.6  2004/06/30 20:58:40  willuhn
- * *** empty log message ***
- *
- * Revision 1.5  2004/06/08 22:54:00  willuhn
- * *** empty log message ***
- *
- * Revision 1.4  2004/06/02 21:15:15  willuhn
- * @B win32 fixes in flat style
- * @C made ButtonInput more abstract
- *
- * Revision 1.3  2004/05/23 15:30:52  willuhn
- * @N new color/font management
- * @N new styleFactory
- *
- * Revision 1.2  2004/04/27 00:04:44  willuhn
- * @D javadoc
- *
- * Revision 1.1  2004/04/12 19:15:58  willuhn
- * @C refactoring
- * @N forms
- **********************************************************************/

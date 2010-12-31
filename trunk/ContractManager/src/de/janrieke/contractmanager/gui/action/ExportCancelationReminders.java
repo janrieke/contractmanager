@@ -8,9 +8,12 @@ import java.util.Date;
 
 import net.fortuna.ical4j.data.CalendarOutputter;
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Dur;
 import net.fortuna.ical4j.model.ValidationException;
+import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.util.UidGenerator;
@@ -66,7 +69,15 @@ public class ExportCancelationReminders implements Action {
 				if (filename == null)
 					return;
 			}
+			
+			//Export reminders for the next 2 years
+			java.util.Calendar until = java.util.Calendar.getInstance();
+			until.add(java.util.Calendar.YEAR, 2);
 
+			// FIXME: Calendar apps usually modify the iCal file to store which
+			// reminders have already been checked.
+			// Thus, we should store the Event's UID and load the file before
+			// overwriting.
 			Calendar ical = new Calendar();
 			ical.getProperties().add(
 					new ProdId("-//ContractManager 0.1//iCal4j 1.0//EN"));
@@ -79,30 +90,49 @@ public class ExportCancelationReminders implements Action {
 
 			while (contracts.hasNext()) {
 				Contract contract = (Contract) contracts.next();
-				Date deadline = contract.getNextCancellationDeadline();
 
+				Date deadline = contract.getNextCancellationDeadline();
 				calcCalendar.setTime(deadline);
 				calcCalendar.add(java.util.Calendar.DAY_OF_YEAR, -warningTime);
 
-				VToDo cancellation = new VToDo(
-						new net.fortuna.ical4j.model.Date(
-								calcCalendar.getTime()),
-						new net.fortuna.ical4j.model.Date(deadline),
-						namedExport ? Settings.i18n().tr(
-								"Check cancellation for contract {0}",
-								contract.getName()) : Settings.i18n().tr(
-								"Check cancellation"));
+				while (calcCalendar.before(until)) {
+					String descr = namedExport ? Settings.i18n().tr(
+							"Check cancellation for contract {0}",
+							contract.getName()) : Settings.i18n().tr(
+							"Check cancellation");
+					VToDo cancellation = new VToDo(
+							new net.fortuna.ical4j.model.Date(
+									calcCalendar.getTime()),
+							new net.fortuna.ical4j.model.Date(deadline), descr);
+					VAlarm alarm = new VAlarm(new Dur(-warningTime, 0, 0, 0));
+					alarm.getProperties().add(
+							net.fortuna.ical4j.model.property.Action.DISPLAY);
+					alarm.getProperties().add(new Description(descr));
+					cancellation.getAlarms().add(alarm);
 
-				UidGenerator ug = new UidGenerator(Thread.currentThread().toString());
-				cancellation.getProperties().add(ug.generateUid());
+					UidGenerator ug = new UidGenerator(Thread.currentThread()
+							.toString());
+					cancellation.getProperties().add(ug.generateUid());
 
-				ical.getComponents().add(cancellation);
+					ical.getComponents().add(cancellation);
+
+					//find next cancellation deadline
+					calcCalendar.setTime(deadline);
+					calcCalendar.add(java.util.Calendar.DAY_OF_YEAR, 1);
+					deadline = contract.getNextCancellationDeadline(calcCalendar.getTime());
+					calcCalendar.setTime(deadline);
+					calcCalendar.add(java.util.Calendar.DAY_OF_YEAR, -warningTime);
+				}
 			}
 
 			FileOutputStream fout = new FileOutputStream(filename);
 
 			CalendarOutputter outputter = new CalendarOutputter();
 			outputter.output(ical, fout);
+			GUI.getStatusBar()
+					.setSuccessText(
+							Settings.i18n()
+									.tr("Cancellation reminders successfully exported to iCalendar file."));
 
 		} catch (RemoteException e) {
 			throw new ApplicationException(

@@ -100,7 +100,7 @@ public abstract class AbstractDBSupportImpl implements DBSupport {
 	public void checkConnection(Connection conn) throws RemoteException {
 		long newCheck = System.currentTimeMillis();
 		if ((newCheck - lastCheck) < (10 * 1000L))
-			return; // Wir checken hoechstens aller 10 Sekunden
+			return; // Wir checken hoechstens alle 10 Sekunden
 
 		Statement s = null;
 		ResultSet rs = null;
