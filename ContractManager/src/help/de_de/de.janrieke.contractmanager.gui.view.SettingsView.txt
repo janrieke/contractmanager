@@ -1,0 +1,17 @@
+<form>
+	<p>
+		<span color="header" font="header">Einstellungen</span>
+	</p>
+
+	<li>
+		Die Benutzerinfos werden lediglich bei der Generierung der Kündigungsschreiben genutzt.
+	</li>
+	<li>
+		Kündigungen, die innerhalb der Erinnerungs- und Warnungszeiten fällig werden, werden auf der Startseite angezeigt sowie gelb und rot unterlegt.
+	</li>
+	<li>
+		Sie können Warnungen auch als iCalendar-Datei (ICS) exportieren, um sie in Kalender-Anwendungen zu nutzen.
+		Dies kann entweder automatisch beim Beenden des Programms passieren (<b>Warnungen beim Schließen exportieren</b>) oder manuell unter "ContractManager, Verträge".
+		<b>Vertragsnamen exportieren</b> bewirkt, dass beim Export der Vertragsname in der Erinnerung steht.
+	</li>
+</form>

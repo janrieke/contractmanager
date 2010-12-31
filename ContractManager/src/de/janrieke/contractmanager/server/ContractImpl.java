@@ -456,8 +456,16 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	public void setMoneyPerYear(double money) throws RemoteException {
 		setAttribute("money_per_year", new Double(money));
 	}
-
-	private Date calculatePeriods(boolean minusCancellationPeriod)
+	
+	/**
+	 * Calculates the next contractual term's end after the given date. 
+	 * 
+	 * @param minusCancellationPeriod If true, the cancellation date is returned.
+	 * @param after
+	 * @return The end of the term.
+	 * @throws RemoteException
+	 */
+	private Date calculateTermEnd(boolean minusCancellationPeriod, Date after)
 			throws RemoteException {
 		if (getEndDate() != null)
 			return null; // if the end is already set, there is no need for
@@ -467,6 +475,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		if (startDate == null)
 			return null;
 		Calendar today = Calendar.getInstance();
+		today.setTime(after);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(startDate);
 
@@ -565,7 +574,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	@Override
 	public Date getNextTermBegin() throws RemoteException {
-		return calculatePeriods(false);
+		return calculateTermEnd(false, new Date());
 	}
 
 	public Date getNextTermEnd() throws RemoteException {
@@ -591,7 +600,12 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	@Override
 	public Date getNextCancellationDeadline() throws RemoteException {
-		return calculatePeriods(true);
+		return calculateTermEnd(true, new Date());
+	}
+
+	@Override
+	public Date getNextCancellationDeadline(Date after) throws RemoteException {
+		return calculateTermEnd(true, after);
 	}
 
 	private int getNextRuntimeDays() throws RemoteException {

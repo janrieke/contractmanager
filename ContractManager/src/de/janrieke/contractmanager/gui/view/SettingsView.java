@@ -45,12 +45,13 @@ public class SettingsView extends AbstractView {
 	    left.addLabelPair(Settings.i18n().tr("Phone"), control.getPhone());
 
 	    SimpleContainer right = new SimpleContainer(columns.getComposite());
-	    right.addHeadline(Settings.i18n().tr("Miscellaneous"));
+	    right.addHeadline(Settings.i18n().tr("Contract Cancellation Reminders"));
 	    right.addLabelPair(Settings.i18n().tr("Extension notice time"), control.getNoticeTime());
 	    right.addLabelPair(Settings.i18n().tr("Extension warning time"), control.getWarningTime());
-	    right.addLabelPair(Settings.i18n().tr("Auto-export warnings to iCal"), control.getICalAutoExport());
+	    right.addHeadline(Settings.i18n().tr("iCal Export of Contract Cancellation Reminders"));
+	    right.addLabelPair(Settings.i18n().tr("Export warnings on exit"), control.getICalAutoExport());
 	    right.addLabelPair(Settings.i18n().tr("iCal file"), control.getICalFileLocation());
-	    right.addLabelPair(Settings.i18n().tr("Export contract name"), control.getNamedICalExport());
+	    right.addLabelPair(Settings.i18n().tr("Export contract names"), control.getNamedICalExport());
 
 	    
 		// add some buttons
