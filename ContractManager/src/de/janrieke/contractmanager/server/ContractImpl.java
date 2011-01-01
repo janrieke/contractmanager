@@ -7,6 +7,7 @@ import java.util.Date;
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
+import de.janrieke.contractmanager.rmi.Costs;
 import de.janrieke.contractmanager.rmi.Transaction;
 import de.willuhn.datasource.db.AbstractDBObject;
 import de.willuhn.datasource.rmi.DBIterator;
@@ -335,7 +336,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	public IntervalType getCancellationPeriodType() throws RemoteException {
 		Object type = getAttribute("cancelation_period_type");
 		return type == null ? IntervalType.DAYS
-				: IntervalType.values()[(Integer) getAttribute("cancelation_period_type")];
+				: IntervalType.values()[(Integer) type];
 	}
 
 	@Override
@@ -370,7 +371,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	public IntervalType getFirstMinRuntimeType() throws RemoteException {
 		Object type = getAttribute("first_min_runtime_type");
 		return type == null ? IntervalType.DAYS
-				: IntervalType.values()[(Integer) getAttribute("first_min_runtime_type")];
+				: IntervalType.values()[(Integer) type];
 	}
 
 	@Override
@@ -394,7 +395,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	public IntervalType getNextMinRuntimeType() throws RemoteException {
 		Object type = getAttribute("next_min_runtime_type");
 		return type == null ? IntervalType.DAYS
-				: IntervalType.values()[(Integer) getAttribute("next_min_runtime_type")];
+				: IntervalType.values()[(Integer) type];
 	}
 
 	@Override
@@ -456,11 +457,35 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	public void setMoneyPerYear(double money) throws RemoteException {
 		setAttribute("money_per_year", new Double(money));
 	}
-	
+
+	public String getURI() throws RemoteException {
+		return (String) getAttribute("uri");
+	}
+
+	public void setURI(String uri) throws RemoteException {
+		setAttribute("uri", uri);
+	}
+
 	/**
-	 * Calculates the next contractual term's end after the given date. 
+	 * @see de.willuhn.jameica.example.rmi.Project#getTasks()
+	 */
+	public DBIterator getCosts() throws RemoteException {
+		try {
+			DBService service = this.getService();
+			DBIterator costs = service.createList(Costs.class);
+			costs.addFilter("contract_id = " + this.getID());
+
+			return costs;
+		} catch (Exception e) {
+			throw new RemoteException("unable to load costs list", e);
+		}
+	}
+
+	/**
+	 * Calculates the next contractual term's end after the given date.
 	 * 
-	 * @param minusCancellationPeriod If true, the cancellation date is returned.
+	 * @param minusCancellationPeriod
+	 *            If true, the cancellation date is returned.
 	 * @param after
 	 * @return The end of the term.
 	 * @throws RemoteException
@@ -490,11 +515,11 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 					&& cancellationPeriodCount > 0) {
 				switch (cancellationPeriodType) {
 				case DAYS:
-					calendar.add(Calendar.DAY_OF_YEAR,
-							-cancellationPeriodCount);
+					calendar.add(Calendar.DAY_OF_YEAR, -cancellationPeriodCount);
 					break;
 				case WEEKS:
-					calendar.add(Calendar.WEEK_OF_YEAR, -cancellationPeriodCount);
+					calendar.add(Calendar.WEEK_OF_YEAR,
+							-cancellationPeriodCount);
 					break;
 				case MONTHS:
 					calendar.add(Calendar.MONTH, -cancellationPeriodCount);
@@ -609,7 +634,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	private int getNextRuntimeDays() throws RemoteException {
-		//FIXME: Calculate costs based on a real calendar 
+		// FIXME: Calculate costs based on a real calendar
 		if (getEndDate() != null)
 			return 0; // if the end is already set, there is no need for
 						// further cancellations
@@ -653,7 +678,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	@Override
 	public double getCostsPerTerm() throws RemoteException {
-		//FIXME: Calculate costs based on a real calendar 
+		// FIXME: Calculate costs based on a real calendar
 		return (getMoneyPerDay() + getMoneyPerMonth() / 30 + getMoneyPerWeek()
 				/ 7 + getMoneyPerYear() / 365)
 				* getNextRuntimeDays();

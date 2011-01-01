@@ -122,7 +122,11 @@ public interface Contract extends DBObject {
 	public double getMoneyPerYear() throws RemoteException;
 	public void setMoneyPerYear(double money) throws RemoteException;
 	
+	public String getURI() throws RemoteException;
+	public void setURI(String uri) throws RemoteException;
+
 	public DBIterator getTransactions() throws RemoteException;
+	public DBIterator getCosts() throws RemoteException;
 
 	//these are derived features
 	public Date getNextTermBegin() throws RemoteException;

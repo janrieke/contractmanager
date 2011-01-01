@@ -11,11 +11,14 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableItem;
 
 import de.janrieke.contractmanager.Settings;
+import de.janrieke.contractmanager.gui.action.ShowTransactionDetailsView;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion;
 import de.janrieke.contractmanager.gui.menu.ContractListMenu;
+import de.janrieke.contractmanager.gui.menu.TransactionListMenu;
 import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
+import de.willuhn.datasource.GenericIterator;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.jameica.gui.AbstractControl;
@@ -92,6 +95,8 @@ public class ContractControl extends AbstractControl {
 	private Contract contract;
 
 	private LabelInput nextCancellationDeadline;
+
+	private TablePart transactionList;
 
 	/**
 	 * ct.
@@ -250,7 +255,7 @@ public class ContractControl extends AbstractControl {
 							+ Settings.i18n().tr("to") + " "
 							+ Settings.DATEFORMAT.format(nte)));
 		} else
-		nextExtension = new LabelInput("");
+			nextExtension = new LabelInput("");
 		return nextExtension;
 	}
 
@@ -614,7 +619,8 @@ public class ContractControl extends AbstractControl {
 							if (calendar.before(today))
 								item.setBackground(Color.ERROR.getSWTColor());
 							else
-								item.setBackground(Color.MANDATORY_BG.getSWTColor());
+								item.setBackground(Color.MANDATORY_BG
+										.getSWTColor());
 						} else {
 							TableItem[] items = item.getParent().getItems();
 							boolean found = false;
@@ -647,43 +653,23 @@ public class ContractControl extends AbstractControl {
 	}
 
 	/**
-	 * Returns a list of tasks in this contract.
+	 * Returns a list of transactions in this contract.
 	 * 
 	 * @return list of tasks in this contract
 	 * @throws RemoteException
 	 */
-	// public Part getTransactionList() throws RemoteException {
-	// if (transactionList != null)
-	// return transactionList;
-	//
-	// GenericIterator transactions = getContract().getTransactions();
-	// transactionList = new TablePart(transactions, new TransactionDetail());
-	// transactionList.addColumn(Settings.i18n().tr("Task name"), "name");
-	// transactionList.addColumn(Settings.i18n().tr("Effort"), "effort",
-	// new Formatter() {
-	// @Override
-	// public String format(Object o) {
-	// if (o == null)
-	// return "-";
-	// return o + " h";
-	// }
-	// });
-	//
-	// TransactionListMenu tlm = new TransactionListMenu();
-	//
-	// // we add an additional menu item to create tasks with predefined
-	// // contract.
-	// tlm.addItem(new ContextMenuItem(Settings.i18n().tr(
-	// "Create new task within this Contract"), new Action() {
-	// public void handleAction(Object context)
-	// throws ApplicationException {
-	// new TransactionDetail().handleAction(getContract());
-	// }
-	// }));
-	// transactionList.setContextMenu(tlm);
-	// transactionList.setSummary(false);
-	// return transactionList;
-	// }
+	public Part getTransactionList() throws RemoteException {
+		if (transactionList != null)
+			return transactionList;
+
+		GenericIterator transactions = getContract().getTransactions();
+		transactionList = new TablePart(transactions, new ShowTransactionDetailsView());
+		transactionList.addColumn(Settings.i18n().tr("Money"), "money");
+		TransactionListMenu tlm = new TransactionListMenu();
+		transactionList.setContextMenu(tlm);
+		transactionList.setSummary(false);
+		return transactionList;
+	}
 
 	/**
 	 * This method stores the contract using the current values.
