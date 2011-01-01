@@ -18,6 +18,17 @@ CREATE TABLE contract (
   money_per_week double,
   money_per_month double,
   money_per_year double,
+  uri varchar(4096),
+  UNIQUE (id),
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE costs (
+  id IDENTITY,
+  contract_id int(5),
+  description varchar(255),
+  money double,
+  period int(1),
   UNIQUE (id),
   PRIMARY KEY (id)
 );
