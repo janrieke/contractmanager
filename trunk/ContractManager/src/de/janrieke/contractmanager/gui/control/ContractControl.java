@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableItem;
@@ -14,10 +15,12 @@ import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.ShowTransactionDetailsView;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion;
 import de.janrieke.contractmanager.gui.menu.ContractListMenu;
+import de.janrieke.contractmanager.gui.menu.CostsListMenu;
 import de.janrieke.contractmanager.gui.menu.TransactionListMenu;
 import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
+import de.janrieke.contractmanager.rmi.Costs;
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.datasource.rmi.DBService;
@@ -29,7 +32,6 @@ import de.willuhn.jameica.gui.dialogs.CalendarDialog;
 import de.willuhn.jameica.gui.formatter.CurrencyFormatter;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
 import de.willuhn.jameica.gui.formatter.TableFormatter;
-import de.willuhn.jameica.gui.input.DecimalInput;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.input.IntegerInput;
 import de.willuhn.jameica.gui.input.LabelInput;
@@ -71,12 +73,6 @@ public class ContractControl extends AbstractControl {
 	private IntegerInput nextMinRuntimeCount;
 	private SelectInput nextMinRuntimeType;
 
-	private DecimalInput moneyOnce;
-	private DecimalInput moneyPerDay;
-	private DecimalInput moneyPerWeek;
-	private DecimalInput moneyPerMonth;
-	private DecimalInput moneyPerYear;
-
 	private Input partnerName;
 	private Input partnerStreet;
 	private Input partnerNumber;
@@ -97,6 +93,9 @@ public class ContractControl extends AbstractControl {
 	private LabelInput nextCancellationDeadline;
 
 	private TablePart transactionList;
+	private TablePart costsList;
+
+	private List<Costs> newCosts = new ArrayList<Costs>();
 
 	/**
 	 * ct.
@@ -154,21 +153,6 @@ public class ContractControl extends AbstractControl {
 		if (comment == null)
 			comment = new TextAreaInput(getContract().getComment());
 		return comment;
-	}
-
-	/**
-	 * Returns the input field for the contract price.
-	 * 
-	 * @return input field.
-	 * @throws RemoteException
-	 */
-	public Input getMoneyOnce() throws RemoteException {
-		if (moneyOnce == null) {
-			moneyOnce = new DecimalInput(getContract().getMoneyOnce(),
-					Settings.DECIMALFORMAT);
-			moneyOnce.setComment(Settings.CURRENCY);
-		}
-		return moneyOnce;
 	}
 
 	/**
@@ -362,42 +346,6 @@ public class ContractControl extends AbstractControl {
 		return nextMinRuntimeType;
 	}
 
-	public DecimalInput getMoneyPerDay() throws RemoteException {
-		if (moneyPerDay == null) {
-			moneyPerDay = new DecimalInput(getContract().getMoneyPerDay(),
-					Settings.DECIMALFORMAT);
-			moneyPerDay.setComment(Settings.CURRENCY);
-		}
-		return moneyPerDay;
-	}
-
-	public DecimalInput getMoneyPerWeek() throws RemoteException {
-		if (moneyPerWeek == null) {
-			moneyPerWeek = new DecimalInput(getContract().getMoneyPerWeek(),
-					Settings.DECIMALFORMAT);
-			moneyPerWeek.setComment(Settings.CURRENCY);
-		}
-		return moneyPerWeek;
-	}
-
-	public DecimalInput getMoneyPerMonth() throws RemoteException {
-		if (moneyPerMonth == null) {
-			moneyPerMonth = new DecimalInput(getContract().getMoneyPerMonth(),
-					Settings.DECIMALFORMAT);
-			moneyPerMonth.setComment(Settings.CURRENCY);
-		}
-		return moneyPerMonth;
-	}
-
-	public DecimalInput getMoneyPerYear() throws RemoteException {
-		if (moneyPerYear == null) {
-			moneyPerYear = new DecimalInput(getContract().getMoneyPerYear(),
-					Settings.DECIMALFORMAT);
-			moneyPerYear.setComment(Settings.CURRENCY);
-		}
-		return moneyPerYear;
-	}
-
 	public Input getPartnerName() throws RemoteException {
 		if (partnerName == null)
 			partnerName = new TextInput(getContract().getAddress().getName(),
@@ -529,7 +477,10 @@ public class ContractControl extends AbstractControl {
 					Calendar today = Calendar.getInstance();
 					Calendar calendar = Calendar.getInstance();
 					try {
-						calendar.setTime(contract.getNextCancellationDeadline());
+						Date deadline = contract.getNextCancellationDeadline();
+						if (deadline == null)
+							return;
+						calendar.setTime(deadline);
 						calendar.add(Calendar.DAY_OF_YEAR,
 								-Settings.getExtensionWarningTime());
 						if (calendar.before(today))
@@ -655,7 +606,7 @@ public class ContractControl extends AbstractControl {
 	/**
 	 * Returns a list of transactions in this contract.
 	 * 
-	 * @return list of tasks in this contract
+	 * @return list of transactions in this contract
 	 * @throws RemoteException
 	 */
 	public Part getTransactionList() throws RemoteException {
@@ -669,6 +620,35 @@ public class ContractControl extends AbstractControl {
 		transactionList.setContextMenu(tlm);
 		transactionList.setSummary(false);
 		return transactionList;
+	}
+
+	/**
+	 * Returns a list of transactions in this contract.
+	 * 
+	 * @return list of transactions in this contract
+	 * @throws RemoteException
+	 */
+	public Part getCostsList() throws RemoteException {
+		if (costsList != null)
+			return costsList;
+
+		GenericIterator costs = getContract().getCosts();
+		costsList = new TablePart(costs, null) {
+
+			@Override
+			public synchronized void paint(Composite parent)
+					throws RemoteException {
+				super.paint(parent);
+			}
+			
+		};
+		costsList.addColumn(Settings.i18n().tr("Description"), "description", null, true);
+		costsList.addColumn(Settings.i18n().tr("Money"), "money", null, true);
+		costsList.addColumn(Settings.i18n().tr("Period"), "period", null, true);
+		CostsListMenu clm = new CostsListMenu(this);
+		costsList.setContextMenu(clm);
+		costsList.setSummary(false);
+		return costsList;
 	}
 
 	/**
@@ -700,17 +680,6 @@ public class ContractControl extends AbstractControl {
 			p.setNextMinRuntimeType((IntervalType) getNextMinRuntimeType()
 					.getValue());
 
-			Double d = (Double) getMoneyOnce().getValue();
-			p.setMoneyOnce(d == null ? 0.0 : d.doubleValue());
-			d = (Double) getMoneyPerDay().getValue();
-			p.setMoneyPerDay(d == null ? 0.0 : d.doubleValue());
-			d = (Double) getMoneyPerWeek().getValue();
-			p.setMoneyPerWeek(d == null ? 0.0 : d.doubleValue());
-			d = (Double) getMoneyPerMonth().getValue();
-			p.setMoneyPerMonth(d == null ? 0.0 : d.doubleValue());
-			d = (Double) getMoneyPerYear().getValue();
-			p.setMoneyPerYear(d == null ? 0.0 : d.doubleValue());
-
 			Address a = getContract().getAddress();
 			a.setName((String) getPartnerName().getValue());
 			a.setStreet((String) getPartnerStreet().getValue());
@@ -730,6 +699,16 @@ public class ContractControl extends AbstractControl {
 				// object has no ID, yet.
 				p.setAddress(a);
 				p.store();
+				
+				DBIterator costs = p.getCosts();
+				while (costs.hasNext()) {
+					Costs c = (Costs) costs.next();
+					c.store();
+				}
+				for (Costs c: newCosts) {
+					c.store();
+				}
+				
 				GUI.getStatusBar().setSuccessText(
 						Settings.i18n().tr("Contract stored successfully"));
 			} catch (ApplicationException e) {
@@ -739,6 +718,21 @@ public class ContractControl extends AbstractControl {
 			Logger.error("error while storing contract", e);
 			GUI.getStatusBar().setErrorText(
 					Settings.i18n().tr("Error while storing contract"));
+		}
+	}
+
+	public void removeCostEntry(Costs c) {
+		costsList.removeItem(c);
+		newCosts.remove(c);
+	}
+
+	public void addTemporaryCostEntry(Costs c) {
+		try {
+			costsList.addItem(c);
+			newCosts.add(c);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

@@ -53,6 +53,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 * 
 	 * @see de.willuhn.datasource.db.AbstractDBObject#getTableName()
 	 */
+	@Override
 	protected String getTableName() {
 		return "contract";
 	}
@@ -64,6 +65,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 * 
 	 * @see de.willuhn.datasource.GenericObject#getPrimaryAttribute()
 	 */
+	@Override
 	public String getPrimaryAttribute() throws RemoteException {
 		// we choose the contract's name as primary field.
 		return "name";
@@ -78,6 +80,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 * 
 	 * @see de.willuhn.datasource.db.AbstractDBObject#deleteCheck()
 	 */
+	@Override
 	protected void deleteCheck() throws ApplicationException {
 	}
 
@@ -87,6 +90,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 * 
 	 * @see de.willuhn.datasource.db.AbstractDBObject#insertCheck()
 	 */
+	@Override
 	protected void insertCheck() throws ApplicationException {
 		try {
 			if (getName() == null || getName().length() == 0)
@@ -124,6 +128,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 * 
 	 * @see de.willuhn.datasource.db.AbstractDBObject#updateCheck()
 	 */
+	@Override
 	protected void updateCheck() throws ApplicationException {
 		// we simply call the insertCheck here
 		insertCheck();
@@ -132,6 +137,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	/**
 	 * @see de.willuhn.datasource.db.AbstractDBObject#getForeignObject(java.lang.String)
 	 */
+	@Override
 	protected Class<?> getForeignObject(String field) throws RemoteException {
 		if ("address_id".equals(field))
 			return Address.class;
@@ -175,6 +181,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	// FIELD DATA ACCESS
+	@Override
 	public Object getAttribute(String arg0) throws RemoteException {
 		// check derived fields
 		if ("nextCancellationDeadline".equals(arg0))
@@ -190,6 +197,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	/**
 	 * @see de.janrieke.contractmanager.rmi.Contract#getName()
 	 */
+	@Override
 	public String getName() throws RemoteException {
 		// We can cast this directly to String, the method getField() knows the
 		// meta data of this sql table ;)
@@ -217,15 +225,9 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	/**
-	 * @see de.janrieke.contractmanager.rmi.Contract#getDescription()
-	 */
-	public String getDescription() throws RemoteException {
-		return (String) getAttribute("description");
-	}
-
-	/**
 	 * @see de.janrieke.contractmanager.rmi.Contract#getStartDate()
 	 */
+	@Override
 	public Date getStartDate() throws RemoteException {
 		return (Date) getAttribute("startdate");
 	}
@@ -233,6 +235,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	/**
 	 * @see de.janrieke.contractmanager.rmi.Contract#getEndDate()
 	 */
+	@Override
 	public Date getEndDate() throws RemoteException {
 		return (Date) getAttribute("enddate");
 	}
@@ -240,20 +243,15 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	/**
 	 * @see de.janrieke.contractmanager.rmi.Contract#setName(java.lang.String)
 	 */
+	@Override
 	public void setName(String name) throws RemoteException {
 		setAttribute("name", name);
 	}
 
 	/**
-	 * @see de.janrieke.contractmanager.rmi.Contract#setDescription(java.lang.String)
-	 */
-	public void setDescription(String description) throws RemoteException {
-		setAttribute("description", description);
-	}
-
-	/**
 	 * @see de.janrieke.contractmanager.rmi.Contract#setStartDate(java.util.Date)
 	 */
+	@Override
 	public void setStartDate(Date startDate) throws RemoteException {
 		setAttribute("startdate", startDate);
 	}
@@ -261,6 +259,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	/**
 	 * @see de.janrieke.contractmanager.rmi.Contract#setEndDate(java.util.Date)
 	 */
+	@Override
 	public void setEndDate(Date endDate) throws RemoteException {
 		setAttribute("enddate", endDate);
 	}
@@ -268,6 +267,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	/**
 	 * @see de.janrieke.contractmanager.rmi.Contract#getTransactions()
 	 */
+	@Override
 	public DBIterator getTransactions() throws RemoteException {
 		try {
 			// 1) Get the Database Service.
@@ -404,64 +404,11 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	@Override
-	public double getMoneyOnce() throws RemoteException {
-		Double d = (Double) getAttribute("money_once");
-		return d == null ? 0.0 : d.doubleValue();
-	}
-
-	@Override
-	public void setMoneyOnce(double money) throws RemoteException {
-		setAttribute("money_once", new Double(money));
-	}
-
-	@Override
-	public double getMoneyPerDay() throws RemoteException {
-		Double d = (Double) getAttribute("money_per_day");
-		return d == null ? 0.0 : d.doubleValue();
-	}
-
-	@Override
-	public void setMoneyPerDay(double money) throws RemoteException {
-		setAttribute("money_per_day", new Double(money));
-	}
-
-	@Override
-	public double getMoneyPerWeek() throws RemoteException {
-		Double d = (Double) getAttribute("money_per_week");
-		return d == null ? 0.0 : d.doubleValue();
-	}
-
-	@Override
-	public void setMoneyPerWeek(double money) throws RemoteException {
-		setAttribute("money_per_week", new Double(money));
-	}
-
-	@Override
-	public double getMoneyPerMonth() throws RemoteException {
-		Double d = (Double) getAttribute("money_per_month");
-		return d == null ? 0.0 : d.doubleValue();
-	}
-
-	@Override
-	public void setMoneyPerMonth(double money) throws RemoteException {
-		setAttribute("money_per_month", new Double(money));
-	}
-
-	@Override
-	public double getMoneyPerYear() throws RemoteException {
-		Double d = (Double) getAttribute("money_per_year");
-		return d == null ? 0.0 : d.doubleValue();
-	}
-
-	@Override
-	public void setMoneyPerYear(double money) throws RemoteException {
-		setAttribute("money_per_year", new Double(money));
-	}
-
 	public String getURI() throws RemoteException {
 		return (String) getAttribute("uri");
 	}
 
+	@Override
 	public void setURI(String uri) throws RemoteException {
 		setAttribute("uri", uri);
 	}
@@ -469,6 +416,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	/**
 	 * @see de.willuhn.jameica.example.rmi.Project#getTasks()
 	 */
+	@Override
 	public DBIterator getCosts() throws RemoteException {
 		try {
 			DBService service = this.getService();
@@ -602,8 +550,11 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		return calculateTermEnd(false, new Date());
 	}
 
+	@Override
 	public Date getNextTermEnd() throws RemoteException {
 		Date begin = getNextTermBegin();
+		if (begin == null)
+			return null;
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(begin);
 		switch (getNextMinRuntimeType()) {
@@ -679,8 +630,9 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public double getCostsPerTerm() throws RemoteException {
 		// FIXME: Calculate costs based on a real calendar
-		return (getMoneyPerDay() + getMoneyPerMonth() / 30 + getMoneyPerWeek()
-				/ 7 + getMoneyPerYear() / 365)
-				* getNextRuntimeDays();
+//		return (getMoneyPerDay() + getMoneyPerMonth() / 30 + getMoneyPerWeek()
+//				/ 7 + getMoneyPerYear() / 365)
+//				* getNextRuntimeDays();
+		return 0;
 	}
 }

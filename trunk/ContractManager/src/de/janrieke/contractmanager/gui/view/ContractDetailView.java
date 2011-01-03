@@ -46,11 +46,7 @@ public class ContractDetailView extends AbstractView {
 	    left.addLabelPair(Settings.i18n().tr("Customer Number"), control.getCustomerNumber());
 
 	    left.addHeadline(Settings.i18n().tr("Financial Details"));
-	    left.addLabelPair(Settings.i18n().tr("One-time costs"), control.getMoneyOnce());
-	    left.addLabelPair(Settings.i18n().tr("Daily costs"), control.getMoneyPerDay());
-	    left.addLabelPair(Settings.i18n().tr("Weekly costs"), control.getMoneyPerWeek());
-	    left.addLabelPair(Settings.i18n().tr("Monthly costs"), control.getMoneyPerMonth());
-	    left.addLabelPair(Settings.i18n().tr("Annual costs"), control.getMoneyPerYear());
+	    left.addPart(control.getCostsList());
 	    left.addHeadline(Settings.i18n().tr("Runtime"));
 	    left.addLabelPair(Settings.i18n().tr("Start date"),	control.getStartDate());
 	    left.addLabelPair(Settings.i18n().tr("End date"), control.getEndDate());
