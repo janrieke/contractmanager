@@ -13,11 +13,6 @@ CREATE TABLE contract (
   first_min_runtime_type int(4),
   next_min_runtime_count int(4),
   next_min_runtime_type int(4),
-  money_once double,
-  money_per_day double,
-  money_per_week double,
-  money_per_month double,
-  money_per_year double,
   uri varchar(4096),
   UNIQUE (id),
   PRIMARY KEY (id)

@@ -52,7 +52,7 @@ import de.willuhn.datasource.rmi.DBObject;
 public interface Contract extends DBObject {
 	
 	public enum IntervalType {
-		DAYS, WEEKS, MONTHS, YEARS;
+		ONCE, DAYS, WEEKS, MONTHS, YEARS;
 		
 		@Override
 		public String toString() {
@@ -106,21 +106,6 @@ public interface Contract extends DBObject {
 	
 	public IntervalType getNextMinRuntimeType() throws RemoteException;
 	public void setNextMinRuntimeType(IntervalType type) throws RemoteException;
-	
-	public double getMoneyOnce() throws RemoteException;
-	public void setMoneyOnce(double money) throws RemoteException;
-	
-	public double getMoneyPerDay() throws RemoteException;
-	public void setMoneyPerDay(double money) throws RemoteException;
-	
-	public double getMoneyPerWeek() throws RemoteException;
-	public void setMoneyPerWeek(double money) throws RemoteException;
-	
-	public double getMoneyPerMonth() throws RemoteException;
-	public void setMoneyPerMonth(double money) throws RemoteException;
-	
-	public double getMoneyPerYear() throws RemoteException;
-	public void setMoneyPerYear(double money) throws RemoteException;
 	
 	public String getURI() throws RemoteException;
 	public void setURI(String uri) throws RemoteException;

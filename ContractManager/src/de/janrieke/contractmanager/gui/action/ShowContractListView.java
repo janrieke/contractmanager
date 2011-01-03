@@ -1,6 +1,7 @@
 package de.janrieke.contractmanager.gui.action;
 
 import de.willuhn.jameica.gui.Action;
+import de.willuhn.jameica.gui.GUI;
 import de.willuhn.util.ApplicationException;
 
 /**
@@ -12,8 +13,8 @@ public class ShowContractListView implements Action {
 	 * @see de.willuhn.jameica.gui.Action#handleAction(java.lang.Object)
 	 */
 	public void handleAction(Object context) throws ApplicationException {
-//		GUI.startView(de.janrieke.contractmanager.gui.view.ContractListView.class
-//				.getName(), null);
+		GUI.startView(de.janrieke.contractmanager.gui.view.ContractListView.class
+				.getName(), null);
 	}
 
 }
