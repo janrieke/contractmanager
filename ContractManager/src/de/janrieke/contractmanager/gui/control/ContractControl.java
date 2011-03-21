@@ -6,7 +6,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableItem;
@@ -17,6 +16,7 @@ import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion;
 import de.janrieke.contractmanager.gui.menu.ContractListMenu;
 import de.janrieke.contractmanager.gui.menu.CostsListMenu;
 import de.janrieke.contractmanager.gui.menu.TransactionListMenu;
+import de.janrieke.contractmanager.gui.parts.SizeableTablePart;
 import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
@@ -93,7 +93,7 @@ public class ContractControl extends AbstractControl {
 	private LabelInput nextCancellationDeadline;
 
 	private TablePart transactionList;
-	private TablePart costsList;
+	private SizeableTablePart costsList;
 
 	private List<Costs> newCosts = new ArrayList<Costs>();
 
@@ -511,7 +511,7 @@ public class ContractControl extends AbstractControl {
 	 * @return a table with contracts.
 	 * @throws RemoteException
 	 */
-	public Part getContractsExtensionWarningTable() throws RemoteException {
+	public TablePart getContractsExtensionWarningTable() throws RemoteException {
 		if (contractList != null)
 			return contractList;
 
@@ -559,7 +559,10 @@ public class ContractControl extends AbstractControl {
 					Calendar today = Calendar.getInstance();
 					Calendar calendar = Calendar.getInstance();
 					try {
-						calendar.setTime(contract.getNextCancellationDeadline());
+						Date deadline = contract.getNextCancellationDeadline();
+						if (deadline == null)
+							return;
+						calendar.setTime(deadline);
 						calendar.add(Calendar.DAY_OF_YEAR,
 								-Settings.getExtensionNoticeTime());
 						if (calendar.before(today)) {
@@ -633,15 +636,8 @@ public class ContractControl extends AbstractControl {
 			return costsList;
 
 		GenericIterator costs = getContract().getCosts();
-		costsList = new TablePart(costs, null) {
-
-			@Override
-			public synchronized void paint(Composite parent)
-					throws RemoteException {
-				super.paint(parent);
-			}
-			
-		};
+		costsList = new SizeableTablePart(costs, null);
+		costsList.setHeightHint(120);
 		costsList.addColumn(Settings.i18n().tr("Description"), "description", null, true);
 		costsList.addColumn(Settings.i18n().tr("Money"), "money", null, true);
 		costsList.addColumn(Settings.i18n().tr("Period"), "period", null, true);
