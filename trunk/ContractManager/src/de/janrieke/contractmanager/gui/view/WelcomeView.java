@@ -33,7 +33,7 @@ public class WelcomeView extends AbstractView {
 
 		group = new LabelGroup(this.getParent(), Settings.i18n().tr(
 				"Contract Cancellation Reminder"));
-		group.addPart(new CancellationReminder());
+		group.addPart(new CancellationReminderBox());
 	}
 
 	/**

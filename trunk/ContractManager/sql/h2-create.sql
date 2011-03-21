@@ -56,5 +56,13 @@ CREATE TABLE settings (
   PRIMARY KEY (key)
 );
 
+CREATE TABLE version (
+  id IDENTITY,
+  name varchar(255) NOT NULL,
+  version int(5) NOT NULL,
+  UNIQUE (id),
+  PRIMARY KEY (id)
+);
+
 ALTER TABLE contract     ADD CONSTRAINT fk_address  FOREIGN KEY (address_id)  REFERENCES address (id)  DEFERRABLE;
 ALTER TABLE transactions ADD CONSTRAINT fk_contract FOREIGN KEY (contract_id) REFERENCES contract (id) DEFERRABLE;

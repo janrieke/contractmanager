@@ -40,6 +40,14 @@ public class ContractManagerPlugin extends AbstractPlugin {
 	 */
 	public void init() throws ApplicationException {
 		instance = this;
+		
+	    call(new ServiceCall()
+	    {
+	      public void call(ContractDBService service) throws ApplicationException, RemoteException
+	      {
+	        service.checkConsistency();
+	      }
+	    });
 
 //		Application.getMessagingFactory().registerMessageConsumer(
 //				new MessageConsumer() {

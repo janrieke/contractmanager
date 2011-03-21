@@ -2,19 +2,27 @@ package de.janrieke.contractmanager.gui.view;
 
 import java.rmi.RemoteException;
 
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.boxes.Box;
+import de.willuhn.jameica.gui.util.SimpleContainer;
 
-public class CancellationReminder extends AbstractView implements Box {
+public class CancellationReminderBox extends AbstractView implements Box {
+
+	private static final int HEIGHT = 140;
 
 	@Override
 	public void paint(Composite parent) throws RemoteException {
 		ContractControl control = new ContractControl(this);
-		control.getContractsExtensionWarningTable().paint(parent);
+	    SimpleContainer container = new SimpleContainer(parent, true); //give the table a minimum height
+	    GridData gd = new GridData(GridData.FILL_VERTICAL | GridData.FILL_HORIZONTAL);
+	    gd.heightHint = HEIGHT;
+	    container.getComposite().setLayoutData(gd);
+		control.getContractsExtensionWarningTable().paint(container.getComposite());
 	}
 
 	@Override
@@ -109,6 +117,7 @@ public class CancellationReminder extends AbstractView implements Box {
 	 * @see de.willuhn.jameica.gui.boxes.Box#getHeight()
 	 */
 	public int getHeight() {
-		return -1;
+		return HEIGHT;
 	}
+	
 }
