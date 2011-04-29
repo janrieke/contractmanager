@@ -173,6 +173,8 @@ public class ContractManagerPlugin extends AbstractPlugin {
 		try {
 			// Da die Service-Factory zu diesem Zeitpunkt noch nicht da ist,
 			// erzeugen wir uns eine lokale Instanz des Services.
+			//Application.getServiceFactory().lookup(ContractManagerPlugin.class, "contract_db");
+			
 			service = new ContractDBServiceImpl();
 			service.start();
 			call.call(service);

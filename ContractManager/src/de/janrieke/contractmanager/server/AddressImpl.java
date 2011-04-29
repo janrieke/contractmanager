@@ -66,7 +66,7 @@ public class AddressImpl extends AbstractDBObject implements Address {
 		try {
 			if (getName() == null || getName().length() == 0)
 				throw new ApplicationException(Settings.i18n().tr(
-						"Please enter a name"));
+						"Please enter a name for the address"));
 
 		} catch (RemoteException e) {
 			Logger.error("insert check of contract failed", e);

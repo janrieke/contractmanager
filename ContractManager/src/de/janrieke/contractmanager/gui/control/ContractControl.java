@@ -39,6 +39,7 @@ import de.willuhn.jameica.gui.input.MultiInput;
 import de.willuhn.jameica.gui.input.SelectInput;
 import de.willuhn.jameica.gui.input.TextAreaInput;
 import de.willuhn.jameica.gui.input.TextInput;
+import de.willuhn.jameica.gui.parts.TableChangeListener;
 import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.jameica.gui.util.Color;
 import de.willuhn.logging.Logger;
@@ -126,8 +127,10 @@ public class ContractControl extends AbstractControl {
 	 * @throws RemoteException
 	 */
 	public Input getName() throws RemoteException {
-		if (name == null)
+		if (name == null) {
 			name = new TextInput(getContract().getName(), 255);
+			name.setMandatory(true);
+		}
 		return name;
 	}
 
@@ -347,9 +350,11 @@ public class ContractControl extends AbstractControl {
 	}
 
 	public Input getPartnerName() throws RemoteException {
-		if (partnerName == null)
+		if (partnerName == null) {
 			partnerName = new TextInput(getContract().getAddress().getName(),
 					255);
+			partnerName.setMandatory(true);
+		}
 		return partnerName;
 	}
 
@@ -644,6 +649,28 @@ public class ContractControl extends AbstractControl {
 		CostsListMenu clm = new CostsListMenu(this);
 		costsList.setContextMenu(clm);
 		costsList.setSummary(false);
+		costsList.addChangeListener(new TableChangeListener() {
+			
+			@Override
+			public void itemChanged(Object object, String attribute, String newValue)
+					throws ApplicationException {
+				assert object instanceof Costs;
+				if (object instanceof Costs) {
+					try {
+					if ("description".equals(attribute))
+						((Costs)object).setDescription(newValue);
+					else if ("money".equals(attribute))
+						((Costs)object).setMoney(Double.parseDouble(newValue));
+					else if ("period".equals(attribute))
+						((Costs)object).setPeriod(Contract.IntervalType.valueOf(newValue));
+					else
+						assert false;
+					} catch (RemoteException e) {
+						throw new ApplicationException(e);
+					}
+				}
+			}
+		});
 		return costsList;
 	}
 
@@ -692,7 +719,7 @@ public class ContractControl extends AbstractControl {
 			try {
 				a.store();
 				// We have to set the address here, because a new, unstored
-				// object has no ID, yet.
+				// object has no ID, yet. After storage, the ID is set.
 				p.setAddress(a);
 				p.store();
 				
@@ -702,6 +729,8 @@ public class ContractControl extends AbstractControl {
 					c.store();
 				}
 				for (Costs c: newCosts) {
+					// Again: Set the contract's new ID.
+					c.setContract(p);
 					c.store();
 				}
 				

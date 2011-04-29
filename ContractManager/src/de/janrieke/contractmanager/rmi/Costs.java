@@ -16,7 +16,7 @@ import de.willuhn.datasource.rmi.DBObject;
  */
 public interface Costs extends DBObject {
 	public Contract getContract() throws RemoteException;
-	public void setContract(Contract name) throws RemoteException;
+	public void setContract(Contract contract) throws RemoteException;
 
 	public String getDescription() throws RemoteException;
 	public void setDescription(String description) throws RemoteException;
