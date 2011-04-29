@@ -115,7 +115,7 @@ public class CostsImpl extends AbstractDBObject implements Costs {
 
 	@Override
 	public double getMoney() throws RemoteException {
-		Double d = (Double) getAttribute("money_per_year");
+		Double d = (Double) getAttribute("money");
 		return d == null ? 0.0 : d.doubleValue();
 	}
 

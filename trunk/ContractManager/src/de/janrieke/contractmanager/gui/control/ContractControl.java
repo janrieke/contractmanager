@@ -509,6 +509,8 @@ public class ContractControl extends AbstractControl {
 
 	static int index = 0;
 
+	private GenericIterator costsIterator;
+
 	/**
 	 * Creates a table containing all contracts in extension warning or notice
 	 * time.
@@ -640,8 +642,22 @@ public class ContractControl extends AbstractControl {
 		if (costsList != null)
 			return costsList;
 
-		GenericIterator costs = getContract().getCosts();
-		costsList = new SizeableTablePart(costs, null);
+		costsIterator = getContract().getCosts();
+		costsList = new SizeableTablePart(costsIterator, null);
+		costsList.setFormatter(new TableFormatter() {
+			
+			@Override
+			public void format(TableItem item) {
+				try {
+					double money = ((Costs)item.getData()).getMoney(); //Double.parseDouble(item.getText(1));
+					String text = String.format("%1$.2f", money) + " €";
+					item.setText(1, text);
+					item.setText(2, ((Costs)item.getData()).getPeriod().toAdjectiveString());
+				} catch (RemoteException e) {
+				}
+			}
+		});
+		
 		costsList.setHeightHint(120);
 		costsList.addColumn(Settings.i18n().tr("Description"), "description", null, true);
 		costsList.addColumn(Settings.i18n().tr("Money"), "money", null, true);
@@ -662,7 +678,7 @@ public class ContractControl extends AbstractControl {
 					else if ("money".equals(attribute))
 						((Costs)object).setMoney(Double.parseDouble(newValue));
 					else if ("period".equals(attribute))
-						((Costs)object).setPeriod(Contract.IntervalType.valueOf(newValue));
+						((Costs)object).setPeriod(Contract.IntervalType.adjectiveValueOf(newValue));
 					else
 						assert false;
 					} catch (RemoteException e) {
@@ -723,9 +739,14 @@ public class ContractControl extends AbstractControl {
 				p.setAddress(a);
 				p.store();
 				
-				DBIterator costs = p.getCosts();
-				while (costs.hasNext()) {
-					Costs c = (Costs) costs.next();
+				//We have to reuse the old iterator that has been used for the
+				// costs list, because otherwise new beans will created that 
+				// do not contain the values changed by the inline editor.
+//				DBIterator costs = p.getCosts(); 
+//				while (costs.hasNext()) {
+				costsIterator.begin();
+				while (costsIterator.hasNext()) {
+					Costs c = (Costs) costsIterator.next();
 					c.store();
 				}
 				for (Costs c: newCosts) {
