@@ -40,7 +40,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 * The UID.
 	 */
 	private static final long serialVersionUID = 1296427502015363939L;
-	private DBIterator costsIterator;
+//	private DBIterator costsIterator;
 
 	/**
 	 * @throws RemoteException
@@ -419,7 +419,8 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 */
 	@Override
 	public DBIterator getCosts() throws RemoteException {
-		if (this.costsIterator == null) { 
+		DBIterator costsIterator = null;
+//		if (this.costsIterator == null) { 
 			try {
 				DBService service = this.getService();
 				costsIterator = service.createList(Costs.class);
@@ -427,8 +428,8 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			} catch (Exception e) {
 				throw new RemoteException("unable to load costs list", e);
 			}
-		}
-		costsIterator.begin();
+//		}
+//		costsIterator.begin();
 		return costsIterator;
 	}
 

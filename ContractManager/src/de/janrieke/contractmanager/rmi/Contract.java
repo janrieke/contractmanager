@@ -60,6 +60,20 @@ public interface Contract extends DBObject {
 			String s = super.toString();
 			return s.substring(0, 1) + s.substring(1).toLowerCase();
 		}
+
+		public String toAdjectiveString() {
+			return getAdjectives()[ordinal()];
+		}
+		public static String[] getAdjectives() {
+			return new String[] {"once", "daily", "weekly", "monthly", "annual"};
+		}
+		public static IntervalType adjectiveValueOf(String text) {
+			for (int i = 0; i<IntervalType.values().length; i++) {
+				if (IntervalType.getAdjectives()[i].equals(text))
+					return IntervalType.values()[i];
+			}
+			return ONCE;
+		}
 	};
 
 	/**
