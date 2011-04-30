@@ -54,8 +54,8 @@ public class DateDialogInputAutoCompletion extends DialogInput {
 				
 				//BACKSPACE and DELETE handling
 				if (e.character == '\b' || e.keyCode == SWT.DEL) {
-					int start = e.keyCode == SWT.DEL ? e.start : e.start-1;
-					int end = e.keyCode == SWT.DEL ? e.end : e.end-1;
+					int start = e.keyCode == SWT.DEL ? e.start : e.start;
+					int end = e.keyCode == SWT.DEL ? e.end : e.end;
 					for (int i = start; i < end; i++) {
 						switch (i) {
 						case 0: /* [Y]YYY */
