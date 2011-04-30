@@ -5,7 +5,6 @@ import de.janrieke.contractmanager.gui.control.SettingsControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
-import de.willuhn.jameica.gui.internal.buttons.Back;
 import de.willuhn.jameica.gui.util.ButtonArea;
 import de.willuhn.jameica.gui.util.ColumnLayout;
 import de.willuhn.jameica.gui.util.SimpleContainer;
@@ -57,7 +56,7 @@ public class SettingsView extends AbstractView {
 		// add some buttons
 	    ButtonArea buttons = new ButtonArea(getParent(), 4);
 
-		buttons.addButton(new Back(false));
+		//buttons.addButton(new Back(false));
 		buttons.addButton(Settings.i18n().tr("Save Settings"), new Action() {
 			public void handleAction(Object context)
 					throws ApplicationException {

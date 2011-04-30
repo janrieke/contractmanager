@@ -6,7 +6,6 @@ import de.janrieke.contractmanager.gui.action.ShowContractDetailView;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
-import de.willuhn.jameica.gui.internal.buttons.Back;
 import de.willuhn.jameica.gui.util.ButtonArea;
 import de.willuhn.util.ApplicationException;
 
@@ -27,7 +26,7 @@ public class ContractListView extends AbstractView {
 		control.getContractsTable().paint(this.getParent());
 
 		ButtonArea buttons = new ButtonArea(this.getParent(), 3);
-		buttons.addButton(new Back(false));
+		//buttons.addButton(new Back(false));
 
 		buttons.addButton(Settings.i18n().tr("Export cancellation reminders..."),
 				new ExportCancelationReminders(), true, true, "office-calendar.png");

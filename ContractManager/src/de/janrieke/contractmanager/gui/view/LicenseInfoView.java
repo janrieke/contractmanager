@@ -18,8 +18,6 @@ import de.janrieke.contractmanager.gui.control.LicenseControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.Part;
-import de.willuhn.jameica.gui.internal.buttons.Back;
-import de.willuhn.jameica.gui.util.ButtonArea;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
@@ -42,8 +40,8 @@ public class LicenseInfoView extends AbstractView {
 		Part libs = control.getLibList();
 		libs.paint(getParent());
 
-		ButtonArea buttons = new ButtonArea(getParent(), 1);
-		buttons.addButton(new Back(true));
+		//ButtonArea buttons = new ButtonArea(getParent(), 1);
+		//buttons.addButton(new Back(true));
   }
 
   /**
