@@ -46,6 +46,7 @@ public class ContractDetailView extends AbstractView {
 
 	    left.addHeadline(Settings.i18n().tr("Financial Details"));
 	    left.addPart(control.getCostsList());
+	    left.addLabelPair(Settings.i18n().tr("Costs per term"), control.getCostsPerTerm());
 	    left.addHeadline(Settings.i18n().tr("Runtime"));
 	    left.addLabelPair(Settings.i18n().tr("Start date"),	control.getStartDate());
 	    left.addLabelPair(Settings.i18n().tr("End date"), control.getEndDate());

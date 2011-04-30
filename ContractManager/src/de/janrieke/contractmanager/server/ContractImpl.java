@@ -634,9 +634,32 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public double getCostsPerTerm() throws RemoteException {
 		// FIXME: Calculate costs based on a real calendar
-//		return (getMoneyPerDay() + getMoneyPerMonth() / 30 + getMoneyPerWeek()
-//				/ 7 + getMoneyPerYear() / 365)
-//				* getNextRuntimeDays();
-		return 0;
+		int termLength = getNextRuntimeDays();
+		if (termLength == 0) {
+			return 0;
+		}
+		double costsPerDay = 0; 
+		DBIterator costsIterator = getCosts();
+		while (costsIterator.hasNext()) {
+			Costs costEntry = (Costs) costsIterator.next();
+			switch (costEntry.getPeriod()) {
+			case DAYS:
+				costsPerDay += costEntry.getMoney();
+				break;
+			case MONTHS:
+				costsPerDay += costEntry.getMoney()/30.42;
+				break;
+			case WEEKS:
+				costsPerDay += costEntry.getMoney()/7;
+				break;
+			case YEARS:
+				costsPerDay += costEntry.getMoney()/365;
+				break;
+
+			default:
+				break;
+			}
+		}
+		return costsPerDay*termLength;
 	}
 }
