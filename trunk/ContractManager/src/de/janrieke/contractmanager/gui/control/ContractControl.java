@@ -22,6 +22,7 @@ import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
 import de.janrieke.contractmanager.rmi.Costs;
 import de.willuhn.datasource.GenericIterator;
+import de.willuhn.datasource.pseudo.PseudoIterator;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.jameica.gui.AbstractControl;
@@ -52,6 +53,8 @@ public class ContractControl extends AbstractControl {
 
 	// list of all contracts
 	private TablePart contractList;
+	// list of all contracts with cancellation warnings
+	private TablePart contractListWarnings;
 
 	// Input fields for the contract attributes,
 	private Input name;
@@ -95,6 +98,7 @@ public class ContractControl extends AbstractControl {
 
 	private TablePart transactionList;
 	private SizeableTablePart costsList;
+	private LabelInput costsPerTerm;
 
 	private List<Costs> newCosts = new ArrayList<Costs>();
 
@@ -254,6 +258,15 @@ public class ContractControl extends AbstractControl {
 		nextCancellationDeadline = new LabelInput(ne == null ? ""
 				: Settings.DATEFORMAT.format(ne));
 		return nextCancellationDeadline;
+	}
+
+	public LabelInput getCostsPerTerm() throws RemoteException {
+		if (costsPerTerm != null)
+			return costsPerTerm;
+
+		double costs = getContract().getCostsPerTerm();
+		costsPerTerm = new LabelInput(Settings.DECIMALFORMAT.format(costs));
+		return costsPerTerm;
 	}
 
 	public Input getCancellationPeriod() throws RemoteException {
@@ -519,8 +532,8 @@ public class ContractControl extends AbstractControl {
 	 * @throws RemoteException
 	 */
 	public TablePart getContractsExtensionWarningTable() throws RemoteException {
-		if (contractList != null)
-			return contractList;
+		if (contractListWarnings != null)
+			return contractListWarnings;
 
 		// 1) get the dataservice
 		DBService service = Settings.getDBService();
@@ -530,45 +543,67 @@ public class ContractControl extends AbstractControl {
 		// the interface "Contract". Jameica's classloader knows
 		// all classes an finds the right implementation automatically. ;)
 		DBIterator contracts = service.createList(Contract.class);
+		
+		ArrayList<Contract> filteredContracts = new ArrayList<Contract>();
+		
+		// Iterate through the list and filter
+		while (contracts.hasNext()) {
+			Contract contract = (Contract) contracts.next();
+
+			Calendar today = Calendar.getInstance();
+			Calendar calendar = Calendar.getInstance();
+			try {
+				Date deadline = contract.getNextCancellationDeadline();
+				if (deadline == null)
+					continue;
+				calendar.setTime(deadline);
+				calendar.add(Calendar.DAY_OF_YEAR,
+						-Settings.getExtensionNoticeTime());
+				if (calendar.before(today)) {
+					filteredContracts.add(contract);
+				}
+			} catch (RemoteException e) {
+			}
+		}
+		Contract[] filteredArray = new Contract[filteredContracts.size()];
+		GenericIterator filteredIterator = PseudoIterator.fromArray(filteredContracts.toArray(filteredArray));
 
 		// 4) create the table
-		contractList = new TablePart(
-				contracts,
+		contractListWarnings = new TablePart(
+				filteredIterator,
 				new de.janrieke.contractmanager.gui.action.ShowContractDetailView());
 
 		// 5) now we have to add some columns.
-		contractList.addColumn(Settings.i18n().tr("Name of contract"), "name");
+		contractListWarnings.addColumn(Settings.i18n().tr("Name of contract"), "name");
 
 		// 6) the following fields are a date fields. So we add a date
 		// formatter.
-		contractList.addColumn(Settings.i18n().tr("Start date"), "startdate",
+		contractListWarnings.addColumn(Settings.i18n().tr("Start date"), "startdate",
 				new DateFormatter(Settings.DATEFORMAT));
-		contractList.addColumn(Settings.i18n().tr("End date"), "enddate",
+		contractListWarnings.addColumn(Settings.i18n().tr("End date"), "enddate",
 				new DateFormatter(Settings.DATEFORMAT));
-		contractList.addColumn(
+		contractListWarnings.addColumn(
 				Settings.i18n().tr("Next cancellation deadline"),
 				"nextCancellationDeadline", new DateFormatter(
 						Settings.DATEFORMAT));
-		contractList.addColumn(Settings.i18n().tr("Costs per Term"),
+		contractListWarnings.addColumn(Settings.i18n().tr("Costs per Term"),
 				"costsPerPeriod", new CurrencyFormatter(Settings.CURRENCY,
 						Settings.DECIMALFORMAT));
 
 		// 7) we are adding a context menu
-		contractList.setContextMenu(new ContractListMenu(false));
+		contractListWarnings.setContextMenu(new ContractListMenu(false));
 
-		contractList.setFormatter(new TableFormatter() {
+		contractListWarnings.setFormatter(new TableFormatter() {
 
 			@Override
 			public void format(TableItem item) {
 				if (item.getData() instanceof Contract) {
 					Contract contract = (Contract) item.getData();
-
 					Calendar today = Calendar.getInstance();
 					Calendar calendar = Calendar.getInstance();
 					try {
 						Date deadline = contract.getNextCancellationDeadline();
-						if (deadline == null)
-							return;
+						assert (deadline != null); //otherwise it never should have been added
 						calendar.setTime(deadline);
 						calendar.add(Calendar.DAY_OF_YEAR,
 								-Settings.getExtensionNoticeTime());
@@ -582,35 +617,13 @@ public class ContractControl extends AbstractControl {
 							else
 								item.setBackground(Color.MANDATORY_BG
 										.getSWTColor());
-						} else {
-							TableItem[] items = item.getParent().getItems();
-							boolean found = false;
-							index = index < items.length ? index : 0;
-							for (int i = index; i < items.length; i++) {
-								if (item.equals(items[i])) {
-									index = i;
-									found = true;
-									break;
-								}
-							}
-							if (!found) {
-								for (int i = 0; i < index; i++) {
-									if (item.equals(items[i])) {
-										index = i;
-										found = true;
-										break;
-									}
-								}
-							}
-							if (found)
-								item.getParent().remove(index);
 						}
 					} catch (RemoteException e) {
 					}
 				}
 			}
 		});
-		return contractList;
+		return contractListWarnings;
 	}
 
 	/**
@@ -675,8 +688,12 @@ public class ContractControl extends AbstractControl {
 					try {
 					if ("description".equals(attribute))
 						((Costs)object).setDescription(newValue);
-					else if ("money".equals(attribute))
-						((Costs)object).setMoney(Double.parseDouble(newValue));
+					else if ("money".equals(attribute)) {
+						try {
+							((Costs)object).setMoney(Double.parseDouble(newValue));
+						} catch (NumberFormatException e) {
+						}
+					}
 					else if ("period".equals(attribute))
 						((Costs)object).setPeriod(Contract.IntervalType.adjectiveValueOf(newValue));
 					else
