@@ -772,6 +772,8 @@ public class ContractControl extends AbstractControl {
 					c.store();
 				}
 				
+				updateDerivedAttributes();
+				
 				GUI.getStatusBar().setSuccessText(
 						Settings.i18n().tr("Contract stored successfully"));
 			} catch (ApplicationException e) {
@@ -782,6 +784,24 @@ public class ContractControl extends AbstractControl {
 			GUI.getStatusBar().setErrorText(
 					Settings.i18n().tr("Error while storing contract"));
 		}
+	}
+
+	private void updateDerivedAttributes() throws RemoteException {
+		double costs = getContract().getCostsPerTerm();
+		costsPerTerm.setValue(Settings.DECIMALFORMAT.format(costs));
+		
+		Date ne = getContract().getNextCancellationDeadline();
+		nextCancellationDeadline.setValue(ne == null ? ""
+				: Settings.DATEFORMAT.format(ne));
+
+		Date ntb = getContract().getNextTermBegin();
+		Date nte = getContract().getNextTermEnd();
+		if (ntb != null && nte != null) {
+			nextExtension.setValue(Settings.DATEFORMAT.format(ntb) + " "
+							+ Settings.i18n().tr("to") + " "
+							+ Settings.DATEFORMAT.format(nte));
+		} else
+			nextExtension.setValue("");
 	}
 
 	public void removeCostEntry(Costs c) {
