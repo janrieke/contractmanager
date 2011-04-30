@@ -7,7 +7,6 @@ import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
-import de.willuhn.jameica.gui.internal.buttons.Back;
 import de.willuhn.jameica.gui.util.ButtonArea;
 import de.willuhn.jameica.gui.util.ColumnLayout;
 import de.willuhn.jameica.gui.util.Headline;
@@ -73,7 +72,7 @@ public class ContractDetailView extends AbstractView {
 		// add some buttons
 		ButtonArea buttons = new ButtonArea(getParent(), 4);
 
-		buttons.addButton(new Back(false));
+		//buttons.addButton(new Back(false));
 		buttons.addButton(Settings.i18n().tr("Generate Cancelation..."), new GenerateCancelation(), control.getCurrentObject(), false, "document-print.png");
 		buttons.addButton(Settings.i18n().tr("Delete Contract..."),
 				new DeleteContract(), control.getCurrentObject(), false, "window-close.png");
