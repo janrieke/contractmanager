@@ -15,29 +15,22 @@
 
 package de.janrieke.contractmanager.gui.button;
 
+import de.janrieke.contractmanager.gui.action.RestoreAction;
+import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.system.Application;
 
 /**
- * Vorkonfigurierter Zurueck-Button.
+ * Vorkonfigurierter Cancel-Button, der die aktuelle View neu lädt.
  */
-public class Back extends Button
+public class RestoreButton extends Button
 {
-  /**
-   * ct.
-   * Der Button ist als Default-Button markiert.
-   */
-  public Back()
-  {
-    this(true);
-  }
-
   /**
    * ct.
    * @param isDefault true, wenn es der Default-Button sein soll.
    */
-  public Back(boolean isDefault)
+  public RestoreButton(AbstractView view, Object object, boolean isDefault)
   {
-    super(Application.getI18n().tr("Back"),new de.willuhn.jameica.gui.internal.action.Back(),null,isDefault,"go-previous.png");
+    super(Application.getI18n().tr("Restore"), new RestoreAction(view), object, isDefault, "edit-undo.png");
   }
 }

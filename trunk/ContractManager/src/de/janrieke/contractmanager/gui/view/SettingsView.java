@@ -1,6 +1,7 @@
 package de.janrieke.contractmanager.gui.view;
 
 import de.janrieke.contractmanager.Settings;
+import de.janrieke.contractmanager.gui.button.RestoreButton;
 import de.janrieke.contractmanager.gui.control.SettingsControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
@@ -57,6 +58,7 @@ public class SettingsView extends AbstractView {
 	    ButtonArea buttons = new ButtonArea(getParent(), 4);
 
 		//buttons.addButton(new Back(false));
+		buttons.addButton(new RestoreButton(this, null, false));
 		buttons.addButton(Settings.i18n().tr("Save Settings"), new Action() {
 			public void handleAction(Object context)
 					throws ApplicationException {
