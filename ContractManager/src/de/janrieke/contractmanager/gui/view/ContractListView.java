@@ -30,7 +30,7 @@ public class ContractListView extends AbstractView {
 
 		buttons.addButton(Settings.i18n().tr("Export cancellation reminders..."),
 				new ExportCancelationReminders(), true, true, "office-calendar.png");
-		buttons.addButton(Settings.i18n().tr("Create new contract"),
+		buttons.addButton(Settings.i18n().tr("Create new contract..."),
 				new ShowContractDetailView(), null, true, "document-new.png");
 	}
 

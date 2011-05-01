@@ -22,7 +22,7 @@ public class DeleteContract implements Action {
 		// check if the context is a contract
 		if (context == null || !(context instanceof Contract))
 			throw new ApplicationException(Settings.i18n().tr(
-					"Please choose a contract"));
+					"Please choose a contract."));
 
 		Contract p = (Contract) context;
 

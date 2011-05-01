@@ -29,7 +29,7 @@ public class ShowContractDetailView implements Action {
 						Contract.class, null);
 			} catch (RemoteException e) {
 				throw new ApplicationException(Settings.i18n().tr(
-						"error while creating new contract"), e);
+						"Error while creating new contract"), e);
 			}
 		}
 

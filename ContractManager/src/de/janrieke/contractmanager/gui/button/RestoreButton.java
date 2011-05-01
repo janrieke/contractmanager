@@ -15,10 +15,10 @@
 
 package de.janrieke.contractmanager.gui.button;
 
+import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.RestoreAction;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.parts.Button;
-import de.willuhn.jameica.system.Application;
 
 /**
  * Vorkonfigurierter Cancel-Button, der die aktuelle View neu lädt.
@@ -31,6 +31,6 @@ public class RestoreButton extends Button
    */
   public RestoreButton(AbstractView view, Object object, boolean isDefault)
   {
-    super(Application.getI18n().tr("Restore"), new RestoreAction(view), object, isDefault, "edit-undo.png");
+    super(Settings.i18n().tr("Restore"), new RestoreAction(view), object, isDefault, "edit-undo.png");
   }
 }

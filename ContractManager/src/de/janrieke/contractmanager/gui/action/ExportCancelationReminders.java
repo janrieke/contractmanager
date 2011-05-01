@@ -48,7 +48,7 @@ public class ExportCancelationReminders implements Action {
 				filename = Settings.getICalFileLocation();
 			} catch (RemoteException e1) {
 				throw new ApplicationException(Settings.i18n().tr(
-						"Error while accessing settings."), e1);
+						"Error while accessing settings"), e1);
 			}
 
 			if (context != null && context instanceof Boolean
@@ -60,7 +60,7 @@ public class ExportCancelationReminders implements Action {
 				if (filename != null && !filename.isEmpty())
 					fd.setFileName(filename);
 				String[] names = {
-						Settings.i18n().tr("iCalendar file" + " (*.ics)"),
+						Settings.i18n().tr("iCalendar file") + " (*.ics)",
 						Settings.i18n().tr("All files") + " (*.*)" };
 				fd.setFilterNames(names);
 				String[] filters = { "*.ics", "*.*" };
@@ -99,7 +99,7 @@ public class ExportCancelationReminders implements Action {
 					String descr = namedExport ? Settings.i18n().tr(
 							"Check cancellation for contract {0}",
 							contract.getName()) : Settings.i18n().tr(
-							"Check cancellation");
+							"Check cancellations");
 					VToDo cancellation = new VToDo(
 							new net.fortuna.ical4j.model.Date(
 									calcCalendar.getTime()),
