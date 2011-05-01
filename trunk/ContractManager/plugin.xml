@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<plugin name="Contract Manager" version="0.1"
+<plugin name="ContractManager" version="0.1"
   class="de.janrieke.contractmanager.ContractManagerPlugin"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="http://www.willuhn.de/schema/jameica-plugin-1.0.xsd">
@@ -21,10 +21,10 @@
 
   <menu>
     <item name="Contract Manager">
-      <item name="New Contract" shortcut="ALT+C" icon="document-new.png" action="de.janrieke.contractmanager.gui.action.ShowContractDetailView" />
+      <item name="New Contract..." shortcut="ALT+C" icon="document-new.png" action="de.janrieke.contractmanager.gui.action.ShowContractDetailView" />
       <item name="-" />
       <item id="de.janrieke.contractmanager.menu.license"      name="Lizenzinformationen"      icon="text-x-generic.png"      action="de.janrieke.contractmanager.gui.action.ShowLicenseInfoView" />
-      <item id="de.janrieke.contractmanager.menu.about"        name="About"                    icon="gtk-info.png"            action="de.janrieke.contractmanager.gui.action.ShowAboutDialog" />
+      <item id="de.janrieke.contractmanager.menu.about"        name="About..."                    icon="gtk-info.png"            action="de.janrieke.contractmanager.gui.action.ShowAboutDialog" />
     </item>
   </menu>
 

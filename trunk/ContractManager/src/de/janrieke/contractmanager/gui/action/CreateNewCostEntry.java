@@ -35,7 +35,7 @@ public class CreateNewCostEntry implements Action {
 			contract.addTemporaryCostEntry(c);
 		} catch (RemoteException e) {
 			throw new ApplicationException(Settings.i18n().tr(
-					"error while creating new cost entry"), e);
+					"Error while creating new cost entry"), e);
 		}
 	}
 }

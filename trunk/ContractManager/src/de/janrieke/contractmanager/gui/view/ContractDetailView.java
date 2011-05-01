@@ -29,7 +29,7 @@ public class ContractDetailView extends AbstractView {
 	 */
 	public void bind() throws Exception {
 		// draw the title
-		GUI.getView().setTitle(Settings.i18n().tr("Contract details"));
+		GUI.getView().setTitle(Settings.i18n().tr("Contract Details"));
 
 		// instanciate controller
 		final ContractControl control = new ContractControl(this);
@@ -45,9 +45,9 @@ public class ContractDetailView extends AbstractView {
 		//		"Contract details"));
 
 		// all all input fields to the group.
-	    left.addLabelPair(Settings.i18n().tr("Name"), control.getName());
-	    left.addLabelPair(Settings.i18n().tr("Contract Number"), control.getContractNumber());
-	    left.addLabelPair(Settings.i18n().tr("Customer Number"), control.getCustomerNumber());
+	    left.addLabelPair(Settings.i18n().tr("Name of contract"), control.getName());
+	    left.addLabelPair(Settings.i18n().tr("Contract number"), control.getContractNumber());
+	    left.addLabelPair(Settings.i18n().tr("Customer number"), control.getCustomerNumber());
 
 	    left.addHeadline(Settings.i18n().tr("Financial Details"));
 	    left.addPart(control.getCostsList());
@@ -79,7 +79,7 @@ public class ContractDetailView extends AbstractView {
 		ButtonArea buttons = new ButtonArea(getParent(), 4);
 
 		//buttons.addButton(new Back(false));
-		buttons.addButton(Settings.i18n().tr("Generate Cancelation..."), new GenerateCancelation(), control.getCurrentObject(), false, "document-print.png");
+		buttons.addButton(Settings.i18n().tr("Generate Cancellation..."), new GenerateCancelation(), control.getCurrentObject(), false, "document-print.png");
 		deleteButton = new Button(Settings.i18n().tr("Delete Contract..."),
 				new DeleteContract(), control.getCurrentObject(), false, "window-close.png");
 		deleteButton.setEnabled(activationState);

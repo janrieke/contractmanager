@@ -50,7 +50,7 @@ public class DeleteCostEntry implements Action {
 		} catch (Exception e) {
 			Logger.error("error while deleting costs", e);
 			throw new ApplicationException(Settings.i18n().tr(
-					"Error while deleting costs"));
+					"Error while deleting cost entry"));
 		}
 	}
 }

@@ -33,7 +33,7 @@ public class GenerateCancelation implements Action {
 		// check if the context is a contract
 		if (context == null || !(context instanceof Contract))
 			throw new ApplicationException(Settings.i18n().tr(
-					"Please choose a contract"));
+					"Please choose a contract."));
 		
 		//TODO: Also generate PDFs
 
@@ -47,7 +47,7 @@ public class GenerateCancelation implements Action {
 					Settings.DATEFORMAT.format(new Date()), p.getName()));
 		} catch (RemoteException e1) {
 			throw new ApplicationException(Settings.i18n().tr(
-					"Error while accessing contract."), e1);
+					"Error while accessing contract"), e1);
 		}
 
 		// String path = System.getProperty("user.home");
@@ -118,7 +118,7 @@ public class GenerateCancelation implements Action {
 					Settings.i18n().tr("Cancellation successfully generated."));
 		} catch (Exception e) {
 			throw new ApplicationException(Settings.i18n().tr(
-				"Error while storing document."), e);
+				"Error while storing document"), e);
 		}
 	}
 
