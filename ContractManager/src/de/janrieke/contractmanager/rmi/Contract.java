@@ -3,6 +3,7 @@ package de.janrieke.contractmanager.rmi;
 import java.rmi.RemoteException;
 import java.util.Date;
 
+import de.janrieke.contractmanager.Settings;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.datasource.rmi.DBObject;
 
@@ -58,14 +59,19 @@ public interface Contract extends DBObject {
 		public String toString() {
 			//only capitalize the first letter
 			String s = super.toString();
-			return s.substring(0, 1) + s.substring(1).toLowerCase();
+			return Settings.i18n().tr(s.substring(0, 1) + s.substring(1).toLowerCase());
 		}
 
 		public String toAdjectiveString() {
 			return getAdjectives()[ordinal()];
 		}
 		public static String[] getAdjectives() {
-			return new String[] {"once", "daily", "weekly", "monthly", "annual"};
+			return new String[] {
+					Settings.i18n().tr("once"), 
+					Settings.i18n().tr("daily"), 
+					Settings.i18n().tr("weekly"), 
+					Settings.i18n().tr("monthly"),
+					Settings.i18n().tr("annual")};
 		}
 		public static IntervalType adjectiveValueOf(String text) {
 			for (int i = 0; i<IntervalType.values().length; i++) {

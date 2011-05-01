@@ -277,6 +277,7 @@ public class ContractControl extends AbstractControl {
 
 		double costs = getContract().getCostsPerTerm();
 		costsPerTerm = new LabelInput(Settings.DECIMALFORMAT.format(costs));
+		costsPerTerm.setComment(Settings.CURRENCY);
 		return costsPerTerm;
 	}
 

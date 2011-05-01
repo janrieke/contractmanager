@@ -8,7 +8,7 @@
   <description>Contract Manager for Jameica</description>
   <url>http://www.janrieke.de/projects/contractmanager</url>
   <homepage>http://www.janrieke.de/projects/contractmanager</homepage>
-  <license>GPL 2.0 - http://www.gnu.org/licenses/gpl-2.0.txt</license>
+  <license>GPL 3.0 - http://www.gnu.org/licenses/gpl-3.0.txt</license>
 
   <requires jameica="1.10+">
     <!--  <import plugin="hibiscus" version="1.12+" required="false" /> //-->
