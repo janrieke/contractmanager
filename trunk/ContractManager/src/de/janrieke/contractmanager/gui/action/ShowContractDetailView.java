@@ -20,7 +20,7 @@ public class ShowContractDetailView implements Action {
 
 		Contract p = null;
 
-		// check if the context is a project
+		// check if the context is a contract
 		if (context != null && (context instanceof Contract))
 			p = (Contract) context;
 		else {

@@ -17,6 +17,7 @@ import de.janrieke.contractmanager.gui.menu.ContractListMenu;
 import de.janrieke.contractmanager.gui.menu.CostsListMenu;
 import de.janrieke.contractmanager.gui.menu.TransactionListMenu;
 import de.janrieke.contractmanager.gui.parts.SizeableTablePart;
+import de.janrieke.contractmanager.gui.view.ContractDetailView;
 import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
@@ -106,10 +107,20 @@ public class ContractControl extends AbstractControl {
 	 * ct.
 	 * 
 	 * @param view
-	 *            this is our view (the welcome screen).
+	 *            this is our view (the contract details view).
 	 */
 	public ContractControl(AbstractView view) {
 		super(view);
+		if (view instanceof ContractDetailView) {
+			try {
+				((ContractDetailView) view)
+						.setButtonActivationState(!((Contract) view
+								.getCurrentObject()).isNewObject());
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -774,6 +785,9 @@ public class ContractControl extends AbstractControl {
 				
 				updateDerivedAttributes();
 				
+				if (view instanceof ContractDetailView)
+					((ContractDetailView) view).setButtonActivationState(true);
+				
 				GUI.getStatusBar().setSuccessText(
 						Settings.i18n().tr("Contract stored successfully"));
 			} catch (ApplicationException e) {
@@ -816,6 +830,14 @@ public class ContractControl extends AbstractControl {
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+
+	public boolean isNewContract() {
+		try {
+			return contract.isNewObject();
+		} catch (RemoteException e) {
+			return false;
 		}
 	}
 }
