@@ -3,13 +3,14 @@ package de.janrieke.contractmanager.gui.view;
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.DeleteContract;
 import de.janrieke.contractmanager.gui.action.GenerateCancelation;
+import de.janrieke.contractmanager.gui.button.RestoreButton;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
+import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.util.ButtonArea;
 import de.willuhn.jameica.gui.util.ColumnLayout;
-import de.willuhn.jameica.gui.util.Headline;
 import de.willuhn.jameica.gui.util.ScrolledContainer;
 import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.util.ApplicationException;
@@ -18,6 +19,10 @@ import de.willuhn.util.ApplicationException;
  * this is the dialog for the contract details.
  */
 public class ContractDetailView extends AbstractView {
+
+	private RestoreButton restoreButton;
+	private boolean activationState;
+	private Button deleteButton;
 
 	/**
 	 * @see de.willuhn.jameica.gui.AbstractView#bind()
@@ -75,8 +80,13 @@ public class ContractDetailView extends AbstractView {
 
 		//buttons.addButton(new Back(false));
 		buttons.addButton(Settings.i18n().tr("Generate Cancelation..."), new GenerateCancelation(), control.getCurrentObject(), false, "document-print.png");
-		buttons.addButton(Settings.i18n().tr("Delete Contract..."),
+		deleteButton = new Button(Settings.i18n().tr("Delete Contract..."),
 				new DeleteContract(), control.getCurrentObject(), false, "window-close.png");
+		deleteButton.setEnabled(activationState);
+		buttons.addButton(deleteButton);
+		restoreButton = new RestoreButton(this, control.getCurrentObject(), false);
+		restoreButton.setEnabled(activationState);
+		buttons.addButton(restoreButton);
 		buttons.addButton(Settings.i18n().tr("Store Contract"), new Action() {
 			public void handleAction(Object context)
 					throws ApplicationException {
@@ -85,8 +95,8 @@ public class ContractDetailView extends AbstractView {
 		}, null, true, "document-save.png"); // "true" defines this button as the default button
 
 		// show transactions of this contract
-		new Headline(getParent(), Settings.i18n().tr(
-				"Transactions of this contract"));
+		//new Headline(getParent(), Settings.i18n().tr(
+		//		"Transactions of this contract"));
 		//		control.getTaskList().paint(getParent());
 
 	}
@@ -98,6 +108,14 @@ public class ContractDetailView extends AbstractView {
 		// this method will be invoked when leaving the dialog.
 		// You are able to interrupt the unbind by throwing an
 		// ApplicationException.
+	}
+	
+	public void setButtonActivationState(boolean active) {
+		if (restoreButton != null)
+			restoreButton.setEnabled(active);
+		if (deleteButton != null)
+			deleteButton.setEnabled(active);
+		activationState = active;
 	}
 
 }
