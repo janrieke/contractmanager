@@ -4,6 +4,7 @@ import de.janrieke.contractmanager.ContractManagerPlugin;
 import de.janrieke.contractmanager.Settings;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
+import de.willuhn.jameica.gui.util.Color;
 import de.willuhn.jameica.gui.util.LabelGroup;
 import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.system.Application;
@@ -22,14 +23,16 @@ public class WelcomeView extends AbstractView {
 	 * @see de.willuhn.jameica.gui.AbstractView#bind()
 	 */
 	public void bind() throws Exception {
-		GUI.getView().setTitle(Settings.i18n().tr("ContractManager"));
+		AbstractPlugin p = Application.getPluginLoader().getPlugin(
+				ContractManagerPlugin.class);
+		GUI.getView().setTitle(Settings.i18n().tr("ContractManager")+" (v" + p.getManifest().getVersion() + ")");
 
 		LabelGroup group = new LabelGroup(this.getParent(), Settings.i18n().tr(
 				"Welcome"));
 
-		AbstractPlugin p = Application.getPluginLoader().getPlugin(
-				ContractManagerPlugin.class);
-		group.addText("Welcome to ContractManager (v" + p.getManifest().getVersion() + ")", false);
+		group.addText(Settings.i18n().tr("Welcome to ContractManager"), true);
+
+		group.addText(Settings.i18n().tr("Be careful: This is software in beta testing. It may still contain bugs and errors."), true, Color.ERROR);
 
 		group = new LabelGroup(this.getParent(), Settings.i18n().tr(
 				"Contract Cancellation Reminder"));

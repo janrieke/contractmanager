@@ -5,7 +5,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="http://www.willuhn.de/schema/jameica-plugin-1.0.xsd">
 
-  <description>Contract Manager for Jameica</description>
+  <description>ContractManager for Jameica</description>
   <url>http://www.janrieke.de/projects/contractmanager</url>
   <homepage>http://www.janrieke.de/projects/contractmanager</homepage>
   <license>GPL 3.0 - http://www.gnu.org/licenses/gpl-3.0.txt</license>
@@ -20,7 +20,7 @@
   </classfinder>
 
   <menu>
-    <item name="Contract Manager">
+    <item name="ContractManager">
       <item name="New Contract..." shortcut="ALT+C" icon="document-new.png" action="de.janrieke.contractmanager.gui.action.ShowContractDetailView" />
       <item name="-" />
       <item id="de.janrieke.contractmanager.menu.license"      name="Lizenzinformationen"      icon="text-x-generic.png"      action="de.janrieke.contractmanager.gui.action.ShowLicenseInfoView" />
@@ -29,7 +29,7 @@
   </menu>
 
   <navigation>
-    <item name="Contract Manager" icon-close="folder.gif" icon-open="folderopen.gif" action="de.janrieke.contractmanager.gui.action.ShowWelcomeView">
+    <item name="ContractManager" icon-close="folder.gif" icon-open="folderopen.gif" action="de.janrieke.contractmanager.gui.action.ShowWelcomeView">
       <item name="Contracts" icon-close="edit-copy.png" icon-open="edit-copy.png" action="de.janrieke.contractmanager.gui.action.ShowContractListView" />
       <item name="Settings" icon-close="document-properties.png" icon-open="document-properties.png" action="de.janrieke.contractmanager.gui.action.ShowSettingsView" />
     </item>
