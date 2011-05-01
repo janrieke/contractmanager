@@ -1,3 +1,4 @@
 Tango Desktop Project (PD, http://tango.freedesktop.org/):
  edit-copy.png
  office-calendar.png
+ edit-undo.png
