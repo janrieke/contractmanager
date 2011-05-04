@@ -1,0 +1,12 @@
+0.1:
+	- Basic contract management
+	- Cancellation Reminder
+	- Generation of letters of cancellation
+	- Export reminders to iCal
+	
+0.2:
+	- Reload iCal file instead of overwriting (do not re-remind of already checked cancellation)
+	- Better address management
+	
+0.3:
+	- Include payments from Hibiscus
