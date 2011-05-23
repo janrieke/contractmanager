@@ -19,7 +19,6 @@ package de.janrieke.contractmanager.gui.view;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.DeleteAddress;
-import de.janrieke.contractmanager.gui.action.GenerateCancelation;
 import de.janrieke.contractmanager.gui.button.RestoreButton;
 import de.janrieke.contractmanager.gui.control.AddressControl;
 import de.willuhn.jameica.gui.AbstractView;
@@ -27,9 +26,7 @@ import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.util.ButtonArea;
-import de.willuhn.jameica.gui.util.ColumnLayout;
 import de.willuhn.jameica.gui.util.ScrolledContainer;
-import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.util.ApplicationException;
 
 /**
@@ -53,28 +50,21 @@ public class AddressDetailView extends AbstractView {
 
 	    ScrolledContainer scroller = new ScrolledContainer(getParent());
 		
-	    ColumnLayout columns = new ColumnLayout(scroller.getComposite(), 2);
-	    SimpleContainer left = new SimpleContainer(columns.getComposite());
-
-	    left.addHeadline(Settings.i18n().tr("Address Information"));
+	    scroller.addHeadline(Settings.i18n().tr("Address Information"));
 		// create a bordered group
 		//LabelGroup group = new LabelGroup(getParent(), Settings.i18n().tr(
 		//		"Address details"));
 
-	    SimpleContainer right = new SimpleContainer(columns.getComposite(), true);
-	    right.addHeadline(Settings.i18n().tr("Contractual Partner Address"));
-	    right.addLabelPair(Settings.i18n().tr("Name/Company"), control.getPartnerName());
-	    right.addLabelPair(Settings.i18n().tr("Street"), control.getPartnerStreetNumber());
-	    right.addLabelPair(Settings.i18n().tr("Extra"), control.getPartnerExtra());
-	    right.addLabelPair(Settings.i18n().tr("Zipcode"), control.getPartnerZipcodeCity());
-	    right.addLabelPair(Settings.i18n().tr("State"), control.getPartnerState());
-	    right.addLabelPair(Settings.i18n().tr("Country"), control.getPartnerCountry());
+	    scroller.addLabelPair(Settings.i18n().tr("Name/Company"), control.getPartnerName());
+	    scroller.addLabelPair(Settings.i18n().tr("Street"), control.getPartnerStreetNumber());
+	    scroller.addLabelPair(Settings.i18n().tr("Extra"), control.getPartnerExtra());
+	    scroller.addLabelPair(Settings.i18n().tr("Zipcode"), control.getPartnerZipcodeCity());
+	    scroller.addLabelPair(Settings.i18n().tr("State"), control.getPartnerState());
+	    scroller.addLabelPair(Settings.i18n().tr("Country"), control.getPartnerCountry());
 	    
 		// add some buttons
 		ButtonArea buttons = new ButtonArea(getParent(), 4);
 
-		//buttons.addButton(new Back(false));
-		buttons.addButton(Settings.i18n().tr("Generate Cancellation..."), new GenerateCancelation(), control.getCurrentObject(), false, "document-print.png");
 		deleteButton = new Button(Settings.i18n().tr("Delete Address..."),
 				new DeleteAddress(), control.getCurrentObject(), false, "window-close.png");
 		deleteButton.setEnabled(activationState);
