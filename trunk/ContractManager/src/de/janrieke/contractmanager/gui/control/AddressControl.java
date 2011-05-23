@@ -29,8 +29,6 @@ import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.Part;
-import de.willuhn.jameica.gui.formatter.CurrencyFormatter;
-import de.willuhn.jameica.gui.formatter.DateFormatter;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.input.LabelInput;
 import de.willuhn.jameica.gui.input.MultiInput;
@@ -194,23 +192,14 @@ public class AddressControl extends AbstractControl {
 				new de.janrieke.contractmanager.gui.action.ShowAddressDetailView());
 
 		// 5) now we have to add some columns.
-		addressList.addColumn(Settings.i18n().tr("Name of address"), "name");
+		addressList.addColumn(Settings.i18n().tr("Name"), "name");
+		addressList.addColumn(Settings.i18n().tr("Street"), "street");
+		addressList.addColumn(Settings.i18n().tr("Number"), "number");
+		addressList.addColumn(Settings.i18n().tr("Zipcode"), "zipcode");
+		addressList.addColumn(Settings.i18n().tr("City"), "city");
+		addressList.addColumn(Settings.i18n().tr("Country"), "country");
 
-		// 6) the following fields are a date fields. So we add a date
-		// formatter.
-		addressList.addColumn(Settings.i18n().tr("Start date"), "startdate",
-				new DateFormatter(Settings.DATEFORMAT));
-		addressList.addColumn(Settings.i18n().tr("End date"), "enddate",
-				new DateFormatter(Settings.DATEFORMAT));
-		addressList.addColumn(
-				Settings.i18n().tr("Next cancellation deadline"),
-				"nextCancellationDeadline", new DateFormatter(
-						Settings.DATEFORMAT));
-		addressList.addColumn(Settings.i18n().tr("Costs per Term"),
-				"costsPerPeriod", new CurrencyFormatter(Settings.CURRENCY,
-						Settings.DECIMALFORMAT));
-
-		// 7) we are adding a context menu
+		// 6) we are adding a context menu
 		addressList.setContextMenu(new AddressListMenu(true));
 
 		return addressList;
