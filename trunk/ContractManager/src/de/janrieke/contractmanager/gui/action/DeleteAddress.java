@@ -17,9 +17,13 @@
  */
 package de.janrieke.contractmanager.gui.action;
 
+import java.rmi.RemoteException;
+
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.view.AddressDetailView;
 import de.janrieke.contractmanager.rmi.Address;
+import de.willuhn.datasource.rmi.DBIterator;
+import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.dialogs.YesNoDialog;
@@ -36,21 +40,41 @@ public class DeleteAddress implements Action {
 	 */
 	public void handleAction(Object context) throws ApplicationException {
 
-		// check if the context is a contract
+		// check if the context is a address
 		if (context == null || !(context instanceof Address))
 			throw new ApplicationException(Settings.i18n().tr(
-					"Please choose a contract."));
+					"Please choose a address."));
 
 		Address p = (Address) context;
 
+		// first check that there is no contract associated with that address
 		try {
+			// 1) Get the Database Service.
+			DBService service = Settings.getDBService();
 
-			// before deleting the contract, we show up a confirm dialog ;)
+			// 2) We create the contract list using createList(Class)
+			DBIterator contracts = service
+					.createList(de.janrieke.contractmanager.rmi.Contract.class);
+
+			// 3) we add a filter to only query for tasks with our project id
+			contracts.addFilter("address_id = " + p.getID());
+			
+			if (contracts.size()>0) {
+				GUI.getView().setErrorText(Settings.i18n().tr("Address was not deleted because it is still in use."));
+				GUI.getStatusBar().setErrorText(Settings.i18n().tr("Address was not deleted because it is still in use."));
+				return;
+			}
+		} catch (RemoteException e) {
+			throw new ApplicationException("unable to load contract list", e);
+		}
+
+		try {
+			// before deleting the address, we show up a confirm dialog ;)
 
 			YesNoDialog d = new YesNoDialog(YesNoDialog.POSITION_CENTER);
 			d.setTitle(Settings.i18n().tr("Are you sure?"));
 			d.setText(Settings.i18n().tr(
-					"Do you really want to delete this contract?"));
+					"Do you really want to delete this address?"));
 
 			Boolean choice = (Boolean) d.open();
 			if (!choice.booleanValue())
@@ -60,9 +84,9 @@ public class DeleteAddress implements Action {
 			GUI.getStatusBar().setSuccessText(
 					Settings.i18n().tr("Address deleted successfully"));
 		} catch (Exception e) {
-			Logger.error("error while deleting contract", e);
+			Logger.error("error while deleting address", e);
 			throw new ApplicationException(Settings.i18n().tr(
-					"Error while deleting contract"));
+					"Error while deleting address"));
 		}
 		
 		if (GUI.getCurrentView() instanceof AddressDetailView)

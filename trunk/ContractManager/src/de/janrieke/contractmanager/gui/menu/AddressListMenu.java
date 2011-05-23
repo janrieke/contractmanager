@@ -18,9 +18,8 @@
 package de.janrieke.contractmanager.gui.menu;
 
 import de.janrieke.contractmanager.Settings;
-import de.janrieke.contractmanager.gui.action.DeleteContract;
+import de.janrieke.contractmanager.gui.action.DeleteAddress;
 import de.janrieke.contractmanager.gui.action.ShowAddressDetailView;
-import de.janrieke.contractmanager.gui.action.ShowContractDetailView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
 import de.willuhn.jameica.gui.parts.ContextMenu;
@@ -40,7 +39,7 @@ public class AddressListMenu extends ContextMenu {
 		// CheckedContextMenuItems will be disabled, if the user clicks into an
 		// empty space of the table
 		addItem(new CheckedContextMenuItem(Settings.i18n().tr("Open..."),
-				new ShowContractDetailView(), "document-open.png"));
+				new ShowAddressDetailView(), "document-open.png"));
 
 		if (showNew) {
 			// separator
@@ -58,7 +57,7 @@ public class AddressListMenu extends ContextMenu {
 
 			addItem(ContextMenuItem.SEPARATOR);
 			addItem(new CheckedContextMenuItem(Settings.i18n().tr(
-					"Delete address..."), new DeleteContract(),
+					"Delete address..."), new DeleteAddress(),
 					"window-close.png"));
 		}
 
