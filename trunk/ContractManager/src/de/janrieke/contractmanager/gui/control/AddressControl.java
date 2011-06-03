@@ -23,6 +23,7 @@ import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.menu.AddressListMenu;
 import de.janrieke.contractmanager.gui.view.AddressDetailView;
 import de.janrieke.contractmanager.rmi.Address;
+import de.willuhn.datasource.GenericIterator;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.jameica.gui.AbstractControl;
@@ -167,6 +168,18 @@ public class AddressControl extends AbstractControl {
 		return partnerCountry;
 	}
 
+	/**
+	 * Returns an iterator with all addresses in the database.
+	 * 
+	 * @throws RemoteException 
+	 * @return iterator containing all addresses
+	 */
+	public static GenericIterator getAddresses() throws RemoteException {
+		DBService service = Settings.getDBService();
+		DBIterator addresses = service.createList(Address.class);
+		return addresses;
+	}
+	
 	/**
 	 * Creates a table containing all addresses.
 	 * 
