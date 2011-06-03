@@ -315,18 +315,18 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		} catch (ObjectNotFoundException e) {
 			result = null;
 		}
-		if (result == null) {
-			try {
-				result = (Address) Settings.getDBService().createObject(
-						Address.class, null);
-			} catch (RemoteException e) {
-				throw new RemoteException(Settings.i18n().tr(
-						"error while creating new address"), e);
-			}
-			// setAddress(result);
-			// we set that later during store, because a new, unstored object
-			// has no ID, yet.
-		}
+//		if (result == null) {
+//			try {
+//				result = (Address) Settings.getDBService().createObject(
+//						Address.class, null);
+//			} catch (RemoteException e) {
+//				throw new RemoteException(Settings.i18n().tr(
+//						"error while creating new address"), e);
+//			}
+//			// setAddress(result);
+//			// we set that later during store, because a new, unstored object
+//			// has no ID, yet.
+//		}
 
 		return result;
 	}

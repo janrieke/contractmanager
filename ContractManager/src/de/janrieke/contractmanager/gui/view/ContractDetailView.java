@@ -82,6 +82,7 @@ public class ContractDetailView extends AbstractView {
 
 	    SimpleContainer right = new SimpleContainer(columns.getComposite(), true);
 	    right.addHeadline(Settings.i18n().tr("Contractual Partner Address"));
+	    right.addLabelPair(Settings.i18n().tr("Address"), control.getPartnerAddress());
 	    right.addLabelPair(Settings.i18n().tr("Name/Company"), control.getPartnerName());
 	    right.addLabelPair(Settings.i18n().tr("Street"), control.getPartnerStreetNumber());
 	    right.addLabelPair(Settings.i18n().tr("Extra"), control.getPartnerExtra());

@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableItem;
@@ -95,6 +96,7 @@ public class ContractControl extends AbstractControl {
 	private IntegerInput nextMinRuntimeCount;
 	private SelectInput nextMinRuntimeType;
 
+	private SelectInput partnerAddress;
 	private Input partnerName;
 	private Input partnerStreet;
 	private Input partnerNumber;
@@ -391,10 +393,64 @@ public class ContractControl extends AbstractControl {
 		return nextMinRuntimeType;
 	}
 
+	private Address currentAddress = null;
+
+	public Input getPartnerAddress() throws RemoteException {
+		if (partnerAddress == null) {
+			currentAddress = getContract().getAddress();
+			partnerAddress = new SelectInput(AddressControl.getAddresses(),
+					currentAddress);
+			partnerAddress.setPleaseChoose(Settings.i18n().tr("[New Address]"));
+			partnerAddress.addListener(new Listener() {
+
+				@Override
+				public void handleEvent(Event event) {
+					if (event.type == SWT.Selection) {
+						Address newAddress = (Address) partnerAddress
+								.getValue();
+						try {
+							if (newAddress == null
+									|| !newAddress.equals(currentAddress)) {
+								addressSwitched(newAddress);
+								currentAddress = newAddress;
+							}
+						} catch (RemoteException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			});
+		}
+		return partnerAddress;
+	}
+
+	protected void addressSwitched(Address newAddress) throws RemoteException {
+		if (newAddress == null) {
+			getPartnerCity().setValue("");
+			getPartnerCountry().setValue("");
+			getPartnerExtra().setValue("");
+			getPartnerName().setValue("");
+			getPartnerNumber().setValue("");
+			getPartnerState().setValue("");
+			getPartnerStreet().setValue("");
+			getPartnerZipcode().setValue("");
+		} else {
+			getPartnerCity().setValue(newAddress.getCity());
+			getPartnerCountry().setValue(newAddress.getCountry());
+			getPartnerExtra().setValue(newAddress.getExtra());
+			getPartnerName().setValue(newAddress.getName());
+			getPartnerNumber().setValue(newAddress.getNumber());
+			getPartnerState().setValue(newAddress.getState());
+			getPartnerStreet().setValue(newAddress.getStreet());
+			getPartnerZipcode().setValue(newAddress.getZipcode());
+		}
+	}
+
 	public Input getPartnerName() throws RemoteException {
 		if (partnerName == null) {
-			partnerName = new TextInput(getContract().getAddress().getName(),
-					255);
+			partnerName = new TextInput(getContract().getAddress() == null ? ""
+					: getContract().getAddress().getName(), 255);
 			partnerName.setMandatory(true);
 		}
 		return partnerName;
@@ -402,15 +458,17 @@ public class ContractControl extends AbstractControl {
 
 	public Input getPartnerStreet() throws RemoteException {
 		if (partnerStreet == null)
-			partnerStreet = new TextInput(getContract().getAddress()
-					.getStreet(), 255);
+			partnerStreet = new TextInput(
+					getContract().getAddress() == null ? "" : getContract()
+							.getAddress().getStreet(), 255);
 		return partnerStreet;
 	}
 
 	public Input getPartnerNumber() throws RemoteException {
 		if (partnerNumber == null)
-			partnerNumber = new TextInput(getContract().getAddress()
-					.getNumber(), 255);
+			partnerNumber = new TextInput(
+					getContract().getAddress() == null ? "" : getContract()
+							.getAddress().getNumber(), 255);
 		return partnerNumber;
 	}
 
@@ -427,22 +485,24 @@ public class ContractControl extends AbstractControl {
 
 	public Input getPartnerExtra() throws RemoteException {
 		if (partnerExtra == null)
-			partnerExtra = new TextInput(getContract().getAddress().getExtra(),
-					255);
+			partnerExtra = new TextInput(
+					getContract().getAddress() == null ? "" : getContract()
+							.getAddress().getExtra(), 255);
 		return partnerExtra;
 	}
 
 	public Input getPartnerZipcode() throws RemoteException {
 		if (partnerZipcode == null)
-			partnerZipcode = new TextInput(getContract().getAddress()
-					.getZipcode(), 255);
+			partnerZipcode = new TextInput(
+					getContract().getAddress() == null ? "" : getContract()
+							.getAddress().getZipcode(), 255);
 		return partnerZipcode;
 	}
 
 	public Input getPartnerCity() throws RemoteException {
 		if (partnerCity == null)
-			partnerCity = new TextInput(getContract().getAddress().getCity(),
-					255);
+			partnerCity = new TextInput(getContract().getAddress() == null ? ""
+					: getContract().getAddress().getCity(), 255);
 		return partnerCity;
 	}
 
@@ -458,15 +518,17 @@ public class ContractControl extends AbstractControl {
 
 	public Input getPartnerState() throws RemoteException {
 		if (partnerState == null)
-			partnerState = new TextInput(getContract().getAddress().getState(),
-					255);
+			partnerState = new TextInput(
+					getContract().getAddress() == null ? "" : getContract()
+							.getAddress().getState(), 255);
 		return partnerState;
 	}
 
 	public Input getPartnerCountry() throws RemoteException {
 		if (partnerCountry == null)
-			partnerCountry = new TextInput(getContract().getAddress()
-					.getCountry(), 255);
+			partnerCountry = new TextInput(
+					getContract().getAddress() == null ? "" : getContract()
+							.getAddress().getCountry(), 255);
 		return partnerCountry;
 	}
 
@@ -572,9 +634,9 @@ public class ContractControl extends AbstractControl {
 		// the interface "Contract". Jameica's classloader knows
 		// all classes an finds the right implementation automatically. ;)
 		DBIterator contracts = service.createList(Contract.class);
-		
+
 		ArrayList<Contract> filteredContracts = new ArrayList<Contract>();
-		
+
 		// Iterate through the list and filter
 		while (contracts.hasNext()) {
 			Contract contract = (Contract) contracts.next();
@@ -595,7 +657,8 @@ public class ContractControl extends AbstractControl {
 			}
 		}
 		Contract[] filteredArray = new Contract[filteredContracts.size()];
-		GenericIterator filteredIterator = PseudoIterator.fromArray(filteredContracts.toArray(filteredArray));
+		GenericIterator filteredIterator = PseudoIterator
+				.fromArray(filteredContracts.toArray(filteredArray));
 
 		// 4) create the table
 		contractListWarnings = new TablePart(
@@ -603,14 +666,15 @@ public class ContractControl extends AbstractControl {
 				new de.janrieke.contractmanager.gui.action.ShowContractDetailView());
 
 		// 5) now we have to add some columns.
-		contractListWarnings.addColumn(Settings.i18n().tr("Name of contract"), "name");
+		contractListWarnings.addColumn(Settings.i18n().tr("Name of contract"),
+				"name");
 
 		// 6) the following fields are a date fields. So we add a date
 		// formatter.
-		contractListWarnings.addColumn(Settings.i18n().tr("Start date"), "startdate",
-				new DateFormatter(Settings.DATEFORMAT));
-		contractListWarnings.addColumn(Settings.i18n().tr("End date"), "enddate",
-				new DateFormatter(Settings.DATEFORMAT));
+		contractListWarnings.addColumn(Settings.i18n().tr("Start date"),
+				"startdate", new DateFormatter(Settings.DATEFORMAT));
+		contractListWarnings.addColumn(Settings.i18n().tr("End date"),
+				"enddate", new DateFormatter(Settings.DATEFORMAT));
 		contractListWarnings.addColumn(
 				Settings.i18n().tr("Next cancellation deadline"),
 				"nextCancellationDeadline", new DateFormatter(
@@ -632,7 +696,8 @@ public class ContractControl extends AbstractControl {
 					Calendar calendar = Calendar.getInstance();
 					try {
 						Date deadline = contract.getNextCancellationDeadline();
-						assert (deadline != null); //otherwise it never should have been added
+						assert (deadline != null); // otherwise it never should
+													// have been added
 						calendar.setTime(deadline);
 						calendar.add(Calendar.DAY_OF_YEAR,
 								-Settings.getExtensionNoticeTime());
@@ -666,7 +731,8 @@ public class ContractControl extends AbstractControl {
 			return transactionList;
 
 		GenericIterator transactions = getContract().getTransactions();
-		transactionList = new TablePart(transactions, new ShowTransactionDetailsView());
+		transactionList = new TablePart(transactions,
+				new ShowTransactionDetailsView());
 		transactionList.addColumn(Settings.i18n().tr("Money"), "money");
 		TransactionListMenu tlm = new TransactionListMenu();
 		transactionList.setContextMenu(tlm);
@@ -687,46 +753,49 @@ public class ContractControl extends AbstractControl {
 		costsIterator = getContract().getCosts();
 		costsList = new SizeableTablePart(costsIterator, null);
 		costsList.setFormatter(new TableFormatter() {
-			
+
 			@Override
 			public void format(TableItem item) {
 				try {
-					double money = ((Costs)item.getData()).getMoney(); //Double.parseDouble(item.getText(1));
+					double money = ((Costs) item.getData()).getMoney(); // Double.parseDouble(item.getText(1));
 					String text = String.format("%1$.2f", money) + " €";
 					item.setText(1, text);
-					item.setText(2, ((Costs)item.getData()).getPeriod().toAdjectiveString());
+					item.setText(2, ((Costs) item.getData()).getPeriod()
+							.toAdjectiveString());
 				} catch (RemoteException e) {
 				}
 			}
 		});
-		
+
 		costsList.setHeightHint(120);
-		costsList.addColumn(Settings.i18n().tr("Description"), "description", null, true);
+		costsList.addColumn(Settings.i18n().tr("Description"), "description",
+				null, true);
 		costsList.addColumn(Settings.i18n().tr("Money"), "money", null, true);
 		costsList.addColumn(Settings.i18n().tr("Period"), "period", null, true);
 		CostsListMenu clm = new CostsListMenu(this);
 		costsList.setContextMenu(clm);
 		costsList.setSummary(false);
 		costsList.addChangeListener(new TableChangeListener() {
-			
+
 			@Override
-			public void itemChanged(Object object, String attribute, String newValue)
-					throws ApplicationException {
+			public void itemChanged(Object object, String attribute,
+					String newValue) throws ApplicationException {
 				assert object instanceof Costs;
 				if (object instanceof Costs) {
 					try {
-					if ("description".equals(attribute))
-						((Costs)object).setDescription(newValue);
-					else if ("money".equals(attribute)) {
-						try {
-							((Costs)object).setMoney(Double.parseDouble(newValue));
-						} catch (NumberFormatException e) {
-						}
-					}
-					else if ("period".equals(attribute))
-						((Costs)object).setPeriod(Contract.IntervalType.adjectiveValueOf(newValue));
-					else
-						assert false;
+						if ("description".equals(attribute))
+							((Costs) object).setDescription(newValue);
+						else if ("money".equals(attribute)) {
+							try {
+								((Costs) object).setMoney(Double
+										.parseDouble(newValue));
+							} catch (NumberFormatException e) {
+							}
+						} else if ("period".equals(attribute))
+							((Costs) object).setPeriod(Contract.IntervalType
+									.adjectiveValueOf(newValue));
+						else
+							assert false;
 					} catch (RemoteException e) {
 						throw new ApplicationException(e);
 					}
@@ -765,7 +834,11 @@ public class ContractControl extends AbstractControl {
 			p.setNextMinRuntimeType((IntervalType) getNextMinRuntimeType()
 					.getValue());
 
-			Address a = getContract().getAddress();
+			Address a = (Address) getPartnerAddress().getValue();
+			if (a == null) {
+				a = (Address) Settings.getDBService().createObject(
+						Address.class, null);
+			}
 			a.setName((String) getPartnerName().getValue());
 			a.setStreet((String) getPartnerStreet().getValue());
 			a.setNumber((String) getPartnerNumber().getValue());
@@ -784,28 +857,28 @@ public class ContractControl extends AbstractControl {
 				// object has no ID, yet. After storage, the ID is set.
 				p.setAddress(a);
 				p.store();
-				
-				//We have to reuse the old iterator that has been used for the
-				// costs list, because otherwise new beans will created that 
+
+				// We have to reuse the old iterator that has been used for the
+				// costs list, because otherwise new beans will created that
 				// do not contain the values changed by the inline editor.
-//				DBIterator costs = p.getCosts(); 
-//				while (costs.hasNext()) {
+				// DBIterator costs = p.getCosts();
+				// while (costs.hasNext()) {
 				costsIterator.begin();
 				while (costsIterator.hasNext()) {
 					Costs c = (Costs) costsIterator.next();
 					c.store();
 				}
-				for (Costs c: newCosts) {
+				for (Costs c : newCosts) {
 					// Again: Set the contract's new ID.
 					c.setContract(p);
 					c.store();
 				}
-				
+
 				updateDerivedAttributes();
-				
+
 				if (view instanceof ContractDetailView)
 					((ContractDetailView) view).setButtonActivationState(true);
-				
+
 				GUI.getStatusBar().setSuccessText(
 						Settings.i18n().tr("Contract stored successfully"));
 			} catch (ApplicationException e) {
@@ -821,17 +894,17 @@ public class ContractControl extends AbstractControl {
 	private void updateDerivedAttributes() throws RemoteException {
 		double costs = getContract().getCostsPerTerm();
 		costsPerTerm.setValue(Settings.DECIMALFORMAT.format(costs));
-		
+
 		Date ne = getContract().getNextCancellationDeadline();
-		nextCancellationDeadline.setValue(ne == null ? ""
-				: Settings.DATEFORMAT.format(ne));
+		nextCancellationDeadline.setValue(ne == null ? "" : Settings.DATEFORMAT
+				.format(ne));
 
 		Date ntb = getContract().getNextTermBegin();
 		Date nte = getContract().getNextTermEnd();
 		if (ntb != null && nte != null) {
 			nextExtension.setValue(Settings.DATEFORMAT.format(ntb) + " "
-							+ Settings.i18n().tr("to") + " "
-							+ Settings.DATEFORMAT.format(nte));
+					+ Settings.i18n().tr("to") + " "
+					+ Settings.DATEFORMAT.format(nte));
 		} else
 			nextExtension.setValue("");
 	}
