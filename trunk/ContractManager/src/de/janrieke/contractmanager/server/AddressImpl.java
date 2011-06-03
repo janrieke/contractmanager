@@ -21,7 +21,10 @@ import java.rmi.RemoteException;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Address;
+import de.janrieke.contractmanager.rmi.Contract;
 import de.willuhn.datasource.db.AbstractDBObject;
+import de.willuhn.datasource.rmi.DBIterator;
+import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
@@ -114,6 +117,8 @@ public class AddressImpl extends AbstractDBObject implements Address {
 		// if ("summary".equals(fieldName)) {
 		// return new Double(getPrice() * getEfforts());
 		// }
+		if ("contractCount".equals(fieldName))
+			return getContractCount();
 
 		return super.getAttribute(fieldName);
 	}
@@ -199,5 +204,18 @@ public class AddressImpl extends AbstractDBObject implements Address {
 	@Override
 	public void setCountry(String country) throws RemoteException {
 		setAttribute("country", country);
+	}
+
+	@Override
+	public int getContractCount() throws RemoteException {
+		DBIterator contractIterator = null;
+		try {
+			DBService service = this.getService();
+			contractIterator = service.createList(Contract.class);
+			contractIterator.addFilter("address_id = " + this.getID());
+		} catch (Exception e) {
+			throw new RemoteException("unable to load contract list", e);
+		}
+		return contractIterator.size();
 	}
 }

@@ -59,4 +59,6 @@ public interface Address extends DBObject {
 	
 	public String getCountry() throws RemoteException;
 	public void setCountry(String country) throws RemoteException;
+
+	public int getContractCount() throws RemoteException;
 }
