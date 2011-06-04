@@ -211,7 +211,7 @@ public class AddressControl extends AbstractControl {
 		addressList.addColumn(Settings.i18n().tr("Zipcode"), "zipcode");
 		addressList.addColumn(Settings.i18n().tr("City"), "city");
 		addressList.addColumn(Settings.i18n().tr("Country"), "country");
-		addressList.addColumn(Settings.i18n().tr("Used in # Contracts"), "contractCount");
+		addressList.addColumn(Settings.i18n().tr("Used in # Contracts"), Address.CONTRACT_COUNT);
 
 		// 6) we are adding a context menu
 		addressList.setContextMenu(new AddressListMenu(true));

@@ -567,10 +567,10 @@ public class ContractControl extends AbstractControl {
 				new DateFormatter(Settings.DATEFORMAT));
 		contractList.addColumn(
 				Settings.i18n().tr("Next cancellation deadline"),
-				"nextCancellationDeadline", new DateFormatter(
+				Contract.NEXT_CANCELLATION_DEADLINE, new DateFormatter(
 						Settings.DATEFORMAT));
 		contractList.addColumn(Settings.i18n().tr("Costs per Term"),
-				"costsPerPeriod", new CurrencyFormatter(Settings.CURRENCY,
+				Contract.COSTS_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
 						Settings.DECIMALFORMAT));
 
 		// 7) we are adding a context menu
@@ -677,10 +677,10 @@ public class ContractControl extends AbstractControl {
 				"enddate", new DateFormatter(Settings.DATEFORMAT));
 		contractListWarnings.addColumn(
 				Settings.i18n().tr("Next cancellation deadline"),
-				"nextCancellationDeadline", new DateFormatter(
+				Contract.NEXT_CANCELLATION_DEADLINE, new DateFormatter(
 						Settings.DATEFORMAT));
 		contractListWarnings.addColumn(Settings.i18n().tr("Costs per Term"),
-				"costsPerPeriod", new CurrencyFormatter(Settings.CURRENCY,
+				Contract.COSTS_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
 						Settings.DECIMALFORMAT));
 
 		// 7) we are adding a context menu
