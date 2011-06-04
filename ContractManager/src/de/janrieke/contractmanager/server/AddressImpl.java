@@ -117,7 +117,7 @@ public class AddressImpl extends AbstractDBObject implements Address {
 		// if ("summary".equals(fieldName)) {
 		// return new Double(getPrice() * getEfforts());
 		// }
-		if ("contractCount".equals(fieldName))
+		if (CONTRACT_COUNT.equals(fieldName))
 			return getContractCount();
 
 		return super.getAttribute(fieldName);

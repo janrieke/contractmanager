@@ -46,7 +46,7 @@ public class AddressListMenu extends ContextMenu {
 			addItem(ContextMenuItem.SEPARATOR);
 			
 			addItem(new ContextMenuItem(Settings.i18n().tr(
-					"Create a new address..."), new Action() {
+					"Create a New Address..."), new Action() {
 				public void handleAction(Object context)
 						throws ApplicationException {
 					// we force the context to be null to create a new
@@ -57,7 +57,7 @@ public class AddressListMenu extends ContextMenu {
 
 			addItem(ContextMenuItem.SEPARATOR);
 			addItem(new CheckedContextMenuItem(Settings.i18n().tr(
-					"Delete address..."), new DeleteAddress(),
+					"Delete Address..."), new DeleteAddress(),
 					"window-close.png"));
 		}
 

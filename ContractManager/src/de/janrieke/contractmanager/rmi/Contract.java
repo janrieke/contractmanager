@@ -151,9 +151,13 @@ public interface Contract extends DBObject {
 	public DBIterator getCosts() throws RemoteException;
 
 	//these are derived features
+	public static final String NEXT_TERM_BEGIN = "next_term_begin";
 	public Date getNextTermBegin() throws RemoteException;
+	public static final String NEXT_TERM_END = "next_term_end";
 	public Date getNextTermEnd() throws RemoteException;
+	public static final String NEXT_CANCELLATION_DEADLINE = "next_cancellation_deadline";
 	public Date getNextCancellationDeadline() throws RemoteException;
 	public Date getNextCancellationDeadline(Date after) throws RemoteException;
+	public static final String COSTS_PER_TERM = "costs_per_term";
 	public double getCostsPerTerm() throws RemoteException;
 }

@@ -17,21 +17,30 @@
  */
 package de.janrieke.contractmanager.gui.action;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Date;
 
+import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
+import net.fortuna.ical4j.data.CalendarParser;
+import net.fortuna.ical4j.data.CalendarParserFactory;
+import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VAlarm;
 import net.fortuna.ical4j.model.component.VToDo;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 import net.fortuna.ical4j.util.UidGenerator;
 
@@ -42,6 +51,7 @@ import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.datasource.rmi.DBService;
+import de.willuhn.datasource.rmi.ResultSetExtractor;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.util.ApplicationException;
@@ -95,7 +105,38 @@ public class ExportCancelationReminders implements Action {
 			// reminders have already been checked.
 			// Thus, we should store the Event's UID and load the file before
 			// overwriting.
-			Calendar ical = new Calendar();
+			Calendar ical;
+			if (new File(filename).exists()) {
+				FileInputStream fin = new FileInputStream(filename);
+				CalendarBuilder builder = new CalendarBuilder();
+				try {
+					ical = builder.build(fin);
+				} catch (ParserException e) {
+					//then just don't care and overwrite the file
+					ical = new Calendar();
+				}
+			}
+			else
+				ical = new Calendar();
+			
+			//Iterate over all calendar entries and get their UIDs.
+			// 1. If the UID is in the DB, check whether it's reminder 
+			//  was in the past -> delete
+			// 2. If UID is in the DB and in the future, leave it as it
+			//  is, so that already checked reminders are not overwritten.
+			// 3. If it is not in the DB, delete it (contract was deleted
+			//  or modified).
+			for (Object comp : ical.getComponents()) {
+				if (comp instanceof Component) {
+					Property prop = ((Component)comp).getProperty(Uid.UID);
+					if (prop instanceof Uid) {
+						String uidValue = ((Uid)prop).getValue();
+						//DBIterator result = Settings.getDBService().createList(CalendarUID.class);
+						//result.addFilter("");
+					}
+				}
+			}
+			
 			ical.getProperties().add(
 					new ProdId("-//ContractManager 0.1//iCal4j 1.0//EN"));
 			ical.getProperties().add(Version.VERSION_2_0);
