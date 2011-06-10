@@ -64,7 +64,15 @@ CREATE TABLE version (
   PRIMARY KEY (id)
 );
 
-ALTER TABLE contract     ADD CONSTRAINT fk_address  FOREIGN KEY (address_id)  REFERENCES address (id)  DEFERRABLE;
-ALTER TABLE transactions ADD CONSTRAINT fk_contract FOREIGN KEY (contract_id) REFERENCES contract (id) DEFERRABLE;
+CREATE TABLE icaluids (
+  uid varchar(255) NOT NULL,
+  contract_id int(5),
+  UNIQUE (uid),
+  PRIMARY KEY (uid)
+);
+
+ALTER TABLE contract     ADD CONSTRAINT fk_address           FOREIGN KEY (address_id)  REFERENCES address (id)  DEFERRABLE;
+ALTER TABLE transactions ADD CONSTRAINT fk_contract          FOREIGN KEY (contract_id) REFERENCES contract (id) DEFERRABLE;
+ALTER TABLE icaluids     ADD CONSTRAINT fk_icaluids_contract FOREIGN KEY (contract_id) REFERENCES contract (id) DEFERRABLE;
 
 INSERT INTO version (name,version) values ('contract_db',16);

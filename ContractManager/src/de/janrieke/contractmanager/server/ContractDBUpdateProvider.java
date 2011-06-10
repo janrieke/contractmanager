@@ -87,7 +87,8 @@ public class ContractDBUpdateProvider implements UpdateProvider
   {
     try
     {
-      return this.version.getVersion();
+    	return this.version.getVersion();
+        //return 15; //to test the db update  
     }
     catch (RemoteException re)
     {
@@ -158,23 +159,3 @@ public class ContractDBUpdateProvider implements UpdateProvider
   }
 
 }
-
-
-/*********************************************************************
- * $Log: HBCIUpdateProvider.java,v $
- * Revision 1.3  2009-03-10 23:51:31  willuhn
- * @C PluginResources#getPath als deprecated markiert - stattdessen sollte jetzt Manifest#getPluginDir() verwendet werden
- *
- * Revision 1.2  2007/12/11 15:23:53  willuhn
- * @N Class-Update fuer neue Tabellen "op" und "op_buchung"
- *
- * Revision 1.1  2007/12/11 00:33:35  willuhn
- * @N Scharfschaltung des neuen Update-Prozesses
- *
- * Revision 1.2  2007/12/07 00:48:05  willuhn
- * @N weiterer Code fuer den neuen Update-Mechanismus
- *
- * Revision 1.1  2007/12/06 17:57:21  willuhn
- * @N Erster Code fuer das neue Versionierungs-System
- *
- **********************************************************************/
