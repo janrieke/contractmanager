@@ -23,12 +23,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.CalendarOutputter;
-import net.fortuna.ical4j.data.CalendarParser;
-import net.fortuna.ical4j.data.CalendarParserFactory;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -49,11 +51,13 @@ import org.eclipse.swt.widgets.FileDialog;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
+import de.janrieke.contractmanager.rmi.ICalUID;
+import de.janrieke.contractmanager.util.ListMap;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.datasource.rmi.DBService;
-import de.willuhn.datasource.rmi.ResultSetExtractor;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
+import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
 /**
@@ -101,11 +105,11 @@ public class ExportCancelationReminders implements Action {
 			java.util.Calendar until = java.util.Calendar.getInstance();
 			until.add(java.util.Calendar.YEAR, 2);
 
-			// FIXME: Calendar apps usually modify the iCal file to store which
+			// Calendar apps usually modify the iCal file to store which
 			// reminders have already been checked.
-			// Thus, we should store the Event's UID and load the file before
+			// Thus, we store the Event's UIDs and load the file before
 			// overwriting.
-			Calendar ical;
+			Calendar ical = null;
 			if (new File(filename).exists()) {
 				FileInputStream fin = new FileInputStream(filename);
 				CalendarBuilder builder = new CalendarBuilder();
@@ -113,11 +117,13 @@ public class ExportCancelationReminders implements Action {
 					ical = builder.build(fin);
 				} catch (ParserException e) {
 					//then just don't care and overwrite the file
-					ical = new Calendar();
+					//ical = new Calendar();
+					ical = null;
 				}
 			}
-			else
-				ical = new Calendar();
+			else {
+				//ical = new Calendar();
+			}
 			
 			//Iterate over all calendar entries and get their UIDs.
 			// 1. If the UID is in the DB, check whether it's reminder 
@@ -126,22 +132,65 @@ public class ExportCancelationReminders implements Action {
 			//  is, so that already checked reminders are not overwritten.
 			// 3. If it is not in the DB, delete it (contract was deleted
 			//  or modified).
-			for (Object comp : ical.getComponents()) {
-				if (comp instanceof Component) {
-					Property prop = ((Component)comp).getProperty(Uid.UID);
-					if (prop instanceof Uid) {
-						String uidValue = ((Uid)prop).getValue();
-						//DBIterator result = Settings.getDBService().createList(CalendarUID.class);
-						//result.addFilter("");
+			// 4. Finally, delete all unused DB entries.
+
+			final Date today = new Date();
+			
+			//use the contracts' ids, because equals does not work, as several 
+			// different Contract objects will be instantiated.
+			final ListMap<Integer, VToDo> exportedReminders = new ListMap<Integer, VToDo>();
+			
+			final Set<String> usedUIDs = new HashSet<String>();
+			
+			final List<Component> deletionList = new ArrayList<Component>();
+			
+			if (ical != null) {
+				Logger.info("Loading ical file with " + ical.getComponents().size() + " entries...");
+				for (Object comp : ical.getComponents()) {
+					if (comp instanceof VToDo) {
+						Property prop = ((VToDo)comp).getProperty(Uid.UID);
+						if (prop instanceof Uid) {
+							String uidValue = ((Uid)prop).getValue();
+							Date duedate = ((VToDo)comp).getDue().getDate();
+							if (duedate.before(today)) {
+								// 1. Delete past reminder from ical file
+								Logger.debug("Deleting past entry " + ((VToDo)comp).getName() + " (" + uidValue + ").");
+								deletionList.add((Component) comp);
+							} else {
+								//Search in DB for entry with that uid
+								DBIterator iCalUIDDBList = Settings.getDBService().createList(ICalUID.class);
+								iCalUIDDBList.addFilter("uid = '" + uidValue + "'");
+								if (iCalUIDDBList.hasNext()) {
+									// 2. Leave it as is, and remember entry, so that we can see   
+									// during ical event creation that this reminder was already exported
+									Logger.debug("Reusing entry " + ((VToDo)comp).getName() + " (" + uidValue + ").");
+									ICalUID icaluid = (ICalUID) iCalUIDDBList.next(); //there should be only one
+									exportedReminders.addToList(Integer.parseInt(icaluid.getContract().getID()), (VToDo) comp);
+									usedUIDs.add(uidValue);
+								} else {
+									// 3. Delete it as its not in the DB (deleted or modified contract)
+									Logger.debug("Deleting invalid entry " + ((VToDo)comp).getName() + " (" + uidValue + ").");
+									deletionList.add((Component) comp);
+								}
+							}
+						}
 					}
 				}
+				
+				for (Component entry : deletionList)
+					ical.getComponents().remove(entry);
 			}
 			
-			ical.getProperties().add(
-					new ProdId("-//ContractManager 0.1//iCal4j 1.0//EN"));
-			ical.getProperties().add(Version.VERSION_2_0);
-			ical.getProperties().add(CalScale.GREGORIAN);
-
+			if (ical == null) {
+				Logger.info("Creating new iCalendar file...");
+				ical = new Calendar();
+				ical.getProperties().add(
+						new ProdId("-//ContractManager 0.1//iCal4j 1.0//EN"));
+				ical.getProperties().add(Version.VERSION_2_0);
+				ical.getProperties().add(CalScale.GREGORIAN);
+			}
+			
+			// Now it's time to generate the reminders!
 			int warningTime = Settings.getExtensionWarningTime();
 			java.util.Calendar calcCalendar = java.util.Calendar.getInstance();
 			boolean namedExport = Settings.getNamedICalExport();
@@ -149,30 +198,88 @@ public class ExportCancelationReminders implements Action {
 			while (contracts.hasNext()) {
 				Contract contract = (Contract) contracts.next();
 
+				Logger.debug("Creating new entries for contract " + contract.getName() + "...");
 				Date deadline = contract.getNextCancellationDeadline();
+				if (deadline == null)
+					continue;
 				calcCalendar.setTime(deadline);
 				calcCalendar.add(java.util.Calendar.DAY_OF_YEAR, -warningTime);
 
+				boolean entryFound = false;
+				//Create possibly multiple reminders until we reached the "until" limit. 
 				while (calcCalendar.before(until)) {
-					String descr = namedExport ? Settings.i18n().tr(
-							"Check cancellation for contract {0}",
-							contract.getName()) : Settings.i18n().tr(
-							"Check cancellations");
-					VToDo cancellation = new VToDo(
-							new net.fortuna.ical4j.model.Date(
-									calcCalendar.getTime()),
-							new net.fortuna.ical4j.model.Date(deadline), descr);
-					VAlarm alarm = new VAlarm(new Dur(-warningTime, 0, 0, 0));
-					alarm.getProperties().add(
-							net.fortuna.ical4j.model.property.Action.DISPLAY);
-					alarm.getProperties().add(new Description(descr));
-					cancellation.getAlarms().add(alarm);
+					//Before creating a reminder, check whether we already have one.
+					if (exportedReminders.containsKey(Integer.parseInt(contract.getID()))) {
+						List<VToDo> todos = exportedReminders.getList(Integer.parseInt(contract.getID()), false);
+						for (VToDo todo: todos) {
+							java.util.Calendar diffCalcCalendar1 = java.util.Calendar.getInstance();
+							Date d1 = todo.getStartDate().getDate();
+							diffCalcCalendar1.setTime(d1);
 
-					UidGenerator ug = new UidGenerator(Thread.currentThread()
-							.toString());
-					cancellation.getProperties().add(ug.generateUid());
+							java.util.Calendar diffCalcCalendar2 = java.util.Calendar.getInstance();
+							Date d2 = calcCalendar.getTime();
+							diffCalcCalendar2.setTime(d2);
+							
+							long comp = diffCalcCalendar1.getTimeInMillis() - diffCalcCalendar2.getTimeInMillis();
+							//Logger.debug("  DIFF: " + comp);
+							
+							if (comp == -79200000 || comp == -82800000) {
+								//entry already exists, so skip to the next
+								Logger.debug("  Reusing entry for " + calcCalendar.getTime() + " (" + todo.getUid().getValue() + ").");
 
-					ical.getComponents().add(cancellation);
+								//Remember the uid, for later usage check
+								usedUIDs.add(todo.getUid().getValue());
+								
+								entryFound = true;
+								break;
+							}
+						}
+					}
+
+					if (!entryFound) {
+						//Actual creation of the ical reminder (as a VToDo)
+
+						//The ToDo will be due on the last possible cancellation day, and
+						// start warningTime days earlier. The alarm will also set off warningTime
+						// days earlier.
+						String descr = namedExport ? Settings.i18n().tr(
+								"Check cancellation for contract {0}",
+								contract.getName()) : Settings.i18n().tr(
+								"Check cancellations");
+								VToDo cancellation = new VToDo(
+										new net.fortuna.ical4j.model.Date(
+												calcCalendar.getTime()),
+												new net.fortuna.ical4j.model.Date(deadline), descr);
+
+								//Add the alarm
+								VAlarm alarm = new VAlarm(new Dur(-warningTime, 0, 0, 0));
+								alarm.getProperties().add(
+										net.fortuna.ical4j.model.property.Action.DISPLAY);
+								alarm.getProperties().add(new Description(descr));
+								cancellation.getAlarms().add(alarm);
+
+								//Generate a UID for later identification
+								UidGenerator ug = new UidGenerator(Thread.currentThread()
+										.toString());
+								Uid uid = ug.generateUid();
+								cancellation.getProperties().add(uid);
+
+								//Finally, add the newly create reminder to the ICalendar.
+								ical.getComponents().add(cancellation);
+
+								//Add that entry to the DB.
+								ICalUID icaluid = (ICalUID) Settings.getDBService().createObject(ICalUID.class, null);
+								icaluid.setContract(contract);
+								icaluid.setUID(uid.getValue());
+								icaluid.store();
+
+								Logger.debug("  Created entry for " + calcCalendar.getTime() + " (" + uid.getValue() + ").");
+
+								//Remember the uid, for later usage check
+								usedUIDs.add(uid.getValue());
+					} else
+						entryFound = false;
+
 
 					//find next cancellation deadline
 					calcCalendar.setTime(deadline);
@@ -180,6 +287,16 @@ public class ExportCancelationReminders implements Action {
 					deadline = contract.getNextCancellationDeadline(calcCalendar.getTime());
 					calcCalendar.setTime(deadline);
 					calcCalendar.add(java.util.Calendar.DAY_OF_YEAR, -warningTime);
+				}
+			}
+			
+			//4. Remove all unnecessary DB entries.
+			DBIterator dbuidlist = Settings.getDBService().createList(ICalUID.class);
+			while (dbuidlist.hasNext()) {
+				ICalUID dbuid = (ICalUID) dbuidlist.next();
+				if (!usedUIDs.contains(dbuid.getUID())) {
+					Logger.debug("Deleting DB entry (" + dbuid.getUID() + ").");
+					dbuid.delete();
 				}
 			}
 

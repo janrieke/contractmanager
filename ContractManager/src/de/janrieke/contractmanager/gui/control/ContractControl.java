@@ -38,6 +38,7 @@ import de.janrieke.contractmanager.gui.parts.SizeableTablePart;
 import de.janrieke.contractmanager.gui.view.ContractDetailView;
 import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
+import de.janrieke.contractmanager.rmi.ICalUID;
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
 import de.janrieke.contractmanager.rmi.Costs;
 import de.willuhn.datasource.GenericIterator;
@@ -811,27 +812,37 @@ public class ContractControl extends AbstractControl {
 	public void handleStore() {
 		try {
 			// get the current contract.
-			Contract p = getContract();
+			Contract c = getContract();
+
+			if (cancellationsChanged(c)) {
+				//delete all ical uids, so that everything will be reexported next time
+				DBIterator dbuidlist = Settings.getDBService().createList(ICalUID.class);
+				dbuidlist.addFilter("contract_id = " + c.getID());
+				while (dbuidlist.hasNext()) {
+					ICalUID dbuid = (ICalUID) dbuidlist.next();
+					dbuid.delete();
+				}
+			}
 
 			// invoke all Setters of this contract and assign the current values
-			p.setName((String) getName().getValue());
-			p.setContractNumber((String) getContractNumber().getValue());
-			p.setCustomerNumber((String) getCustomerNumber().getValue());
-			p.setComment((String) getComment().getValue());
-			p.setStartDate((Date) getStartDate().getValue());
-			p.setEndDate((Date) getEndDate().getValue());
+			c.setName((String) getName().getValue());
+			c.setContractNumber((String) getContractNumber().getValue());
+			c.setCustomerNumber((String) getCustomerNumber().getValue());
+			c.setComment((String) getComment().getValue());
+			c.setStartDate((Date) getStartDate().getValue());
+			c.setEndDate((Date) getEndDate().getValue());
 
-			p.setCancelationPeriodCount((Integer) getCancellationPeriodCount()
+			c.setCancelationPeriodCount((Integer) getCancellationPeriodCount()
 					.getValue());
-			p.setCancelationPeriodType((IntervalType) getCancellationPeriodType()
+			c.setCancelationPeriodType((IntervalType) getCancellationPeriodType()
 					.getValue());
-			p.setFirstMinRuntimeCount((Integer) getFirstMinRuntimeCount()
+			c.setFirstMinRuntimeCount((Integer) getFirstMinRuntimeCount()
 					.getValue());
-			p.setFirstMinRuntimeType((IntervalType) getFirstMinRuntimeType()
+			c.setFirstMinRuntimeType((IntervalType) getFirstMinRuntimeType()
 					.getValue());
-			p.setNextMinRuntimeCount((Integer) getNextMinRuntimeCount()
+			c.setNextMinRuntimeCount((Integer) getNextMinRuntimeCount()
 					.getValue());
-			p.setNextMinRuntimeType((IntervalType) getNextMinRuntimeType()
+			c.setNextMinRuntimeType((IntervalType) getNextMinRuntimeType()
 					.getValue());
 
 			Address a = (Address) getPartnerAddress().getValue();
@@ -855,8 +866,8 @@ public class ContractControl extends AbstractControl {
 				a.store();
 				// We have to set the address here, because a new, unstored
 				// object has no ID, yet. After storage, the ID is set.
-				p.setAddress(a);
-				p.store();
+				c.setAddress(a);
+				c.store();
 
 				// We have to reuse the old iterator that has been used for the
 				// costs list, because otherwise new beans will created that
@@ -865,13 +876,13 @@ public class ContractControl extends AbstractControl {
 				// while (costs.hasNext()) {
 				costsIterator.begin();
 				while (costsIterator.hasNext()) {
-					Costs c = (Costs) costsIterator.next();
-					c.store();
+					Costs cost = (Costs) costsIterator.next();
+					cost.store();
 				}
-				for (Costs c : newCosts) {
+				for (Costs cost : newCosts) {
 					// Again: Set the contract's new ID.
-					c.setContract(p);
-					c.store();
+					cost.setContract(c);
+					cost.store();
 				}
 
 				updateDerivedAttributes();
@@ -888,7 +899,26 @@ public class ContractControl extends AbstractControl {
 			Logger.error("error while storing contract", e);
 			GUI.getStatusBar().setErrorText(
 					Settings.i18n().tr("Error while storing contract"));
+		} catch (ApplicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+	}
+	
+	private boolean equalCheck(Object o1, Object o2) {
+		return (o1 == o2 || o1 != null && o1.equals(o2));
+	}
+
+	private boolean cancellationsChanged(Contract c) throws RemoteException {
+		return !(equalCheck(getName().getValue(), c.getName()) &&
+				equalCheck(getStartDate().getValue(), c.getStartDate()) &&
+				equalCheck(getCancellationPeriodCount().getValue(), c.getCancellationPeriodCount()) &&
+				equalCheck(getCancellationPeriodType().getValue(), c.getCancellationPeriodType()) &&
+				equalCheck(getEndDate().getValue(), c.getEndDate()) &&
+				equalCheck(getFirstMinRuntimeCount().getValue(), c.getFirstMinRuntimeCount()) &&
+				equalCheck(getFirstMinRuntimeType().getValue(), c.getFirstMinRuntimeType()) &&
+				equalCheck(getNextMinRuntimeCount().getValue(), c.getNextMinRuntimeCount()) &&
+				equalCheck(getNextMinRuntimeType().getValue(), c.getNextMinRuntimeType()));
 	}
 
 	private void updateDerivedAttributes() throws RemoteException {

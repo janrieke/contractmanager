@@ -56,7 +56,7 @@ public class DeleteAddress implements Action {
 			DBIterator contracts = service
 					.createList(de.janrieke.contractmanager.rmi.Contract.class);
 
-			// 3) we add a filter to only query for tasks with our project id
+			// 3) we add a filter to only query for tasks with our address id
 			contracts.addFilter("address_id = " + p.getID());
 			
 			if (contracts.size()>0) {
