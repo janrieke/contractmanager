@@ -50,7 +50,7 @@ public class AboutDialog extends AbstractDialog {
 
 		FormTextPart text = new FormTextPart();
 		text.setText("<form>" + "<p><b>Contract Manager</b></p>"
-				+ "<br/>Licence: GPL 2.0 (http://www.gnu.org/licenses/gpl-2.0.txt)"
+				+ "<br/>Licence: GPL 3.0 (http://www.gnu.org/licenses/gpl-3.0.txt)"
 				+ "<br/><p>Copyright by Jan Rieke [it@janrieke.de]</p>"
 				+ "<p>http://www.janrieke.de/projects/contractmanager</p>"
 				+ "<br/><p>Based upon Jameica Example Plugin, copyright by Olaf Willuhn [info@jameica.org]</p>"
