@@ -3,8 +3,11 @@
 		<span color="header" font="header">Vertragsdetails</span>
 	</p>
 
+	<p>
+		Geben Sie hier die Vertragsdetails ein. 
+	</p>
 	<li>
-		Geben Sie hier die Vertragsdetails ein. Angaben zur Laufzeit sind wichtig, um Sie automatisch an Vertragsverlängerungen und mögliche Kündigungen zu erinnern. 
+		Angaben zur Laufzeit sind wichtig, um Sie automatisch an Vertragsverlängerungen und mögliche Kündigungen zu erinnern. 
 	</li>
 	<li>
 		Verwenden Sie die Schaltfläche <b>Kündigung generieren</b>, um automatisch ein Kündungsschreiben zu generieren (OpenOffice-Format).

@@ -23,6 +23,7 @@ import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.menu.AddressListMenu;
 import de.janrieke.contractmanager.gui.view.AddressDetailView;
 import de.janrieke.contractmanager.rmi.Address;
+import de.janrieke.contractmanager.rmi.Contract;
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.datasource.rmi.DBService;
@@ -30,6 +31,8 @@ import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.Part;
+import de.willuhn.jameica.gui.formatter.CurrencyFormatter;
+import de.willuhn.jameica.gui.formatter.DateFormatter;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.input.LabelInput;
 import de.willuhn.jameica.gui.input.MultiInput;
@@ -60,6 +63,8 @@ public class AddressControl extends AbstractControl {
 
 	// this is the currently opened address
 	private Address address;
+
+	private TablePart contractList;
 
 	/**
 	 * ct.
@@ -218,6 +223,42 @@ public class AddressControl extends AbstractControl {
 
 		return addressList;
 	}
+	
+
+	public Part getContractList() throws RemoteException  {
+		if (contractList == null) {
+			// 1) get the dataservice
+			DBService service = Settings.getDBService();
+
+			// 2) now we can create the address list.
+			// We do not need to specify the implementing class for
+			// the interface "Address". Jameica's classloader knows
+			// all classes an finds the right implementation automatically. ;)
+			DBIterator contracts = service.createList(Contract.class);
+			contracts.addFilter("address_id = " + getAddress().getID());
+
+			// 4) create the table
+			contractList = new TablePart(
+					contracts,
+					new de.janrieke.contractmanager.gui.action.ShowContractDetailView());
+
+			// 5) now we have to add some columns.
+			contractList.addColumn(Settings.i18n().tr("Name of contract"), "name");
+			contractList.addColumn(Settings.i18n().tr("Start date"), "startdate",
+					new DateFormatter(Settings.DATEFORMAT));
+			contractList.addColumn(Settings.i18n().tr("End date"), "enddate",
+					new DateFormatter(Settings.DATEFORMAT));
+			contractList.addColumn(
+					Settings.i18n().tr("Next cancellation deadline"),
+					Contract.NEXT_CANCELLATION_DEADLINE, new DateFormatter(
+							Settings.DATEFORMAT));
+			contractList.addColumn(Settings.i18n().tr("Costs per Term"),
+					Contract.COSTS_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
+							Settings.DECIMALFORMAT));
+		}
+		// TODO Auto-generated method stub
+		return contractList;
+	}
 
 	/**
 	 * This method stores the address using the current values.
@@ -270,4 +311,5 @@ public class AddressControl extends AbstractControl {
 			return false;
 		}
 	}
+
 }

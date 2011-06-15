@@ -27,6 +27,7 @@ import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.util.ButtonArea;
 import de.willuhn.jameica.gui.util.ScrolledContainer;
+import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.util.ApplicationException;
 
 /**
@@ -79,10 +80,14 @@ public class AddressDetailView extends AbstractView {
 			}
 		}, null, true, "document-save.png"); // "true" defines this button as the default button
 
-		// show transactions of this address
-		//new Headline(getParent(), Settings.i18n().tr(
-		//		"Transactions of this address"));
-		//		control.getTaskList().paint(getParent());
+
+		// show contracts of this address
+	    SimpleContainer scroller2 = new SimpleContainer(getParent());
+	    scroller2.addHeadline(Settings.i18n().tr("Contracts of this address"));
+	    scroller2.addPart(control.getContractList());
+//		new Headline(getParent(), Settings.i18n().tr(
+//				"Contracts of this address"));
+//				control.getContractList().paint(getParent());
 
 	}
 
