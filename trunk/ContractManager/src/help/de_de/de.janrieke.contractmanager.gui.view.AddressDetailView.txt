@@ -1,0 +1,12 @@
+<form>
+	<p>
+		<span color="header" font="header">Adressdetails</span>
+	</p>
+
+	<p>
+		Geben Sie hier die Adressdaten ein. 
+	</p>
+	<li>
+		Sie können nur Adressen löschen, die aktuell in keinem Vertrag verwendet werden. 
+	</li>
+</form>

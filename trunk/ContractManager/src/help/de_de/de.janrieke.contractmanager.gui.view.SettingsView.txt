@@ -11,7 +11,8 @@
 	</li>
 	<li>
 		Sie können Warnungen auch als iCalendar-Datei (ICS) exportieren, um sie in Kalender-Anwendungen zu nutzen.
-		Dies kann entweder automatisch beim Beenden des Programms passieren (<b>Warnungen beim Schließen exportieren</b>) oder manuell unter "ContractManager, Verträge".
-		<b>Vertragsnamen exportieren</b> bewirkt, dass beim Export der Vertragsname in der Erinnerung steht.
+		Dies kann entweder automatisch beim Beenden des Programms passieren (<b>Export beim Schließen</b>) oder manuell unter "ContractManager, Verträge".
+		Für den automatisch Export können Sie unter <b>iCal-Datei</b> festlegen, wo die erzeugte Kalenderdatei gespeichert werden soll.
+		<b>Vertragsbezeichnungen mit exportieren</b> bewirkt, dass beim Export der Vertragsname in der Erinnerung steht.
 	</li>
 </form>

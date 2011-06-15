@@ -3,8 +3,10 @@
 		<span color="header" font="header">Vertragsliste</span>
 	</p>
 
-	<li>
+	<p>
 		Hier finden Sie die Übersicht aller Verträge.
+	</p>
+	<li>
 		Gelb und rot hinterlegte Vertäge sind kurz vor einer Kündigungsfrist. 
 	</li>
 	<li>

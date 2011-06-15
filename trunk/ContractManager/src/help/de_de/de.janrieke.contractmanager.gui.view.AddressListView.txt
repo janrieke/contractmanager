@@ -1,0 +1,15 @@
+<form>
+	<p>
+		<span color="header" font="header">Adressliste</span>
+	</p>
+
+	<p>
+		Hier finden Sie eine Übersicht über alle Adressen von Vertragspartnern.
+	</p>
+	<li>
+		Doppelklicken Sie auf eine Adresse, um die Adressdaten anzuzeigen und zu bearbeiten. 
+	</li>
+	<li>
+		Verwenden Sie die Schaltfläche am unteren Rand, um eine neue Adresse zu erstellen. 
+	</li>
+</form>

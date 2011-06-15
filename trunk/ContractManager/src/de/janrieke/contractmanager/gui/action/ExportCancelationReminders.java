@@ -101,6 +101,12 @@ public class ExportCancelationReminders implements Action {
 					return;
 			}
 			
+			if (filename == null || "".equals(filename)) {
+				Logger.warn("No filename set for auto-export on close");
+				return;
+			}
+				
+			
 			//Export reminders for the next 2 years
 			java.util.Calendar until = java.util.Calendar.getInstance();
 			until.add(java.util.Calendar.YEAR, 2);
