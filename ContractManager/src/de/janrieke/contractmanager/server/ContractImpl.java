@@ -478,7 +478,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		if (minusCancellationPeriod) {
 			IntervalType cancellationPeriodType = getCancellationPeriodType();
 			// one more day, as this is a deadline
-			Integer cancellationPeriodCount = getCancellationPeriodCount() + 1;
+			Integer cancellationPeriodCount = getCancellationPeriodCount();
 
 			// if the period is invalid, assume there is none
 			if (cancellationPeriodType != null
@@ -500,6 +500,9 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 					break;
 				}
 			}
+			//minus one day, as the last day of the running term is the reference,
+			// not the first of the new
+			calendar.add(Calendar.DAY_OF_YEAR, -1);
 		}
 
 		IntervalType firstMinRuntimeType = getFirstMinRuntimeType();
