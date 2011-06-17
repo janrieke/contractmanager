@@ -6,11 +6,11 @@
   xsi:noNamespaceSchemaLocation="http://www.willuhn.de/schema/jameica-plugin-1.0.xsd">
 
   <description>ContractManager for Jameica</description>
-  <url>http://www.janrieke.de/projects/contractmanager</url>
-  <homepage>http://www.janrieke.de/projects/contractmanager</homepage>
+  <url>http://janrieke.de/projects/jameica/updates/contractmanager/0.2/contractmanager.zip</url>
+  <homepage>http://janrieke.de/projects/jameica/contractmanager</homepage>
   <license>GPL 3.0 - http://www.gnu.org/licenses/gpl-3.0.txt</license>
 
-  <requires jameica="1.10+">
+  <requires jameica="1.11+">
     <!--  <import plugin="hibiscus" version="1.12+" required="false" /> //-->
   </requires>
 
