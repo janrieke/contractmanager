@@ -6,7 +6,7 @@
 
     <property environment="env" />
 
-    <property name="define.pluginname" value="ContractManager" />
+    <property name="define.pluginname" value="contractmanager" />
     <property name="define.jarfilename" value="${define.pluginname}.jar" />
     <property name="define.srcfilename" value="${define.pluginname}.src.zip" />
     <property name="define.package" value="de.janrieke.contractmanager" />
