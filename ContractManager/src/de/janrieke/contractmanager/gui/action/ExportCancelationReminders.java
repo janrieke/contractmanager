@@ -126,6 +126,10 @@ public class ExportCancelationReminders implements Action {
 					//ical = new Calendar();
 					ical = null;
 				}
+				finally {
+					if (fin != null)
+						fin.close();
+				}
 			}
 			else {
 				//ical = new Calendar();
@@ -194,6 +198,12 @@ public class ExportCancelationReminders implements Action {
 						new ProdId("-//ContractManager 0.1//iCal4j 1.0//EN"));
 				ical.getProperties().add(Version.VERSION_2_0);
 				ical.getProperties().add(CalScale.GREGORIAN);
+				
+				//hack to prevent errors when no calendar exists
+//				VTimeZone timezone = new VTimeZone();
+//				timezone.getProperties().add(new TzId("ContractManagerTime"));
+//				timezone.getProperties().add(new Stand);
+//				ical.getComponents().add(timezone);
 			}
 			
 			// Now it's time to generate the reminders!
@@ -309,7 +319,12 @@ public class ExportCancelationReminders implements Action {
 			FileOutputStream fout = new FileOutputStream(filename);
 
 			CalendarOutputter outputter = new CalendarOutputter();
-			outputter.output(ical, fout);
+			try {
+				outputter.output(ical, fout);
+			} finally {
+				if (fout != null)
+					fout.close();
+			}
 			GUI.getStatusBar()
 					.setSuccessText(
 							Settings.i18n()

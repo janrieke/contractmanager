@@ -25,6 +25,7 @@ import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Costs;
+import de.janrieke.contractmanager.rmi.ICalUID;
 import de.janrieke.contractmanager.rmi.Transaction;
 import de.willuhn.datasource.db.AbstractDBObject;
 import de.willuhn.datasource.rmi.DBIterator;
@@ -179,8 +180,19 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 				Transaction t = (Transaction) transactions.next();
 				t.delete();
 			}
+
+			DBIterator costs = getCosts();
+			while (costs.hasNext()) {
+				Costs cost = (Costs) costs.next();
+				cost.delete();
+			}
+			DBIterator uids = getICalUIDs();
+			while (uids.hasNext()) {
+				ICalUID uid = (ICalUID) uids.next();
+				uid.delete();
+			}
+
 			super.delete(); // we delete the contract itself
-			getAddress().delete();
 
 			// everything seems to be ok, lets commit the transaction
 			this.transactionCommit();
@@ -210,6 +222,8 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			return getCostsPerTerm();
 		else if (NEXT_TERM_END.equals(arg0))
 			return getNextTermEnd();
+		else if (COSTS_PER_MONTH.equals(arg0))
+			return getCostsPerMonth();
 		else
 			return super.getAttribute(arg0);
 	}
@@ -433,9 +447,6 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		setAttribute("uri", uri);
 	}
 
-	/**
-	 * @see de.willuhn.jameica.example.rmi.Project#getTasks()
-	 */
 	@Override
 	public DBIterator getCosts() throws RemoteException {
 		DBIterator costsIterator = null;
@@ -452,6 +463,21 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		return costsIterator;
 	}
 
+	
+
+	@Override
+	public DBIterator getICalUIDs() throws RemoteException {
+		DBIterator uidIterator = null;
+		try {
+			DBService service = this.getService();
+			uidIterator = service.createList(ICalUID.class);
+			uidIterator.addFilter("contract_id = " + this.getID());
+		} catch (Exception e) {
+			throw new RemoteException("unable to load uid list", e);
+		}
+		return uidIterator;
+	}	
+	
 	/**
 	 * Calculates the next contractual term's end after the given date.
 	 * 
@@ -683,5 +709,34 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			}
 		}
 		return costsPerDay*termLength;
+	}
+
+
+	@Override
+	public double getCostsPerMonth() throws RemoteException {
+		// FIXME: Calculate costs based on a real calendar
+		double costsPerMonth = 0; 
+		DBIterator costsIterator = getCosts();
+		while (costsIterator.hasNext()) {
+			Costs costEntry = (Costs) costsIterator.next();
+			switch (costEntry.getPeriod()) {
+			case DAYS:
+				costsPerMonth += costEntry.getMoney()*30.42;
+				break;
+			case MONTHS:
+				costsPerMonth += costEntry.getMoney();
+				break;
+			case WEEKS:
+				costsPerMonth += costEntry.getMoney()/(30.42/7);
+				break;
+			case YEARS:
+				costsPerMonth += costEntry.getMoney()/12;
+				break;
+
+			default:
+				break;
+			}
+		}
+		return costsPerMonth;
 	}
 }

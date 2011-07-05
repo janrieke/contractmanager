@@ -25,6 +25,7 @@ import de.janrieke.contractmanager.server.ContractDBServiceImpl;
 import de.janrieke.contractmanager.server.DBSupportH2Impl;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.plugin.AbstractPlugin;
+import de.willuhn.jameica.plugin.Version;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
@@ -39,7 +40,7 @@ import de.willuhn.util.I18N;
  */
 public class ContractManagerPlugin extends AbstractPlugin {
 
-	private static ContractManagerPlugin instance;
+	private static ContractManagerPlugin instance = null;
 
 	/**
 	 * constructor.
@@ -55,7 +56,9 @@ public class ContractManagerPlugin extends AbstractPlugin {
 	 * 
 	 * @see de.willuhn.jameica.plugin.AbstractPlugin#init()
 	 */
+	@Override
 	public void init() throws ApplicationException {
+		assert instance == null;
 		instance = this;
 		
 	    call(new ServiceCall()
@@ -110,6 +113,7 @@ public class ContractManagerPlugin extends AbstractPlugin {
 	 * 
 	 * @see de.willuhn.jameica.plugin.AbstractPlugin#install()
 	 */
+	@Override
 	public void install() throws ApplicationException {
 
 		call(new ServiceCall() {
@@ -126,7 +130,8 @@ public class ContractManagerPlugin extends AbstractPlugin {
 	 * 
 	 * @see de.willuhn.jameica.plugin.AbstractPlugin#update(double)
 	 */
-	public void update(double oldVersion) throws ApplicationException {
+	@Override
+	public void update(Version oldVersion) throws ApplicationException {
 	}
 
 	/**
@@ -135,6 +140,7 @@ public class ContractManagerPlugin extends AbstractPlugin {
 	 * 
 	 * @see de.willuhn.jameica.plugin.AbstractPlugin#shutDown()
 	 */
+	@Override
 	public void shutDown() {
 		try {
 			if (Settings.getICalAutoExport()) {

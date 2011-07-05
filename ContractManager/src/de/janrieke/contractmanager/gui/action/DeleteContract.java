@@ -41,7 +41,7 @@ public class DeleteContract implements Action {
 			throw new ApplicationException(Settings.i18n().tr(
 					"Please choose a contract."));
 
-		Contract p = (Contract) context;
+		Contract c = (Contract) context;
 
 		try {
 
@@ -56,7 +56,7 @@ public class DeleteContract implements Action {
 			if (!choice.booleanValue())
 				return;
 
-			p.delete();
+			c.delete();
 			GUI.getStatusBar().setSuccessText(
 					Settings.i18n().tr("Contract deleted successfully"));
 		} catch (Exception e) {

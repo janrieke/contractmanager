@@ -19,7 +19,6 @@ package de.janrieke.contractmanager.gui.action;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.control.ContractControl;
-import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Costs;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
@@ -44,7 +43,7 @@ public class DeleteCostEntry implements Action {
 	public void handleAction(Object context) throws ApplicationException {
 
 		// check if the context is a contract
-		if (context == null || !(context instanceof Contract))
+		if (context == null || !(context instanceof Costs))
 			throw new ApplicationException(Settings.i18n().tr(
 					"Please choose a cost entry."));
 

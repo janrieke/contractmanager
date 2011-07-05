@@ -47,31 +47,31 @@ import de.willuhn.util.I18N;
  */
 public class VersionUtil
 {
-  /**
-   * Liefert die Version zum angegebenen Namen.
-   * Wenn das Versions-Objekt noch nicht existiert, wird es automatisch erstellt.
-   * @param service der Datenbank-Service.
-   * @param name Name der Version.
-   * @return die Version.
-   * @throws RemoteException
-   * @throws ApplicationException
-   */
-  public static Version getVersion(DBService service, String name) throws RemoteException, ApplicationException
-  {
-    if (name == null || name.length() == 0)
-    {
-      I18N i18n = Application.getPluginLoader().getPlugin(ContractManagerPlugin.class).getResources().getI18N();
-      throw new ApplicationException(i18n.tr("No name for version"));
-    }
-    DBIterator list = service.createList(Version.class);
-    list.addFilter("name = ?", new String[]{name});
-    if (list.hasNext())
-      return (Version) list.next();
-    
-    // Neue Version erstellen
-    Version v = (Version) service.createObject(Version.class,null);
-    v.setName(name);
-    v.store();
-    return v;
-  }
+	/**
+	 * Liefert die Version zum angegebenen Namen.
+	 * Wenn das Versions-Objekt noch nicht existiert, wird es automatisch erstellt.
+	 * @param service der Datenbank-Service.
+	 * @param name Name der Version.
+	 * @return die Version.
+	 * @throws RemoteException
+	 * @throws ApplicationException
+	 */
+	public static Version getVersion(DBService service, String name) throws RemoteException, ApplicationException
+	{
+		if (name == null || name.length() == 0)
+		{
+			I18N i18n = Application.getPluginLoader().getPlugin(ContractManagerPlugin.class).getResources().getI18N();
+			throw new ApplicationException(i18n.tr("No name for version"));
+		}
+		DBIterator list = service.createList(Version.class);
+		list.addFilter("name = ?", (Object)new String[]{name});
+		if (list.hasNext())
+			return (Version) list.next();
+
+		// Neue Version erstellen
+		Version v = (Version) service.createObject(Version.class,null);
+		v.setName(name);
+		v.store();
+		return v;
+	}
 }
