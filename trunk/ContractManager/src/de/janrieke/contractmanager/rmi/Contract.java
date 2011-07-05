@@ -147,17 +147,25 @@ public interface Contract extends DBObject {
 	public String getURI() throws RemoteException;
 	public void setURI(String uri) throws RemoteException;
 
+	//derived features
 	public DBIterator getTransactions() throws RemoteException;
+	public DBIterator getICalUIDs() throws RemoteException;
 	public DBIterator getCosts() throws RemoteException;
 
-	//these are derived features
 	public static final String NEXT_TERM_BEGIN = "next_term_begin";
 	public Date getNextTermBegin() throws RemoteException;
+	
 	public static final String NEXT_TERM_END = "next_term_end";
 	public Date getNextTermEnd() throws RemoteException;
+	
 	public static final String NEXT_CANCELLATION_DEADLINE = "next_cancellation_deadline";
 	public Date getNextCancellationDeadline() throws RemoteException;
+	
 	public Date getNextCancellationDeadline(Date after) throws RemoteException;
+	
 	public static final String COSTS_PER_TERM = "costs_per_term";
 	public double getCostsPerTerm() throws RemoteException;
+
+	public static final String COSTS_PER_MONTH = "costs_per_month";
+	public double getCostsPerMonth() throws RemoteException;
 }

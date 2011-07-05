@@ -245,13 +245,13 @@ public class AddressControl extends AbstractControl {
 			// 5) now we have to add some columns.
 			contractList.addColumn(Settings.i18n().tr("Name of contract"), "name");
 			contractList.addColumn(Settings.i18n().tr("Start date"), "startdate",
-					new DateFormatter(Settings.DATEFORMAT));
+					new DateFormatter(Settings.getNewDateFormat()));
 			contractList.addColumn(Settings.i18n().tr("End date"), "enddate",
-					new DateFormatter(Settings.DATEFORMAT));
+					new DateFormatter(Settings.getNewDateFormat()));
 			contractList.addColumn(
 					Settings.i18n().tr("Next cancellation deadline"),
 					Contract.NEXT_CANCELLATION_DEADLINE, new DateFormatter(
-							Settings.DATEFORMAT));
+							Settings.getNewDateFormat()));
 			contractList.addColumn(Settings.i18n().tr("Costs per Term"),
 					Contract.COSTS_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
 							Settings.DECIMALFORMAT));

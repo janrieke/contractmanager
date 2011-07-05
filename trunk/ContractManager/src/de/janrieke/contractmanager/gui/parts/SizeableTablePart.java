@@ -82,7 +82,7 @@ public class SizeableTablePart extends TablePart {
 		super(list, action);
 	}
 
-	public void setHeightHint(int heightHint) {
+	public synchronized void setHeightHint(int heightHint) {
 		this.heightHint = heightHint; 
 	}
 

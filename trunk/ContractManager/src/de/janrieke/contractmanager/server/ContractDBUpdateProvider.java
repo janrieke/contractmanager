@@ -52,110 +52,115 @@ import de.willuhn.util.ProgressMonitor;
  */
 public class ContractDBUpdateProvider implements UpdateProvider
 {
-  private Version version     = null;
-  private Connection conn     = null;
-  private Manifest manifest   = null;
-  private PluginResources res = null;
+	private Version version     = null;
+	private Connection conn     = null;
+	private Manifest manifest   = null;
+	private PluginResources res = null;
 
-  /**
-   * ct
-   * @param conn Datenbank-Verbindung.
-   * @param version Version der Datenbank.
-   */
-  protected ContractDBUpdateProvider(Connection conn, Version version)
-  {
-    this.conn    = conn;
-    this.version = version;
-    
-    AbstractPlugin p = Application.getPluginLoader().getPlugin(ContractManagerPlugin.class);
-    this.manifest    = p.getManifest();
-    this.res         = p.getResources();
-  }
+	/**
+	 * ct
+	 * @param conn Datenbank-Verbindung.
+	 * @param version Version der Datenbank.
+	 */
+	protected ContractDBUpdateProvider(Connection conn, Version version)
+	{
+		this.conn    = conn;
+		this.version = version;
 
-  /**
-   * @see de.willuhn.sql.version.UpdateProvider#getConnection()
-   */
-  public synchronized Connection getConnection() throws ApplicationException
-  {
-    return this.conn;
-  }
+		AbstractPlugin p = Application.getPluginLoader().getPlugin(ContractManagerPlugin.class);
+		this.manifest    = p.getManifest();
+		this.res         = p.getResources();
+	}
 
-  /**
-   * @see de.willuhn.sql.version.UpdateProvider#getCurrentVersion()
-   */
-  public int getCurrentVersion() throws ApplicationException
-  {
-    try
-    {
-    	return this.version.getVersion();
-        //return 15; //to test the db update  
-    }
-    catch (RemoteException re)
-    {
-      Logger.error("unable to read current version number");
-      throw new ApplicationException(res.getI18N().tr("Unable to read current version number"));
-    }
-  }
+	/**
+	 * @see de.willuhn.sql.version.UpdateProvider#getConnection()
+	 */
+	@Override
+	public synchronized Connection getConnection() throws ApplicationException
+	{
+		return this.conn;
+	}
 
-  /**
-   * @see de.willuhn.sql.version.UpdateProvider#getProgressMonitor()
-   */
-  public ProgressMonitor getProgressMonitor()
-  {
-    // Liefert den Splashscreen oder im Servermode einen
-    // Pseudo-Monitor.
-    return Application.getController().getApplicationCallback().getStartupMonitor();
-  }
+	/**
+	 * @see de.willuhn.sql.version.UpdateProvider#getCurrentVersion()
+	 */
+	@Override
+	public int getCurrentVersion() throws ApplicationException
+	{
+		try
+		{
+			return this.version.getVersion();
+			//return 15; //to test the db update  
+		}
+		catch (RemoteException re)
+		{
+			Logger.error("unable to read current version number");
+			throw new ApplicationException(res.getI18N().tr("Unable to read current version number"));
+		}
+	}
 
-  /**
-   * @see de.willuhn.sql.version.UpdateProvider#getUpdatePath()
-   */
-  public File getUpdatePath() throws ApplicationException
-  {
-    // Ist das Unterverzeichnis "plugins" im Plugin
-    return new File(manifest.getPluginDir(),"updates");
-  }
+	/**
+	 * @see de.willuhn.sql.version.UpdateProvider#getProgressMonitor()
+	 */
+	@Override
+	public ProgressMonitor getProgressMonitor()
+	{
+		// Liefert den Splashscreen oder im Servermode einen
+		// Pseudo-Monitor.
+		return Application.getController().getApplicationCallback().getStartupMonitor();
+	}
 
-  /**
-   * @see de.willuhn.sql.version.UpdateProvider#setNewVersion(int)
-   */
-  public void setNewVersion(int newVersion) throws ApplicationException
-  {
-    int current = getCurrentVersion();
-    try
-    {
-      Logger.info("applying new version [" + this.version.getName() + "]: " + newVersion);
-      this.version.setVersion(newVersion);
-      this.version.store();
-    }
-    catch (Exception e)
-    {
-      // Im Fehlerfall Versionsnummer zuruecksetzen
-      try
-      {
-        this.version.setVersion(current);
-      }
-      catch (Exception e2)
-      {
-        Logger.error("unable to rollback version",e2);
-        // Werfen wir nicht, weil es sonst die eigentliche Exception verdecken wuerde
-      }
+	/**
+	 * @see de.willuhn.sql.version.UpdateProvider#getUpdatePath()
+	 */
+	@Override
+	public File getUpdatePath() throws ApplicationException
+	{
+		// Ist das Unterverzeichnis "updates" im Plugin
+		return new File(manifest.getPluginDir(),"updates");
+	}
 
-      if (e instanceof ApplicationException)
-        throw (ApplicationException) e;
-      
-      Logger.error("unable to read current version number",e);
-      throw new ApplicationException(res.getI18N().tr("Unable to read current version number"));
-    }
-  }
-  
-  /**
-   * Liefert die Plugin-Ressourcen.
-   * @return die Plugin-Ressourcen.
-   */
-  public PluginResources getResources()
-  {
-    return this.res;
-  }
+	/**
+	 * @see de.willuhn.sql.version.UpdateProvider#setNewVersion(int)
+	 */
+	@Override
+	public void setNewVersion(int newVersion) throws ApplicationException
+	{
+		int current = getCurrentVersion();
+		try
+		{
+			Logger.info("applying new version [" + this.version.getName() + "]: " + newVersion);
+			this.version.setVersion(newVersion);
+			this.version.store();
+		}
+		catch (Exception e)
+		{
+			// Im Fehlerfall Versionsnummer zuruecksetzen
+			try
+			{
+				this.version.setVersion(current);
+			}
+			catch (Exception e2)
+			{
+				Logger.error("unable to rollback version",e2);
+				// Werfen wir nicht, weil es sonst die eigentliche Exception verdecken wuerde
+			}
+
+			if (e instanceof ApplicationException)
+				throw (ApplicationException) e;
+
+			Logger.error("unable to read current version number",e);
+			throw new ApplicationException(res.getI18N().tr("Unable to read current version number"));
+		}
+	}
+
+	/**
+	 * Liefert die Plugin-Ressourcen.
+	 * @return die Plugin-Ressourcen.
+	 */
+	public PluginResources getResources()
+	{
+		return this.res;
+	}
 
 }

@@ -120,6 +120,7 @@ public class ContractControl extends AbstractControl {
 	private TablePart transactionList;
 	private SizeableTablePart costsList;
 	private LabelInput costsPerTerm;
+	private LabelInput costsPerMonth;
 
 	private List<Costs> newCosts = new ArrayList<Costs>();
 
@@ -214,13 +215,12 @@ public class ContractControl extends AbstractControl {
 				if (event == null || event.data == null)
 					return;
 
-				startDate.setText(Settings.DATEFORMAT.format((Date) event.data));
+				startDate.setText(Settings.dateformat((Date) event.data));
 			}
 		});
 
 		Date initial = getContract().getStartDate();
-		String s = initial == null ? "YYYY-MM-DD" : Settings.DATEFORMAT
-				.format(initial);
+		String s = initial == null ? "YYYY-MM-DD" : Settings.dateformat(initial);
 
 		// Dialog-Input is an Input field that gets its data from a dialog.
 		startDate = new DateDialogInputAutoCompletion(s, d);
@@ -248,13 +248,12 @@ public class ContractControl extends AbstractControl {
 				if (event == null || event.data == null)
 					return;
 
-				endDate.setText(Settings.DATEFORMAT.format((Date) event.data));
+				endDate.setText(Settings.dateformat((Date) event.data));
 			}
 		});
 
 		Date initial = getContract().getEndDate();
-		String s = initial == null ? "YYYY-MM-DD" : Settings.DATEFORMAT
-				.format(initial);
+		String s = initial == null ? "YYYY-MM-DD" : Settings.dateformat(initial);
 
 		// Dialog-Input is an Input field that gets its data from a dialog.
 		endDate = new DateDialogInputAutoCompletion(s, d);
@@ -273,9 +272,9 @@ public class ContractControl extends AbstractControl {
 		Date nte = getContract().getNextTermEnd();
 		if (ntb != null && nte != null) {
 			nextExtension = new MultiInput(new LabelInput(
-					Settings.DATEFORMAT.format(ntb) + " "
+					Settings.dateformat(ntb) + " "
 							+ Settings.i18n().tr("to") + " "
-							+ Settings.DATEFORMAT.format(nte)));
+							+ Settings.dateformat(nte)));
 		} else
 			nextExtension = new LabelInput("");
 		return nextExtension;
@@ -287,7 +286,7 @@ public class ContractControl extends AbstractControl {
 
 		Date ne = getContract().getNextCancellationDeadline();
 		nextCancellationDeadline = new LabelInput(ne == null ? ""
-				: Settings.DATEFORMAT.format(ne));
+				: Settings.dateformat(ne));
 		return nextCancellationDeadline;
 	}
 
@@ -299,6 +298,16 @@ public class ContractControl extends AbstractControl {
 		costsPerTerm = new LabelInput(Settings.DECIMALFORMAT.format(costs));
 		costsPerTerm.setComment(Settings.CURRENCY);
 		return costsPerTerm;
+	}
+
+	public LabelInput getCostsPerMonth() throws RemoteException {
+		if (costsPerMonth != null)
+			return costsPerMonth;
+
+		double costs = getContract().getCostsPerTerm();
+		costsPerMonth = new LabelInput(Settings.DECIMALFORMAT.format(costs));
+		costsPerMonth.setComment(Settings.CURRENCY);
+		return costsPerMonth;
 	}
 
 	public Input getCancellationPeriod() throws RemoteException {
@@ -558,20 +567,23 @@ public class ContractControl extends AbstractControl {
 				new de.janrieke.contractmanager.gui.action.ShowContractDetailView());
 
 		// 5) now we have to add some columns.
-		contractList.addColumn(Settings.i18n().tr("Name of contract"), "name");
+		contractList.addColumn(Settings.i18n().tr("Name of Contract"), "name");
 
 		// 6) the following fields are a date fields. So we add a date
 		// formatter.
-		contractList.addColumn(Settings.i18n().tr("Start date"), "startdate",
-				new DateFormatter(Settings.DATEFORMAT));
-		contractList.addColumn(Settings.i18n().tr("End date"), "enddate",
-				new DateFormatter(Settings.DATEFORMAT));
+		contractList.addColumn(Settings.i18n().tr("Start Date"), "startdate",
+				new DateFormatter(Settings.getNewDateFormat()));
+		contractList.addColumn(Settings.i18n().tr("End Date"), "enddate",
+				new DateFormatter(Settings.getNewDateFormat()));
 		contractList.addColumn(
-				Settings.i18n().tr("Next cancellation deadline"),
+				Settings.i18n().tr("Next Cancellation Deadline"),
 				Contract.NEXT_CANCELLATION_DEADLINE, new DateFormatter(
-						Settings.DATEFORMAT));
+						Settings.getNewDateFormat()));
 		contractList.addColumn(Settings.i18n().tr("Costs per Term"),
 				Contract.COSTS_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
+						Settings.DECIMALFORMAT));
+		contractList.addColumn(Settings.i18n().tr("Costs per Month"),
+				Contract.COSTS_PER_MONTH, new CurrencyFormatter(Settings.CURRENCY,
 						Settings.DECIMALFORMAT));
 
 		// 7) we are adding a context menu
@@ -667,21 +679,24 @@ public class ContractControl extends AbstractControl {
 				new de.janrieke.contractmanager.gui.action.ShowContractDetailView());
 
 		// 5) now we have to add some columns.
-		contractListWarnings.addColumn(Settings.i18n().tr("Name of contract"),
+		contractListWarnings.addColumn(Settings.i18n().tr("Name of Contract"),
 				"name");
 
 		// 6) the following fields are a date fields. So we add a date
 		// formatter.
-		contractListWarnings.addColumn(Settings.i18n().tr("Start date"),
-				"startdate", new DateFormatter(Settings.DATEFORMAT));
-		contractListWarnings.addColumn(Settings.i18n().tr("End date"),
-				"enddate", new DateFormatter(Settings.DATEFORMAT));
+		contractListWarnings.addColumn(Settings.i18n().tr("Start Date"),
+				"startdate", new DateFormatter(Settings.getNewDateFormat()));
+		contractListWarnings.addColumn(Settings.i18n().tr("End Date"),
+				"enddate", new DateFormatter(Settings.getNewDateFormat()));
 		contractListWarnings.addColumn(
-				Settings.i18n().tr("Next cancellation deadline"),
+				Settings.i18n().tr("Next Cancellation Deadline"),
 				Contract.NEXT_CANCELLATION_DEADLINE, new DateFormatter(
-						Settings.DATEFORMAT));
+						Settings.getNewDateFormat()));
 		contractListWarnings.addColumn(Settings.i18n().tr("Costs per Term"),
 				Contract.COSTS_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
+						Settings.DECIMALFORMAT));
+		contractListWarnings.addColumn(Settings.i18n().tr("Costs per Month"),
+				Contract.COSTS_PER_MONTH, new CurrencyFormatter(Settings.CURRENCY,
 						Settings.DECIMALFORMAT));
 
 		// 7) we are adding a context menu
@@ -782,24 +797,22 @@ public class ContractControl extends AbstractControl {
 			public void itemChanged(Object object, String attribute,
 					String newValue) throws ApplicationException {
 				assert object instanceof Costs;
-				if (object instanceof Costs) {
-					try {
-						if ("description".equals(attribute))
-							((Costs) object).setDescription(newValue);
-						else if ("money".equals(attribute)) {
-							try {
-								((Costs) object).setMoney(Double
-										.parseDouble(newValue));
-							} catch (NumberFormatException e) {
-							}
-						} else if ("period".equals(attribute))
-							((Costs) object).setPeriod(Contract.IntervalType
-									.adjectiveValueOf(newValue));
-						else
-							assert false;
-					} catch (RemoteException e) {
-						throw new ApplicationException(e);
-					}
+				try {
+					if ("description".equals(attribute))
+						((Costs) object).setDescription(newValue);
+					else if ("money".equals(attribute)) {
+						try {
+							((Costs) object).setMoney(Double
+									.parseDouble(newValue));
+						} catch (NumberFormatException e) {
+						}
+					} else if ("period".equals(attribute))
+						((Costs) object).setPeriod(Contract.IntervalType
+								.adjectiveValueOf(newValue));
+					else
+						assert false;
+				} catch (RemoteException e) {
+					throw new ApplicationException(e);
 				}
 			}
 		});
@@ -926,15 +939,14 @@ public class ContractControl extends AbstractControl {
 		costsPerTerm.setValue(Settings.DECIMALFORMAT.format(costs));
 
 		Date ne = getContract().getNextCancellationDeadline();
-		nextCancellationDeadline.setValue(ne == null ? "" : Settings.DATEFORMAT
-				.format(ne));
+		nextCancellationDeadline.setValue(ne == null ? "" : Settings.dateformat(ne));
 
 		Date ntb = getContract().getNextTermBegin();
 		Date nte = getContract().getNextTermEnd();
 		if (ntb != null && nte != null) {
-			nextExtension.setValue(Settings.DATEFORMAT.format(ntb) + " "
+			nextExtension.setValue(Settings.dateformat(ntb) + " "
 					+ Settings.i18n().tr("to") + " "
-					+ Settings.DATEFORMAT.format(nte));
+					+ Settings.dateformat(nte));
 		} else
 			nextExtension.setValue("");
 	}

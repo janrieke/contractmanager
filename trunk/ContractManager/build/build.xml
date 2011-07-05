@@ -50,6 +50,7 @@
     <property name="help.dir" value="${src.dir}/help" />
     <property name="lib.dir" value="lib" />
     <property name="sql.dir" value="sql" />
+    <property name="templates.dir" value="templates" />
     <property name="class.dir" value="${project.tmp}/bin" />
 
     <property name="project.zipdir" value="${project.release}/${define.pluginname}" />
@@ -94,9 +95,14 @@
     <copy todir="${class.dir}/lang">
       <fileset dir="${lang.dir}" />
     </copy>
+    <copy todir="${class.dir}/img">
+      <fileset dir="${icon.dir}" />
+    </copy>
     <copy todir="${class.dir}/help">
       <fileset dir="${help.dir}" />
     </copy>
+
+  	<copy file="ical4j.properties" todir="${class.dir}" />
 
   </target>
 
@@ -130,7 +136,18 @@
     <copy todir="${project.zipdir}/sql">
       <fileset dir="${sql.dir}" />
     </copy>
-    <copy file="plugin.xml" todir="${project.zipdir}" />
+  	
+    <mkdir dir="${project.zipdir}/lib" />
+    <copy todir="${project.zipdir}/lib">
+      <fileset dir="${lib.dir}" />
+    </copy>
+  	
+    <mkdir dir="${project.zipdir}/templates" />
+    <copy todir="${project.zipdir}/templates">
+      <fileset dir="${templates.dir}" />
+    </copy>
+
+  	<copy file="plugin.xml" todir="${project.zipdir}" />
 
     <!-- Jetzt muessen wir noch das ZIP-File erzeugen und signieren -->
     <zip destfile="${project.release}/${project.zipfilename}">
@@ -181,7 +198,7 @@
   </target>
 
 
-  <target depends="init,compile,cvstag,jar,javadoc,src,clean" description="build an official release" name="all" />
+  <target depends="init,compile,jar,javadoc,src,clean" description="build an official release" name="all" />
 
   <target depends="init,compile,jar,src,clean" description="build inofficial release" name="fast" />
 

@@ -22,6 +22,7 @@ import java.rmi.RemoteException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import de.janrieke.contractmanager.rmi.ContractDBService;
 import de.janrieke.contractmanager.server.SettingsUtil;
@@ -38,15 +39,23 @@ import de.willuhn.util.I18N;
  */
 public class Settings {
 
-	private static DBService db;
-	private static I18N i18n;
+	private static volatile DBService db;
+	private static volatile I18N i18n;
 
 	/**
 	 * Our DateFormatter.
 	 */
 	//public final static DateFormat DATEFORMAT = DateFormat.getDateInstance(
 	//		DateFormat.DEFAULT, Application.getConfig().getLocale());
-	public final static DateFormat DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	private final static DateFormat DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	
+	public static synchronized String dateformat(Date date) {
+		return DATEFORMAT.format(date);
+	}
+	
+	public static DateFormat getNewDateFormat() {
+		return new SimpleDateFormat("yyyy-MM-dd");
+	}
 
 
 	/**

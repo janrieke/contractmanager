@@ -92,7 +92,7 @@ public class CancellationReminderBox extends AbstractView implements Box {
 	 */
 	public int getIndex() {
 		if (this.index == null)
-			this.index = new Integer(settings.getInt(this.getClass().getName()
+			this.index = Integer.valueOf(settings.getInt(this.getClass().getName()
 					+ ".index", getDefaultIndex()));
 		return this.index.intValue();
 	}
@@ -101,7 +101,7 @@ public class CancellationReminderBox extends AbstractView implements Box {
 	 * @see de.willuhn.jameica.gui.boxes.Box#setIndex(int)
 	 */
 	public void setIndex(int index) {
-		this.index = new Integer(index);
+		this.index = Integer.valueOf(index);
 		settings.setAttribute(this.getClass().getName() + ".index", index);
 	}
 
@@ -121,6 +121,29 @@ public class CancellationReminderBox extends AbstractView implements Box {
 		return index > oindex ? 1 : -1;
 	}
 
+	/**
+	 * Also overwrite equals when using compareTo().
+	 */
+	public boolean equals(Object arg0) {
+		if (arg0 == null || !(arg0 instanceof Box))
+			return false;
+		Box other = (Box) arg0;
+
+		int index = getIndex();
+		int oindex = other.getIndex();
+		return (index == oindex);
+	}
+
+	/**
+	 * Also overwrite hashCode when using equals().
+	 */
+	@Override
+	public int hashCode() {
+		return getIndex();
+	}
+
+
+	
 	/**
 	 * @see de.willuhn.jameica.gui.boxes.Box#isActive()
 	 */

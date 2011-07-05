@@ -61,7 +61,7 @@ public class GenerateCancelation implements Action {
 		fd.setOverwrite(true);
 		try {
 			fd.setFileName(Settings.i18n().tr("cancellation-{0}-{1}.odt",
-					Settings.DATEFORMAT.format(new Date()), p.getName()));
+					Settings.dateformat(new Date()), p.getName()));
 		} catch (RemoteException e1) {
 			throw new ApplicationException(Settings.i18n().tr(
 					"Error while accessing contract"), e1);
@@ -100,16 +100,16 @@ public class GenerateCancelation implements Action {
 			values.put("FROM_EMAIL", SettingsUtil.get("email", ""));
 			values.put("FROM_PHONE", SettingsUtil.get("phone", ""));
 
-			values.put("TODAY", Settings.DATEFORMAT.format(new Date()));
+			values.put("TODAY", Settings.dateformat(new Date()));
 			values.put("CONTRACT_NAME", p.getName());
 
 			Date nextExtension = p.getNextTermBegin();
 			if (nextExtension != null)
 				values.put("CANCELLATION_DATE",
-						Settings.DATEFORMAT.format(nextExtension));
+						Settings.dateformat(nextExtension));
 			else
 				values.put("CANCELLATION_DATE",
-						Settings.DATEFORMAT.format(new Date()));
+						Settings.dateformat(new Date()));
 
 			// open template document from plugin directory
 			FileInputStream fis = new FileInputStream(ContractManagerPlugin
