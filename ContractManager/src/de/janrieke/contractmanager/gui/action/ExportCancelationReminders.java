@@ -199,7 +199,7 @@ public class ExportCancelationReminders implements Action {
 				ical.getProperties().add(Version.VERSION_2_0);
 				ical.getProperties().add(CalScale.GREGORIAN);
 				
-				//hack to prevent errors when no calendar exists
+				//hack to prevent errors when no entry exists
 //				VTimeZone timezone = new VTimeZone();
 //				timezone.getProperties().add(new TzId("ContractManagerTime"));
 //				timezone.getProperties().add(new Stand);
@@ -315,21 +315,28 @@ public class ExportCancelationReminders implements Action {
 					dbuid.delete();
 				}
 			}
-
-			FileOutputStream fout = new FileOutputStream(filename);
-
-			CalendarOutputter outputter = new CalendarOutputter();
-			try {
-				outputter.output(ical, fout);
-			} finally {
-				if (fout != null)
-					fout.close();
+			
+			// Do not export the calendar if there are no entries in it (causing exception)
+			if (ical.getComponents().size() > 0) {
+				FileOutputStream fout = new FileOutputStream(filename);
+	
+				CalendarOutputter outputter = new CalendarOutputter();
+				try {
+					outputter.output(ical, fout);
+				} finally {
+					if (fout != null)
+						fout.close();
+				}
+				GUI.getStatusBar()
+						.setSuccessText(
+								Settings.i18n()
+										.tr("Cancellation reminders successfully exported to iCalendar file."));
+			} else {
+				GUI.getStatusBar()
+				.setSuccessText(
+						Settings.i18n()
+								.tr("No cancellation reminders exist to be exported to iCalendar file."));
 			}
-			GUI.getStatusBar()
-					.setSuccessText(
-							Settings.i18n()
-									.tr("Cancellation reminders successfully exported to iCalendar file."));
-
 		} catch (RemoteException e) {
 			throw new ApplicationException(
 					"Error during cancellation reminder export.", e);

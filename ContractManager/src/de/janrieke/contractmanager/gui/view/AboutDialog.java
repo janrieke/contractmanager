@@ -31,7 +31,7 @@ import de.willuhn.jameica.system.Application;
 /**
  * Our "About..." dialog.
  */
-public class AboutDialog extends AbstractDialog {
+public class AboutDialog extends AbstractDialog<Object> {
 
 	/**
 	 * ct.
@@ -46,6 +46,7 @@ public class AboutDialog extends AbstractDialog {
 	/**
 	 * @see de.willuhn.jameica.gui.dialogs.AbstractDialog#paint(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	protected void paint(Composite parent) throws Exception {
 
 		FormTextPart text = new FormTextPart();
@@ -73,6 +74,7 @@ public class AboutDialog extends AbstractDialog {
 	/**
 	 * @see de.willuhn.jameica.gui.dialogs.AbstractDialog#getData()
 	 */
+	@Override
 	protected Object getData() throws Exception {
 		return null;
 	}

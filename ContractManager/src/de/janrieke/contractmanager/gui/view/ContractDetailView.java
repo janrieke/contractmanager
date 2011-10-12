@@ -25,6 +25,8 @@ import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
+import de.willuhn.jameica.gui.extension.Extendable;
+import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.util.ButtonArea;
 import de.willuhn.jameica.gui.util.ColumnLayout;
@@ -35,12 +37,13 @@ import de.willuhn.util.ApplicationException;
 /**
  * this is the dialog for the contract details.
  */
-public class ContractDetailView extends AbstractView {
+public class ContractDetailView extends AbstractView implements Extendable {
 
 	private RestoreButton restoreButton;
 	private boolean activationState;
 	private Button deleteButton;
-
+	private ContractControl control; 
+			
 	/**
 	 * @see de.willuhn.jameica.gui.AbstractView#bind()
 	 */
@@ -49,7 +52,7 @@ public class ContractDetailView extends AbstractView {
 		GUI.getView().setTitle(Settings.i18n().tr("Contract Details"));
 
 		// instanciate controller
-		final ContractControl control = new ContractControl(this);
+		control = new ContractControl(this);
 
 	    ScrolledContainer scroller = new ScrolledContainer(getParent());
 		
@@ -137,4 +140,18 @@ public class ContractDetailView extends AbstractView {
 		activationState = active;
 	}
 
+	public ContractControl getControl() {
+		return control;
+	}
+
+	public void addInput(Input input) {
+	    ScrolledContainer scroller = new ScrolledContainer(getParent());
+	    scroller.getComposite().setSize(200, 100);
+	    scroller.addInput(input);
+	}
+
+	@Override
+	public String getExtendableID() {
+		return this.getClass().getName();
+	}
 }

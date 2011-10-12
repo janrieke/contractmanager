@@ -11,7 +11,7 @@
   <license>GPL 3.0 - http://www.gnu.org/licenses/gpl-3.0.txt</license>
 
   <requires jameica="1.11+">
-    <!--  <import plugin="hibiscus" version="1.12+" required="false" /> //-->
+    <import plugin="hibiscus" version="2.1+" required="false" />
   </requires>
 
   <classfinder>
@@ -40,4 +40,12 @@
     <service name="contract_db" depends="" autostart="true"
       class="de.janrieke.contractmanager.rmi.ContractDBService" />
   </services>
+
+  <extensions>
+    <!-- Hibiscus-Extensions -->
+    <extension class="de.janrieke.contractmanager.ext.hibiscus.UmsatzListPart"     extends="de.willuhn.jameica.hbci.gui.parts.UmsatzList" requires="hibiscus" />
+    <extension class="de.janrieke.contractmanager.ext.hibiscus.UmsatzListMenu"     extends="de.willuhn.jameica.hbci.gui.menus.UmsatzList" requires="hibiscus"/>
+    <extension class="de.janrieke.contractmanager.ext.hibiscus.ContractDetailViewHibiscusCategories" extends="de.janrieke.contractmanager.gui.view.ContractDetailView" requires="hibiscus"/>
+  </extensions>
+
 </plugin>
