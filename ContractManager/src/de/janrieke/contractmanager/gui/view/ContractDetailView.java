@@ -42,7 +42,8 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	private RestoreButton restoreButton;
 	private boolean activationState;
 	private Button deleteButton;
-	private ContractControl control; 
+	private ContractControl control;
+	private SimpleContainer right; 
 			
 	/**
 	 * @see de.willuhn.jameica.gui.AbstractView#bind()
@@ -84,7 +85,7 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    left.addLabelPair(Settings.i18n().tr("Next term"), control.getNextTerm());
 	    left.addLabelPair(Settings.i18n().tr("Deadline for next cancellation"), control.getNextCancellationDeadline());
 
-	    SimpleContainer right = new SimpleContainer(columns.getComposite(), true);
+	    right = new SimpleContainer(columns.getComposite(), true);
 	    right.addHeadline(Settings.i18n().tr("Contractual Partner Address"));
 	    right.addLabelPair(Settings.i18n().tr("Address"), control.getPartnerAddress());
 	    right.addLabelPair(Settings.i18n().tr("Name/Company"), control.getPartnerName());
@@ -144,10 +145,13 @@ public class ContractDetailView extends AbstractView implements Extendable {
 		return control;
 	}
 
-	public void addInput(Input input) {
-	    ScrolledContainer scroller = new ScrolledContainer(getParent());
-	    scroller.getComposite().setSize(200, 100);
-	    scroller.addInput(input);
+	public void addExtensionInput(String headline, String label, Input input) {
+	    //SimpleContainer scroller = new SimpleContainer(getParent());
+	    //scroller.getComposite().setSize(200, 100);
+	    //scroller.addInput(input);
+		
+	    right.addHeadline(Settings.i18n().tr("Hibiscus"));
+	    right.addLabelPair(label, input);
 	}
 
 	@Override
