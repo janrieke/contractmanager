@@ -23,6 +23,7 @@ package de.janrieke.contractmanager.ext.hibiscus;
 
 import org.eclipse.swt.widgets.Composite;
 
+import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.janrieke.contractmanager.gui.view.ContractDetailView;
 import de.willuhn.jameica.gui.extension.Extendable;
@@ -53,7 +54,9 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 
 		// Auswahlfeld hinzufuegen
 		final SelectInput input = new SelectInput(new String[]{"a","b"}, null);
-		view.addInput(input);
+	    //right.addLabelPair(Settings.i18n().tr("Country"), control.getPartnerCountry());
+
+		view.addExtensionInput("Hibiscus", Settings.i18n().tr("Category"), input);
 
 		// try
 		// {
