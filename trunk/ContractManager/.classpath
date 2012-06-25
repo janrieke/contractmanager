@@ -15,5 +15,6 @@
 	<classpathentry kind="lib" path="lib/ical4j-1.0-rc3.jar"/>
 	<classpathentry kind="lib" path="lib/backport-util-concurrent-3.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/hibiscus"/>
+	<classpathentry kind="lib" path="/jameica/lib/swt/win64/swt.jar" sourcepath="/jameica/lib.src/swt/linux/swt.src.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

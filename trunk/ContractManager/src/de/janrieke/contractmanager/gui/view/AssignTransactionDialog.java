@@ -29,18 +29,18 @@ import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.system.Application;
 
 /**
- * Our "About..." dialog.
+ * Dialog to assign a transaction to a contract.
  */
-public class AboutDialog extends AbstractDialog<Object> {
+public class AssignTransactionDialog extends AbstractDialog<Object> {
 
 	/**
 	 * ct.
 	 * 
 	 * @param position
 	 */
-	public AboutDialog(int position) {
-		super(position);
-		this.setTitle(Settings.i18n().tr("About..."));
+	public AssignTransactionDialog(Object context) {
+		super(AbstractDialog.POSITION_CENTER);
+		this.setTitle(Settings.i18n().tr("Assign Transaction to Contract"));
 	}
 
 	/**

@@ -83,7 +83,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 		super();
 		System.setProperty(ContractDBServiceImpl.class.getName() + ".schema","PUBLIC");
 		MultipleClassLoader cl = Application.getPluginLoader()
-				.getPlugin(ContractManagerPlugin.class).getResources()
+				.getPlugin(ContractManagerPlugin.class).getManifest()
 				.getClassLoader();
 		this.setClassloader(cl);
 		this.setClassFinder(cl.getClassFinder());

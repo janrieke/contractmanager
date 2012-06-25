@@ -25,6 +25,7 @@ import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
+import de.willuhn.jameica.gui.Part;
 import de.willuhn.jameica.gui.extension.Extendable;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.parts.Button;
@@ -146,14 +147,16 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	}
 
 	public void addExtensionInput(String headline, String label, Input input) {
-	    //SimpleContainer scroller = new SimpleContainer(getParent());
-	    //scroller.getComposite().setSize(200, 100);
-	    //scroller.addInput(input);
-		
 	    right.addHeadline(Settings.i18n().tr("Hibiscus"));
 	    right.addLabelPair(label, input);
 	}
 
+	public void addExtensionContainer(Part part) {
+	    SimpleContainer scroller = new SimpleContainer(getParent());
+	    scroller.getComposite().setSize(200, 100);
+	    scroller.addPart(part);
+	}
+	
 	@Override
 	public String getExtendableID() {
 		return this.getClass().getName();

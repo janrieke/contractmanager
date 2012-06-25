@@ -168,4 +168,7 @@ public interface Contract extends DBObject {
 
 	public static final String COSTS_PER_MONTH = "costs_per_month";
 	public double getCostsPerMonth() throws RemoteException;
+
+	public String getHibiscusCategoryID() throws RemoteException;
+	public void setHibiscusCategoryID(String category) throws RemoteException;
 }
