@@ -79,4 +79,21 @@ public class TransactionImpl extends AbstractDBObject implements Transaction {
 		return "transaction_id";
 	}
 
+	@Override
+	public void setTransactionID(Integer id) throws RemoteException {
+		setAttribute("transaction_id", id);
+	}
+
+	@Override
+	public Integer getTransactionID() throws RemoteException {
+		return (Integer) getAttribute("transaction_id");
+	}
+
+	@Override
+	protected String getIDField() {
+	    return Boolean.getBoolean(getService().getClass().getName() + ".uppercase") ? "TRANSACTION_ID" : "transaction_id";
+	}
+	
+	
+
 }

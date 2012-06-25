@@ -32,7 +32,6 @@ import de.willuhn.util.I18N;
 
 /**
  * Erweitert die Liste der Umsaetze um eine Spalte.
- * BUGZILLA 140 http://www.willuhn.de/bugzilla/show_bug.cgi?id=140
  */
 public class UmsatzListPart implements Extension
 {
@@ -53,7 +52,7 @@ public class UmsatzListPart implements Extension
 //    this.cache = null; // Cache loeschen, damit die Daten neu gelesen werden
     
     TablePart table = (TablePart) extendable;
-    table.addColumn(i18n.tr("SynTAX-Beleg"),"id-int", new Formatter() {
+    table.addColumn(i18n.tr("Vertrag"),"id-int", new Formatter() {
       public String format(Object o)
       {
         if (o == null || !(o instanceof Integer))
@@ -125,30 +124,3 @@ public class UmsatzListPart implements Extension
 //    getCache().put(umsatzId,b);
 //  }
 }
-
-
-/*********************************************************************
- * $Log: UmsatzListPart.java,v $
- * Revision 1.6  2011-05-12 09:10:32  willuhn
- * @R Back-Buttons entfernt
- * @C GUI-Cleanup
- *
- * Revision 1.5  2010-06-03 17:07:14  willuhn
- * @N Erste Version der vollautomatischen Uebernahme von Umsatzen in Hibiscus!
- *
- * Revision 1.4  2010/06/01 11:58:04  willuhn
- * @R removed debug output
- *
- * Revision 1.3  2009/07/03 10:52:19  willuhn
- * @N Merged SYNTAX_1_3_BRANCH into HEAD
- *
- * Revision 1.2.2.1  2008/06/25 09:40:02  willuhn
- * @B Buchungsnummer wurde unter Umstaenden nicht korrekt angezeigt
- *
- * Revision 1.2  2007/04/04 22:19:09  willuhn
- * @B Umsatzliste nur erweitern, wenn GJ vorhanden
- *
- * Revision 1.1  2006/10/09 23:48:41  willuhn
- * @B bug 140
- *
- **********************************************************************/

@@ -463,6 +463,15 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		return costsIterator;
 	}
 
+	@Override
+	public String getHibiscusCategoryID() throws RemoteException {
+		return (String) getAttribute("hibiscus_category");
+	}
+
+	@Override
+	public void setHibiscusCategoryID(String category) throws RemoteException {
+		setAttribute("hibiscus_category", category);
+	}
 	
 
 	@Override

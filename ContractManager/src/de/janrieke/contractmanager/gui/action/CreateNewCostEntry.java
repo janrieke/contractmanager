@@ -22,8 +22,8 @@ import java.rmi.RemoteException;
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.janrieke.contractmanager.rmi.Contract;
-import de.janrieke.contractmanager.rmi.Costs;
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
+import de.janrieke.contractmanager.rmi.Costs;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.util.ApplicationException;
 

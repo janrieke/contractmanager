@@ -123,6 +123,10 @@ public class ContractControl extends AbstractControl {
 	private LabelInput costsPerMonth;
 
 	private List<Costs> newCosts = new ArrayList<Costs>();
+	
+	//holds the current Hibiscus category of the selection box (used for 
+	//  storing to DB on store button click)
+	public String hibiscusCategoryID = null;
 
 	/**
 	 * ct.
@@ -857,6 +861,7 @@ public class ContractControl extends AbstractControl {
 					.getValue());
 			c.setNextMinRuntimeType((IntervalType) getNextMinRuntimeType()
 					.getValue());
+			c.setHibiscusCategoryID(hibiscusCategoryID);
 
 			Address a = (Address) getPartnerAddress().getValue();
 			if (a == null) {

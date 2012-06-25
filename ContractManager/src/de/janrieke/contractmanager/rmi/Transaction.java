@@ -30,6 +30,8 @@ import de.willuhn.datasource.rmi.DBObject;
  * );
  */
 public interface Transaction extends DBObject {
+	public void setTransactionID(Integer id) throws RemoteException;
+	public Integer getTransactionID() throws RemoteException;
 	public Contract getContract() throws RemoteException;
 	public void setContract(Contract contract) throws RemoteException;
 }
