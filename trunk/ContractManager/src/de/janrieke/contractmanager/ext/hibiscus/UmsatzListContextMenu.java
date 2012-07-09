@@ -26,6 +26,7 @@ import java.rmi.RemoteException;
 
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Transaction;
+import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
 import de.willuhn.jameica.gui.parts.ContextMenu;
@@ -45,24 +46,27 @@ public class UmsatzListContextMenu extends ContextMenu
 {
 
 	private I18N i18n;
-	private Contract contract;
 
 	/**
 	 * Context menu for the table of hibiscus transactions that are assigned to a contract.
 	 * @param konto optionale Angabe des Kontos.
 	 */
-	public UmsatzListContextMenu(Contract contract)
+	public UmsatzListContextMenu(Contract contr)
 	{
-		this.contract = contract; 
+		final Contract contract = contr;
 		i18n = Application.getPluginLoader().getPlugin(HBCI.class).getResources().getI18N();
 
-		addItem(new UmsatzItem(i18n.tr("Unassign this transaction from contract..."), new Action() {
+		addItem(new UmsatzItem(i18n.tr("Unassign this transaction from contract"), new Action() {
 			
 			@Override
 			public void handleAction(Object context) throws ApplicationException {
-				if (context instanceof Transaction)
+				if (context instanceof Umsatz)
 					try {
-						((Transaction)context).delete();
+						DBIterator transactions = contract.getTransactions();
+						transactions.addFilter("transaction_id = ?",new Object[]{((Umsatz)context).getID()});
+						while (transactions.hasNext()) {
+							((Transaction)transactions.next()).delete();
+						}
 					} catch (RemoteException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

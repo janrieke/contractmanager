@@ -21,13 +21,19 @@
  */
 package de.janrieke.contractmanager.ext.hibiscus;
 
+import java.rmi.RemoteException;
+
 import de.janrieke.contractmanager.ContractManagerPlugin;
+import de.janrieke.contractmanager.Settings;
+import de.janrieke.contractmanager.rmi.Transaction;
+import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.jameica.gui.extension.Extendable;
 import de.willuhn.jameica.gui.extension.Extension;
 import de.willuhn.jameica.gui.formatter.Formatter;
 import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
+import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
 /**
@@ -58,18 +64,32 @@ public class UmsatzListPart implements Extension
         if (o == null || !(o instanceof Integer))
           return null;
 
-//        Buchung b = (Buchung) getCache().get(o.toString());
-//        if (b == null)
-//          return null;
-//        try
-//        {
-//          return Integer.toString(b.getBelegnummer());
-//        }
-//        catch (RemoteException re)
-//        {
-//          Logger.error("unable to load beleg number",re);
-//        }
-        return null;
+        DBIterator transactions = null; 
+		try
+		{
+			transactions = Settings.getDBService().createList(Transaction.class);
+			transactions.addFilter("transaction_id = ?",new Object[]{o});
+			if (transactions.size() > 1)
+				Logger.warn("Umsatz assigned to more than one contract. Possible DB error.");
+			if (transactions.hasNext()) {
+				Transaction transaction = (Transaction)transactions.next();
+				if (transaction.getContract() != null)
+					return transaction.getContract().toString();
+				else
+					try {
+						transaction.delete();
+					} catch (ApplicationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			}
+		}
+		catch (RemoteException e)
+		{
+			Logger.error("unable to load transactions", e);
+		}
+
+		return null;
       }
     
     });

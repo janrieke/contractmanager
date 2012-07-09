@@ -22,6 +22,8 @@
 package de.janrieke.contractmanager.ext.hibiscus;
 
 import java.rmi.RemoteException;
+import java.util.List;
+import java.util.Vector;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
@@ -30,6 +32,7 @@ import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.janrieke.contractmanager.gui.view.ContractDetailView;
 import de.janrieke.contractmanager.rmi.Contract;
+import de.janrieke.contractmanager.rmi.Transaction;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.datasource.rmi.ObjectNotFoundException;
 import de.willuhn.jameica.gui.extension.Extendable;
@@ -41,6 +44,7 @@ import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.HBCIProperties;
 import de.willuhn.jameica.hbci.gui.action.UmsatzDetail;
 import de.willuhn.jameica.hbci.gui.input.UmsatzTypInput;
+import de.willuhn.jameica.hbci.rmi.Umsatz;
 import de.willuhn.jameica.hbci.rmi.UmsatzTyp;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
@@ -115,8 +119,25 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 			view.addExtensionInput("Hibiscus", Settings.i18n().tr("Category"), input);
 			
 			// 2) add a container that holds the list of assigned transactions
+			List<Umsatz> umsaetze = new Vector<Umsatz>();
 			DBIterator transactions = contract.getTransactions();
-			umsatzList = new TablePart(transactions, new UmsatzDetail());
+			while (transactions.hasNext()) {
+				Transaction transaction = (Transaction) transactions.next();
+				Umsatz umsatz = null;
+				try
+				{
+					umsatz = (Umsatz)
+							de.willuhn.jameica.hbci.Settings.getDBService().createObject(Umsatz.class,transaction.getTransactionID().toString());
+				}
+				catch (ObjectNotFoundException e)
+				{
+					// Der Umsatz wurde in Hibiscus zwischenzeitlich geloescht
+					// TODO: Transaction löschen
+				}
+				if (umsatz != null)
+					umsaetze.add(umsatz);
+			}
+			umsatzList = new TablePart(umsaetze, new UmsatzDetail());
 			umsatzList.setContextMenu(new UmsatzListContextMenu(contract));
 			umsatzList.addColumn("#","id-int");
 			umsatzList.addColumn(hibiscusI18n.tr("Flags"),                     "flags");
