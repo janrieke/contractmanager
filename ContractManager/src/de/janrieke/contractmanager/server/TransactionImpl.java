@@ -86,7 +86,7 @@ public class TransactionImpl extends AbstractDBObject implements Transaction {
 
 	@Override
 	public Integer getTransactionID() throws RemoteException {
-		return (Integer) getAttribute("transaction_id");
+		return Integer.valueOf((String) getAttribute("transaction_id"));
 	}
 
 	@Override
