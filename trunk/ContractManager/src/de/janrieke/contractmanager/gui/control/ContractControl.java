@@ -161,6 +161,18 @@ public class ContractControl extends AbstractControl {
 	}
 
 	/**
+	 * Returns an iterator with all contracts in the database.
+	 * 
+	 * @throws RemoteException 
+	 * @return iterator containing all addresses
+	 */
+	public static GenericIterator getContracts() throws RemoteException {
+		DBService service = Settings.getDBService();
+		DBIterator contracts = service.createList(Contract.class);
+		return contracts;
+	}
+	
+	/**
 	 * Returns the input field for the contract name.
 	 * 
 	 * @return input field.
