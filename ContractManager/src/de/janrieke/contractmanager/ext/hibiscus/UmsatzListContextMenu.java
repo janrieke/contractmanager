@@ -49,11 +49,13 @@ public class UmsatzListContextMenu extends ContextMenu
 
 	/**
 	 * Context menu for the table of hibiscus transactions that are assigned to a contract.
+	 * @param extension 
 	 * @param konto optionale Angabe des Kontos.
 	 */
-	public UmsatzListContextMenu(Contract contr)
+	public UmsatzListContextMenu(Contract contr, ContractDetailViewHibiscusCategories extension)
 	{
 		final Contract contract = contr;
+		final ContractDetailViewHibiscusCategories ext = extension;
 		i18n = Application.getPluginLoader().getPlugin(HBCI.class).getResources().getI18N();
 
 		addItem(new UmsatzItem(i18n.tr("Unassign this transaction from contract"), new Action() {
@@ -65,7 +67,9 @@ public class UmsatzListContextMenu extends ContextMenu
 						DBIterator transactions = contract.getTransactions();
 						transactions.addFilter("transaction_id = ?",new Object[]{((Umsatz)context).getID()});
 						while (transactions.hasNext()) {
-							((Transaction)transactions.next()).delete();
+							Transaction tr = ((Transaction)transactions.next());
+							ext.removeTransactionFromTable(tr);
+							tr.delete();
 						}
 					} catch (RemoteException e) {
 						// TODO Auto-generated catch block

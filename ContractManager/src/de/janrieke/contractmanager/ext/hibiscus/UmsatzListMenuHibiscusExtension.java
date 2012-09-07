@@ -21,9 +21,10 @@
  */
 package de.janrieke.contractmanager.ext.hibiscus;
 
+import java.util.List;
+
 import de.janrieke.contractmanager.ContractManagerPlugin;
 import de.janrieke.contractmanager.Settings;
-import de.janrieke.contractmanager.gui.action.NewTransaction;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Transaction;
 import de.willuhn.datasource.rmi.DBIterator;
@@ -31,9 +32,11 @@ import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.extension.Extendable;
 import de.willuhn.jameica.gui.extension.Extension;
+import de.willuhn.jameica.gui.extension.ExtensionRegistry;
 import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
 import de.willuhn.jameica.gui.parts.ContextMenu;
 import de.willuhn.jameica.gui.parts.ContextMenuItem;
+import de.willuhn.jameica.hbci.messaging.ObjectChangedMessage;
 import de.willuhn.jameica.hbci.rmi.Umsatz;
 import de.willuhn.jameica.hbci.rmi.UmsatzTyp;
 import de.willuhn.jameica.messaging.StatusBarMessage;
@@ -45,9 +48,9 @@ import de.willuhn.util.I18N;
 import de.willuhn.util.ProgressMonitor;
 
 /**
- * Erweitert das Kontextmenu der Umsatzliste.
+ * Erweitert das Kontextmenu der Umsatzliste in Hibiscus.
  */
-public class UmsatzListMenu implements Extension
+public class UmsatzListMenuHibiscusExtension implements Extension
 {
 	private final static I18N i18n = Application.getPluginLoader().getPlugin(ContractManagerPlugin.class).getResources().getI18N();
 
@@ -124,12 +127,19 @@ public class UmsatzListMenu implements Extension
 
 		if (contract == null && auto)
 			throw new ApplicationException(i18n.tr("Kein zugeordneter Vertrag ermittelbar"));
+		
+		if (contract == null) {
+			contract = new UmsatzImportDialog().open();
+		}
 
-		final Transaction transaction = (Transaction) Settings.getDBService().createObject(Transaction.class,null);
-		transaction.setContract(contract);
-		transaction.setTransactionID(Integer.parseInt(u.getID()));
-
-		return transaction;
+		if (contract != null) {
+			final Transaction transaction = (Transaction) Settings.getDBService().createObject(Transaction.class,null);
+			transaction.setContract(contract);
+			transaction.setTransactionID(Integer.parseInt(u.getID()));
+			return transaction;
+		}
+		else 
+			return null;
 	}
 
 	/**
@@ -266,42 +276,27 @@ public class UmsatzListMenu implements Extension
 						}
 
 						transaction = createAssignedTransaction(list[i], list.length>1);
-						transaction.store();
-						created++;
+						if (transaction != null) {
+							transaction.store();
+							created++;
+						}
 
 						// Mit der Benachrichtigung wird dann gleich die Buchungsnummer in der Liste
 						// angezeigt. Vorher muessen wir der anderen Extension aber noch die neue
 						// Buchung mitteilen
-						//						List<Extension> extensions = ExtensionRegistry.getExtensions("de.willuhn.jameica.hbci.gui.parts.UmsatzList");
-						//						if (extensions != null)
-						//						{
-						//							for (Extension e:extensions)
-						//							{
-						//								if (e instanceof UmsatzListPart)
-						//								{
-						//									((UmsatzListPart)e).add(transaction);
-						//									break;
-						//								}
-						//							}
-						//						}
-						//						Application.getMessagingFactory().sendMessage(new ObjectChangedMessage(list[i]));
-					}
-					catch (ApplicationException ae)
-					{
-						// Wenn wir nur eine Buchung hatten und eine
-						// ApplicationException, dann fehlen noch Eingaben
-						// Da wir nur eine Buchung haben, oeffnen wir
-						// die Erfassungsmaske.
-						if (list.length == 1)
+						List<Extension> extensions = ExtensionRegistry.getExtensions("de.willuhn.jameica.hbci.gui.parts.UmsatzList");
+						if (extensions != null)
 						{
-							Application.getMessagingFactory().sendMessage(new StatusBarMessage(ae.getMessage(),StatusBarMessage.TYPE_ERROR));
-							new NewTransaction().handleAction(transaction);
-							return;
+							for (Extension e:extensions)
+							{
+								if (e instanceof UmsatzListPartHibiscusExtension)
+								{
+									((UmsatzListPartHibiscusExtension)e).add(transaction);
+									break;
+								}
+							}
 						}
-
-						if (monitor != null)
-							monitor.log("    " + ae.getMessage());
-						error++;
+						Application.getMessagingFactory().sendMessage(new ObjectChangedMessage(list[i]));
 					}
 					catch (Exception e)
 					{
@@ -312,9 +307,8 @@ public class UmsatzListMenu implements Extension
 					}
 				}
 
-				String text = i18n.tr("Umsatz importiert");
-				if (list.length > 1)
-					text = i18n.tr("{0} Umsätze importiert, {1} fehlerhaft, {2} bereits vorhanden", new String[]{Integer.toString(created),Integer.toString(error),Integer.toString(skipped)});
+				String text = i18n.tr("Umsatzimport abgeschlossen");
+				text = i18n.tr("{0} Umsätze importiert, {1} fehlerhaft, {2} bereits vorhanden", new String[]{Integer.toString(created),Integer.toString(error),Integer.toString(skipped)});
 
 				Application.getMessagingFactory().sendMessage(new StatusBarMessage(text,StatusBarMessage.TYPE_SUCCESS));
 				if (monitor != null)

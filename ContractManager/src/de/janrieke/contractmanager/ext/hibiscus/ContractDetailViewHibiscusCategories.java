@@ -52,7 +52,7 @@ import de.willuhn.util.I18N;
 
 /**
  * Erweitert die ContractDetails um die Zuordnung einer Umsatzkategorie aus
- * Hibiscus - jedoch nur, insofern Hibiscus installiert ist.
+ * Hibiscus sowie der zugeordneten Verträge - jedoch nur, insofern Hibiscus installiert ist.
  */
 public class ContractDetailViewHibiscusCategories implements Extension {
 
@@ -138,7 +138,7 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 					umsaetze.add(umsatz);
 			}
 			umsatzList = new TablePart(umsaetze, new UmsatzDetail());
-			umsatzList.setContextMenu(new UmsatzListContextMenu(contract));
+			umsatzList.setContextMenu(new UmsatzListContextMenu(contract, this));
 			umsatzList.addColumn("#","id-int");
 			umsatzList.addColumn(hibiscusI18n.tr("Flags"),                     "flags");
 			umsatzList.addColumn(hibiscusI18n.tr("Gegenkonto"),                "empfaenger");
@@ -154,5 +154,24 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 		{
 			Logger.error("unable to extend ContractDetailView",e);
 		}
+	}
+	
+	public void removeTransactionFromTable(Transaction tr) {
+		Umsatz umsatz = null;
+		try
+		{
+			umsatz = (Umsatz)
+					de.willuhn.jameica.hbci.Settings.getDBService().createObject(Umsatz.class,tr.getTransactionID().toString());
+		}
+		catch (ObjectNotFoundException e)
+		{
+			// Der Umsatz wurde in Hibiscus zwischenzeitlich geloescht
+			// TODO: Transaction löschen
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (umsatz != null)
+			umsatzList.removeItem(umsatz);
 	}
 }

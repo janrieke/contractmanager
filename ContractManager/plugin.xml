@@ -43,8 +43,8 @@
 
   <extensions>
     <!-- Hibiscus-Extensions -->
-    <extension class="de.janrieke.contractmanager.ext.hibiscus.UmsatzListPart"     extends="de.willuhn.jameica.hbci.gui.parts.UmsatzList" requires="hibiscus" />
-    <extension class="de.janrieke.contractmanager.ext.hibiscus.UmsatzListMenu"     extends="de.willuhn.jameica.hbci.gui.menus.UmsatzList" requires="hibiscus"/>
+    <extension class="de.janrieke.contractmanager.ext.hibiscus.UmsatzListPartHibiscusExtension"      extends="de.willuhn.jameica.hbci.gui.parts.UmsatzList"            requires="hibiscus" />
+    <extension class="de.janrieke.contractmanager.ext.hibiscus.UmsatzListMenuHibiscusExtension"      extends="de.willuhn.jameica.hbci.gui.menus.UmsatzList"            requires="hibiscus"/>
     <extension class="de.janrieke.contractmanager.ext.hibiscus.ContractDetailViewHibiscusCategories" extends="de.janrieke.contractmanager.gui.view.ContractDetailView" requires="hibiscus"/>
   </extensions>
 
