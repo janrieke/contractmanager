@@ -566,7 +566,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 		boolean first = true;
 
-		while (calendar.before(today)) {
+		while (!calendar.after(today)) {
 			if (first) {
 				switch (firstMinRuntimeType) {
 				case DAYS:
@@ -703,11 +703,11 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			case DAYS:
 				costsPerDay += costEntry.getMoney();
 				break;
-			case MONTHS:
-				costsPerDay += costEntry.getMoney()/30.42;
-				break;
 			case WEEKS:
 				costsPerDay += costEntry.getMoney()/7;
+				break;
+			case MONTHS:
+				costsPerDay += costEntry.getMoney()/30.42;
 				break;
 			case YEARS:
 				costsPerDay += costEntry.getMoney()/365;
@@ -732,11 +732,11 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			case DAYS:
 				costsPerMonth += costEntry.getMoney()*30.42;
 				break;
+			case WEEKS:
+				costsPerMonth += costEntry.getMoney()*(30.42/7);
+				break;
 			case MONTHS:
 				costsPerMonth += costEntry.getMoney();
-				break;
-			case WEEKS:
-				costsPerMonth += costEntry.getMoney()/(30.42/7);
 				break;
 			case YEARS:
 				costsPerMonth += costEntry.getMoney()/12;
