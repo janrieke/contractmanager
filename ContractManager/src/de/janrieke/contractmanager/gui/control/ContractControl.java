@@ -320,7 +320,7 @@ public class ContractControl extends AbstractControl {
 		if (costsPerMonth != null)
 			return costsPerMonth;
 
-		double costs = getContract().getCostsPerTerm();
+		double costs = getContract().getCostsPerMonth();
 		costsPerMonth = new LabelInput(Settings.DECIMALFORMAT.format(costs));
 		costsPerMonth.setComment(Settings.CURRENCY);
 		return costsPerMonth;
@@ -954,6 +954,9 @@ public class ContractControl extends AbstractControl {
 	private void updateDerivedAttributes() throws RemoteException {
 		double costs = getContract().getCostsPerTerm();
 		costsPerTerm.setValue(Settings.DECIMALFORMAT.format(costs));
+
+		costs = getContract().getCostsPerMonth();
+		costsPerMonth.setValue(Settings.DECIMALFORMAT.format(costs));
 
 		Date ne = getContract().getNextCancellationDeadline();
 		nextCancellationDeadline.setValue(ne == null ? "" : Settings.dateformat(ne));
