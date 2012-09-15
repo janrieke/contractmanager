@@ -25,7 +25,6 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.janrieke.contractmanager.ContractManagerPlugin;
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Transaction;
 import de.willuhn.datasource.rmi.DBIterator;
@@ -33,7 +32,6 @@ import de.willuhn.jameica.gui.extension.Extendable;
 import de.willuhn.jameica.gui.extension.Extension;
 import de.willuhn.jameica.gui.formatter.Formatter;
 import de.willuhn.jameica.gui.parts.TablePart;
-import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
@@ -42,8 +40,7 @@ import de.willuhn.util.I18N;
  * Erweitert die Liste der Umsaetze in Hibiscus um eine Spalte.
  */
 public class UmsatzListPartHibiscusExtension implements Extension {
-	private final static I18N i18n = Application.getPluginLoader()
-			.getPlugin(ContractManagerPlugin.class).getResources().getI18N();
+	private final static I18N i18n = Settings.i18n();
 	private Map<Integer, Transaction> cache = null;
 
 	/**

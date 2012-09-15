@@ -1,15 +1,24 @@
-/**********************************************************************
- * $Source: /cvsroot/syntax/syntax/src/de/willuhn/jameica/fibu/gui/dialogs/ExportDialog.java,v $
- * $Revision: 1.1 $
- * $Date: 2010/08/27 11:19:40 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
+/*
+ *   This file is part of ContractManager for Jameica.
+ *   Copyright (C) 2010-2011  Jan Rieke
  *
- * Copyright (c) by willuhn.webdesign
- * All rights reserved
+ *   ContractManager is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
  *
- **********************************************************************/
+ *   ContractManager is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *   
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * Partially copied from Hibiscus/Syntax, (c) by willuhn.webdesign
+ */
 package de.janrieke.contractmanager.ext.hibiscus;
 
 import java.rmi.RemoteException;
@@ -17,6 +26,7 @@ import java.rmi.RemoteException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
+import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.willuhn.datasource.GenericIterator;
@@ -28,23 +38,22 @@ import de.willuhn.jameica.gui.input.SelectInput;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.util.ButtonArea;
 import de.willuhn.jameica.gui.util.LabelGroup;
-import de.willuhn.jameica.hbci.HBCI;
-import de.willuhn.jameica.system.Application;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
 /**
- * Dialog, ueber den Daten exportiert werden koennen.
+ * Dialog, ueber den Umsätze importiert werden koennen.
  */
 public class UmsatzImportDialog extends AbstractDialog<Contract> {
-	private final static I18N i18n = Application.getPluginLoader()
-			.getPlugin(HBCI.class).getResources().getI18N();
+	private final static I18N i18n = Settings.i18n();
 
 	private final static int WINDOW_WIDTH = 420;
 
 	private Input contractList = null;
 	private Contract selectedContract = null;
 
+	private boolean importButtonEnabled = false;
+	
 	/**
 	 * ct.
 	 * 
@@ -54,7 +63,7 @@ public class UmsatzImportDialog extends AbstractDialog<Contract> {
 	public UmsatzImportDialog() {
 		super(POSITION_CENTER);
 
-		setTitle(i18n.tr("Umsatz-Import"));
+		setTitle(i18n.tr("Import of Transactions"));
 		this.setSize(WINDOW_WIDTH, SWT.DEFAULT);
 	}
 
@@ -63,23 +72,24 @@ public class UmsatzImportDialog extends AbstractDialog<Contract> {
 	 */
 	protected void paint(Composite parent) throws Exception {
 		LabelGroup group = new LabelGroup(parent,
-				i18n.tr("Auswahl des Vertrags"));
+				i18n.tr("Contract Selection"));
 		group.addText(
-				i18n.tr("Bitte wählen Sie den Vertrag aus, dem der gewählte Umsatz zugeordnet werden soll."),
+				i18n.tr("Please select the contract that the imported transaction should be assigned to."),
 				true);
 
 		Input formats = getContractList();
-		group.addLabelPair(i18n.tr("Verfügbare Formate:"), formats);
+		group.addLabelPair(i18n.tr("Available contracts:"), formats);
 
 		ButtonArea buttons = new ButtonArea(parent, 2);
-		Button button = new Button(i18n.tr("Importieren"), new Action() {
+		Button importButton = new Button(i18n.tr("Import"), new Action() {
 			public void handleAction(Object context)
 					throws ApplicationException {
 				importUmsatz();
 			}
 		}, null, true);
-		buttons.addButton(button);
-		buttons.addButton(i18n.tr("Abbrechen"), new Action() {
+		importButton.setEnabled(importButtonEnabled);
+		buttons.addButton(importButton);
+		buttons.addButton(i18n.tr("Cancel"), new Action() {
 			public void handleAction(Object context)
 					throws ApplicationException {
 				close();
@@ -118,11 +128,13 @@ public class UmsatzImportDialog extends AbstractDialog<Contract> {
 		GenericIterator contracts = ContractControl.getContracts();
 
 		if (contracts.size() == 0) {
+			importButtonEnabled = false;
 			contractList = new LabelInput(
-					i18n.tr("Keine Verträge vorhanden."));
+					i18n.tr("No existing contracts."));
 			return contractList;
 		}
 
+		importButtonEnabled = true;
 		contractList = new SelectInput(contracts, null);
 		return contractList;
 	}

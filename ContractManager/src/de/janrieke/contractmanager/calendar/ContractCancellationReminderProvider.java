@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.eclipse.swt.graphics.RGB;
 
+import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.willuhn.datasource.GenericIterator;
@@ -15,20 +16,16 @@ import de.willuhn.jameica.gui.calendar.AbstractAppointment;
 import de.willuhn.jameica.gui.calendar.Appointment;
 import de.willuhn.jameica.gui.calendar.AppointmentProvider;
 import de.willuhn.util.ApplicationException;
+import de.willuhn.util.I18N;
 
 public class ContractCancellationReminderProvider implements
 		AppointmentProvider {
 
-//	ContractCancellationAppointment createAppointment(
-//			Contract contract) {
-//		return new ContractCancellationAppointment(contract);
-//	}
-
+	I18N i18n = Settings.i18n();
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return "ContractManager: Cancellation Deadlines";
+		return i18n.tr("Cancellation Deadlines");
 	}
 
 	@Override
@@ -78,7 +75,7 @@ public class ContractCancellationReminderProvider implements
 		 */
 		public String getDescription() {
 			try {
-				return "Cancellation deadline of contract " + contract.getName();
+				return i18n.tr("Cancellation deadline of contract ") + contract.getName();
 			} catch (RemoteException e) {
 				return "Error while getting contract name";
 			}
@@ -89,7 +86,7 @@ public class ContractCancellationReminderProvider implements
 		 */
 		public String getName() {
 			try {
-				return contract.getName();
+				return i18n.tr("Cancellation Deadline: ") + contract.getName();
 			} catch (RemoteException e) {
 				return "Error while getting contract name";
 			}
@@ -99,7 +96,6 @@ public class ContractCancellationReminderProvider implements
 		 * @see de.willuhn.jameica.hbci.calendar.AbstractAppointmentProvider.AbstractHibiscusAppointment#getColor()
 		 */
 		public RGB getColor() {
-			// TODO: Rot oder gelb, je nach Erinnerungsfrist
 			return new RGB(255,0,0);
 		}
 
