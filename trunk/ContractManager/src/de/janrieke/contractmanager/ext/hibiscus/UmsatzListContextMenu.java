@@ -24,6 +24,7 @@ package de.janrieke.contractmanager.ext.hibiscus;
 
 import java.rmi.RemoteException;
 
+import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Transaction;
 import de.willuhn.datasource.rmi.DBIterator;
@@ -31,10 +32,8 @@ import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
 import de.willuhn.jameica.gui.parts.ContextMenu;
 import de.willuhn.jameica.gui.parts.ContextMenuItem;
-import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.gui.action.UmsatzDetail;
 import de.willuhn.jameica.hbci.rmi.Umsatz;
-import de.willuhn.jameica.system.Application;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
@@ -56,7 +55,7 @@ public class UmsatzListContextMenu extends ContextMenu
 	{
 		final Contract contract = contr;
 		final ContractDetailViewHibiscusCategories ext = extension;
-		i18n = Application.getPluginLoader().getPlugin(HBCI.class).getResources().getI18N();
+		i18n = Settings.i18n();
 
 		addItem(new UmsatzItem(i18n.tr("Unassign this transaction from contract"), new Action() {
 			
@@ -116,7 +115,7 @@ public class UmsatzListContextMenu extends ContextMenu
 	{
 		private OpenItem()
 		{
-			super(i18n.tr("In Hibiscus anzeigen"),new UmsatzDetail(),"document-open.png");
+			super(i18n.tr("Show in Hibiscus"),new UmsatzDetail(),"document-open.png");
 		}
 		/**
 		 * @see de.willuhn.jameica.gui.parts.ContextMenuItem#isEnabledFor(java.lang.Object)

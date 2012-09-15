@@ -68,7 +68,7 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 		ContextMenu menu = (ContextMenu) extendable;
 		menu.addItem(ContextMenuItem.SEPARATOR);
 
-		menu.addItem(new MyContextMenuItem(i18n.tr("in ContractManager übernehmen..."), new Action() {
+		menu.addItem(new MyContextMenuItem(i18n.tr("Import to ContractManager"), new Action() {
 
 			public void handleAction(Object context) throws ApplicationException
 			{
@@ -113,7 +113,7 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 		UmsatzTyp typ = u.getUmsatzTyp();
 
 		if (typ == null && auto)
-			throw new ApplicationException(i18n.tr("Keine Kategorie zugeordnet"));
+			throw new ApplicationException(i18n.tr("No category assigned"));
 
 		Contract contract = null;
 		if (typ != null)
@@ -126,7 +126,7 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 		}
 
 		if (contract == null && auto)
-			throw new ApplicationException(i18n.tr("Kein zugeordneter Vertrag ermittelbar"));
+			throw new ApplicationException(i18n.tr("No assigned contract in database"));
 		
 		if (contract == null) {
 			contract = new UmsatzImportDialog().open();
@@ -186,7 +186,7 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 			catch (Exception e)
 			{
 				Logger.error("unable to detect if buchung is allready assigned",e);
-				Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Fehler beim Prüfen, ob die Buchung bereits in SynTAX zugeordnet ist"), StatusBarMessage.TYPE_ERROR));
+				Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Error while checking for assigned contracts in ContractManager"), StatusBarMessage.TYPE_ERROR));
 			}
 			return !found && super.isEnabledFor(o);
 		}
@@ -262,7 +262,7 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 					if (monitor != null)
 					{
 						monitor.setPercentComplete((int)((i+1) * factor));
-						monitor.log("  " + i18n.tr("Erstelle Buchung {0}",Integer.toString(i+1)));
+						monitor.log("  " + i18n.tr("Assigning transaction {0}",Integer.toString(i+1)));
 					}
 
 					Transaction transaction = null;
@@ -307,8 +307,8 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 					}
 				}
 
-				String text = i18n.tr("Umsatzimport abgeschlossen");
-				text = i18n.tr("{0} Umsätze importiert, {1} fehlerhaft, {2} bereits vorhanden", new String[]{Integer.toString(created),Integer.toString(error),Integer.toString(skipped)});
+				String text = i18n.tr("Import complete.");
+				text = i18n.tr("{0} transactions imported, {1} error, {2} already assigned", new String[]{Integer.toString(created),Integer.toString(error),Integer.toString(skipped)});
 
 				Application.getMessagingFactory().sendMessage(new StatusBarMessage(text,StatusBarMessage.TYPE_SUCCESS));
 				if (monitor != null)

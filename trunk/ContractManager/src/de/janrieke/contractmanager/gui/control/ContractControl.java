@@ -18,6 +18,8 @@
 package de.janrieke.contractmanager.gui.control;
 
 import java.rmi.RemoteException;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -38,9 +40,9 @@ import de.janrieke.contractmanager.gui.parts.SizeableTablePart;
 import de.janrieke.contractmanager.gui.view.ContractDetailView;
 import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
-import de.janrieke.contractmanager.rmi.ICalUID;
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
 import de.janrieke.contractmanager.rmi.Costs;
+import de.janrieke.contractmanager.rmi.ICalUID;
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.datasource.pseudo.PseudoIterator;
 import de.willuhn.datasource.rmi.DBIterator;
@@ -818,9 +820,9 @@ public class ContractControl extends AbstractControl {
 						((Costs) object).setDescription(newValue);
 					else if ("money".equals(attribute)) {
 						try {
-							((Costs) object).setMoney(Double
-									.parseDouble(newValue));
-						} catch (NumberFormatException e) {
+							Number num = NumberFormat.getInstance().parse(newValue);
+							((Costs) object).setMoney(num.doubleValue());
+						} catch (ParseException e) {
 						}
 					} else if ("period".equals(attribute))
 						((Costs) object).setPeriod(Contract.IntervalType
