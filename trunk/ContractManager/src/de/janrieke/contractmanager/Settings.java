@@ -93,7 +93,7 @@ public class Settings {
 	        I18N i18n = Application.getPluginLoader().getPlugin(ContractManagerPlugin.class).getResources().getI18N();
 	        String host = Application.getServiceFactory().getLookupHost(ContractManagerPlugin.class,"contract_db");
 	        int    port = Application.getServiceFactory().getLookupPort(ContractManagerPlugin.class,"contract_db");
-	        String msg = i18n.tr("Hibiscus-Server \"{0}\" nicht erreichbar", (host + ":" + port));
+	        String msg = i18n.tr("DB-Server \"{0}\" nicht erreichbar", (host + ":" + port));
 	        try
 	        {
 	          Application.getCallback().notifyUser(msg);
