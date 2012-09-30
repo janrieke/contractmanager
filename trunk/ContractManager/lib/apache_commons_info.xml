@@ -1,6 +1,6 @@
 <info>
-  <name>backport-util-concurrent</name>
-  <description>Backport ot JSR 166 (java.util.concurrent)</description>
-  <url>http://backport-jsr166.sourceforge.net/</url>
-  <license>Public Domain</license>
+  <name>Apache Commons</name>
+  <description>Used components: Logging, Lang</description>
+  <url>http://commons.apache.org/</url>
+  <license>Apache License 2.0 - http://commons.apache.org/license.html</license>
 </info>
