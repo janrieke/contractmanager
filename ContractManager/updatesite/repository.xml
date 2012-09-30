@@ -5,7 +5,7 @@
   name="ContractManager UpdateSite">
  
    <plugins name="ContractManager">
-     <plugin url="http://janrieke.de/products/jameica/updates/contractmanager/0.2" />
+     <plugin url="http://janrieke.de/products/jameica/updates/contractmanager/0.3" />
    </plugins>
  
 </repository>
