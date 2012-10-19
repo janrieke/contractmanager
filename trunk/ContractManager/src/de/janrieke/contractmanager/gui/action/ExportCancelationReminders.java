@@ -61,7 +61,7 @@ import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
 /**
- * Generic Action for "History back" ;).
+ * Action for cancellation export.
  */
 public class ExportCancelationReminders implements Action {
 
@@ -106,6 +106,18 @@ public class ExportCancelationReminders implements Action {
 				return;
 			}
 				
+			File calfile = new File(filename);
+
+			try {
+				if (!calfile.canWrite() && !calfile.createNewFile()) {
+					//no use in exporting: file cannot be written to!
+					Logger.error("Calender export file is not writable!");
+					return;
+				}
+			} catch (SecurityException e) {
+				Logger.error("Calender export file is not writable!");
+				return;
+			}
 			
 			//Export reminders for the next 2 years
 			java.util.Calendar until = java.util.Calendar.getInstance();
@@ -116,7 +128,7 @@ public class ExportCancelationReminders implements Action {
 			// Thus, we store the Event's UIDs and load the file before
 			// overwriting.
 			Calendar ical = null;
-			if (new File(filename).exists()) {
+			if (calfile.exists()) {
 				FileInputStream fin = new FileInputStream(filename);
 				CalendarBuilder builder = new CalendarBuilder();
 				try {
@@ -318,6 +330,8 @@ public class ExportCancelationReminders implements Action {
 			
 			// Do not export the calendar if there are no entries in it (causing exception)
 			if (ical.getComponents().size() > 0) {
+				
+
 				FileOutputStream fout = new FileOutputStream(filename);
 	
 				CalendarOutputter outputter = new CalendarOutputter();
