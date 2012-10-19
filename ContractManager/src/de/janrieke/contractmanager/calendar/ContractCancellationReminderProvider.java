@@ -116,5 +116,14 @@ public class ContractCancellationReminderProvider implements
 			GUI.startView(de.janrieke.contractmanager.gui.view.ContractDetailView.class
 					.getName(), contract);
 		}
+
+		@Override
+		public AlarmTime getAlarmTime() {
+			try {
+				return new AlarmTime(-Settings.getExtensionWarningTime(), 0, 0, 0);
+			} catch (RemoteException e) {
+				return new AlarmTime(-7, 0, 0, 0);
+			}
+		}
 	}
 }

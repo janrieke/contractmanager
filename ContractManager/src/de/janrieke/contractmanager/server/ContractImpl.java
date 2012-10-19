@@ -501,6 +501,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		if (getEndDate() != null)
 			return null; // if the end is already set, there is no need for
 							// further cancellations
+		// FIXME: If EndDate is in the future, it may be possible to cancel before!
 
 		Date startDate = getStartDate();
 		if (startDate == null)
@@ -537,7 +538,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			}
 			//minus one day, as the last day of the running term is the reference,
 			// not the first of the new
-			calendar.add(Calendar.DAY_OF_YEAR, -1);
+			//calendar.add(Calendar.DAY_OF_YEAR, -1);
 		}
 
 		IntervalType firstMinRuntimeType = getFirstMinRuntimeType();
@@ -650,6 +651,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		if (getEndDate() != null)
 			return 0; // if the end is already set, there is no need for
 						// further cancellations
+		// FIXME: If EndDate is in the future, it may be possible to cancel before!
 
 		Date startDate = getStartDate();
 		if (startDate == null)
@@ -659,7 +661,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		IntervalType nextMinRuntimeType = getNextMinRuntimeType();
 		Integer nextMinRuntimeCount = getNextMinRuntimeCount();
 
-		// if one of the runtime definition is invalid, use the other one
+		// if one of the runtime definitions is invalid, use the other one
 		if (firstMinRuntimeType == null || firstMinRuntimeCount == null
 				|| firstMinRuntimeCount < 0) {
 			firstMinRuntimeCount = nextMinRuntimeCount;
