@@ -219,9 +219,42 @@ public class SettingsControl extends AbstractControl {
 			GUI.getView().setErrorText(e.getMessage());
 
 		} catch (RemoteException e) {
-			Logger.error("error while storing contract", e);
+			Logger.error("Error while storing settings", e);
 			GUI.getStatusBar().setErrorText(
 					Settings.i18n().tr("Error while storing settings"));
+		}
+	}
+
+	/**
+	 * This method resets the settings to the default values.
+	 */
+	public void handleReset() {
+		try {
+			SettingsUtil.set("name", "");
+			SettingsUtil.set("street", "");
+			SettingsUtil.set("number", "");
+			SettingsUtil.set("extra", "");
+			SettingsUtil.set("zipcode", "");
+			SettingsUtil.set("city", "");
+			SettingsUtil.set("state", "");
+			SettingsUtil.set("country", "");
+			SettingsUtil.set("email", "");
+			SettingsUtil.set("phone", "");
+			Settings.setExtensionNoticeTime(30);
+			Settings.setExtensionWarningTime(7);
+			Settings.setICalAutoExport(true);
+			Settings.setNamedICalExport(true);
+			Settings.setICalFileLocation("");
+			
+			GUI.getStatusBar().setSuccessText(
+					Settings.i18n().tr("Settings reset to default."));
+		} catch (ApplicationException e) {
+			GUI.getView().setErrorText(e.getMessage());
+
+		} catch (RemoteException e) {
+			Logger.error("Error while resetting settings", e);
+			GUI.getStatusBar().setErrorText(
+					Settings.i18n().tr("Error while resetting settings"));
 		}
 	}
 }
