@@ -23,6 +23,7 @@ import de.janrieke.contractmanager.gui.control.SettingsControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
+import de.willuhn.jameica.gui.dialogs.YesNoDialog;
 import de.willuhn.jameica.gui.util.ButtonArea;
 import de.willuhn.jameica.gui.util.ColumnLayout;
 import de.willuhn.jameica.gui.util.SimpleContainer;
@@ -75,6 +76,22 @@ public class SettingsView extends AbstractView {
 	    ButtonArea buttons = new ButtonArea(getParent(), 4);
 
 		//buttons.addButton(new Back(false));
+		buttons.addButton(Settings.i18n().tr("Revert to default settings"), new Action() {
+			public void handleAction(Object context)
+					throws ApplicationException {
+		  		YesNoDialog prompt = new YesNoDialog(YesNoDialog.POSITION_CENTER);
+		  		prompt.setTitle(Settings.i18n().tr("Are you sure?"));
+		  		prompt.setText(Settings.i18n().tr("Revert all settings to default values"));
+		  		try {
+					if (!((Boolean) prompt.open()).booleanValue())
+						return;
+				} catch (Exception e) {
+					return;
+				}
+				control.handleReset();
+				GUI.startView(SettingsView.this, context);
+			}
+		}, null, true, "edit-undo.png");
 		buttons.addButton(new RestoreButton(this, null, false));
 		buttons.addButton(Settings.i18n().tr("Save Settings"), new Action() {
 			public void handleAction(Object context)

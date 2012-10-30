@@ -48,6 +48,6 @@ public class RestoreButton extends Button
    */
   public RestoreButton(AbstractView view, Object object, boolean isDefault)
   {
-    super(Settings.i18n().tr("Restore"), new RestoreAction(view), object, isDefault, "edit-undo.png");
+    super(Settings.i18n().tr("Revert changes"), new RestoreAction(view), object, isDefault, "edit-undo_green.png");
   }
 }
