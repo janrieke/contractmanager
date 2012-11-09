@@ -67,8 +67,7 @@ public class SettingsView extends AbstractView {
 	    right.addLabelPair(Settings.i18n().tr("Extension notice time"), control.getNoticeTime());
 	    right.addLabelPair(Settings.i18n().tr("Extension warning time"), control.getWarningTime());
 	    right.addHeadline(Settings.i18n().tr("iCal Export of Contract Cancellation Reminders"));
-	    right.addLabelPair(Settings.i18n().tr("Export warnings on exit"), control.getICalAutoExport());
-	    right.addLabelPair(Settings.i18n().tr("iCal file"), control.getICalFileLocation());
+//	    right.addLabelPair(Settings.i18n().tr("Export warnings on exit"), control.getICalAutoExport());
 	    right.addLabelPair(Settings.i18n().tr("Export contract names"), control.getNamedICalExport());
 
 	    

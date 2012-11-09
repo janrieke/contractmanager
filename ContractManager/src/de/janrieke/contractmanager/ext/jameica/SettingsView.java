@@ -34,6 +34,7 @@ import de.willuhn.jameica.gui.util.TabGroup;
 import de.willuhn.jameica.messaging.Message;
 import de.willuhn.jameica.messaging.MessageConsumer;
 import de.willuhn.jameica.messaging.SettingsChangedMessage;
+import de.willuhn.jameica.messaging.SettingsRestoredMessage;
 import de.willuhn.jameica.messaging.StatusBarMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
@@ -62,14 +63,17 @@ public class SettingsView implements Extension {
 			 * @see de.willuhn.jameica.messaging.MessageConsumer#handleMessage(de.willuhn.jameica.messaging.Message)
 			 */
 			public void handleMessage(Message message) throws Exception {
-				handleStore();
+				if (message instanceof SettingsChangedMessage)
+					handleStore();
+				else if (message instanceof SettingsRestoredMessage)
+					handleReset();
 			}
 
 			/**
 			 * @see de.willuhn.jameica.messaging.MessageConsumer#getExpectedMessageTypes()
 			 */
 			public Class<?>[] getExpectedMessageTypes() {
-				return new Class[] { SettingsChangedMessage.class };
+				return new Class[] { SettingsChangedMessage.class, SettingsRestoredMessage.class };
 			}
 
 			/**
@@ -117,10 +121,8 @@ public class SettingsView implements Extension {
 					settingsControl.getWarningTime());
 			right.addHeadline(i18n
 					.tr("iCal Export of Contract Cancellation Reminders"));
-			right.addLabelPair(i18n.tr("Export warnings on exit"),
-					settingsControl.getICalAutoExport());
-			right.addLabelPair(i18n.tr("iCal file"),
-					settingsControl.getICalFileLocation());
+//			right.addLabelPair(i18n.tr("Export warnings on exit"),
+//					settingsControl.getICalAutoExport());
 			right.addLabelPair(i18n.tr("Export contract names"),
 					settingsControl.getNamedICalExport());
 

@@ -42,7 +42,6 @@ import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
 import de.janrieke.contractmanager.rmi.Costs;
-import de.janrieke.contractmanager.rmi.ICalUID;
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.datasource.pseudo.PseudoIterator;
 import de.willuhn.datasource.rmi.DBIterator;
@@ -845,16 +844,6 @@ public class ContractControl extends AbstractControl {
 			// get the current contract.
 			Contract c = getContract();
 
-			if (cancellationsChanged(c)) {
-				//delete all ical uids, so that everything will be reexported next time
-				DBIterator dbuidlist = Settings.getDBService().createList(ICalUID.class);
-				dbuidlist.addFilter("contract_id = " + c.getID());
-				while (dbuidlist.hasNext()) {
-					ICalUID dbuid = (ICalUID) dbuidlist.next();
-					dbuid.delete();
-				}
-			}
-
 			// invoke all Setters of this contract and assign the current values
 			c.setName((String) getName().getValue());
 			c.setContractNumber((String) getContractNumber().getValue());
@@ -931,27 +920,24 @@ public class ContractControl extends AbstractControl {
 			Logger.error("error while storing contract", e);
 			GUI.getStatusBar().setErrorText(
 					Settings.i18n().tr("Error while storing contract"));
-		} catch (ApplicationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 	
-	private boolean equalCheck(Object o1, Object o2) {
-		return (o1 == o2 || o1 != null && o1.equals(o2));
-	}
-
-	private boolean cancellationsChanged(Contract c) throws RemoteException {
-		return !(equalCheck(getName().getValue(), c.getName()) &&
-				equalCheck(getStartDate().getValue(), c.getStartDate()) &&
-				equalCheck(getCancellationPeriodCount().getValue(), c.getCancellationPeriodCount()) &&
-				equalCheck(getCancellationPeriodType().getValue(), c.getCancellationPeriodType()) &&
-				equalCheck(getEndDate().getValue(), c.getEndDate()) &&
-				equalCheck(getFirstMinRuntimeCount().getValue(), c.getFirstMinRuntimeCount()) &&
-				equalCheck(getFirstMinRuntimeType().getValue(), c.getFirstMinRuntimeType()) &&
-				equalCheck(getNextMinRuntimeCount().getValue(), c.getNextMinRuntimeCount()) &&
-				equalCheck(getNextMinRuntimeType().getValue(), c.getNextMinRuntimeType()));
-	}
+//	private boolean equalCheck(Object o1, Object o2) {
+//		return (o1 == o2 || o1 != null && o1.equals(o2));
+//	}
+//
+//	private boolean cancellationsChanged(Contract c) throws RemoteException {
+//		return !(equalCheck(getName().getValue(), c.getName()) &&
+//				equalCheck(getStartDate().getValue(), c.getStartDate()) &&
+//				equalCheck(getCancellationPeriodCount().getValue(), c.getCancellationPeriodCount()) &&
+//				equalCheck(getCancellationPeriodType().getValue(), c.getCancellationPeriodType()) &&
+//				equalCheck(getEndDate().getValue(), c.getEndDate()) &&
+//				equalCheck(getFirstMinRuntimeCount().getValue(), c.getFirstMinRuntimeCount()) &&
+//				equalCheck(getFirstMinRuntimeType().getValue(), c.getFirstMinRuntimeType()) &&
+//				equalCheck(getNextMinRuntimeCount().getValue(), c.getNextMinRuntimeCount()) &&
+//				equalCheck(getNextMinRuntimeType().getValue(), c.getNextMinRuntimeType()));
+//	}
 
 	private void updateDerivedAttributes() throws RemoteException {
 		double costs = getContract().getCostsPerTerm();

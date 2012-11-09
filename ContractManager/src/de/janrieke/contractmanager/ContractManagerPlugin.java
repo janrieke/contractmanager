@@ -19,11 +19,9 @@ package de.janrieke.contractmanager;
 
 import java.rmi.RemoteException;
 
-import de.janrieke.contractmanager.gui.action.ExportCancelationReminders;
 import de.janrieke.contractmanager.rmi.ContractDBService;
 import de.janrieke.contractmanager.server.ContractDBServiceImpl;
 import de.janrieke.contractmanager.server.DBSupportH2Impl;
-import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.plugin.AbstractPlugin;
 import de.willuhn.jameica.plugin.Version;
 import de.willuhn.jameica.system.Application;
@@ -142,22 +140,22 @@ public class ContractManagerPlugin extends AbstractPlugin {
 	 */
 	@Override
 	public void shutDown() {
-		try {
-			if (Settings.getICalAutoExport()) {
-				new ExportCancelationReminders()
-				.handleAction(null);
-			}
-		} catch (RemoteException e) {
-			GUI.getStatusBar()
-			.setErrorText(
-					Settings.i18n()
-					.tr("Error during cancellation reminder export."));
-		} catch (ApplicationException e) {
-			GUI.getStatusBar()
-			.setErrorText(
-					Settings.i18n()
-					.tr("Error during cancellation reminder export."));
-		}
+//		try {
+//			if (Settings.getICalAutoExport()) {
+//				new ExportCancelationReminders()
+//				.handleAction(null);
+//			}
+//		} catch (RemoteException e) {
+//			GUI.getStatusBar()
+//			.setErrorText(
+//					Settings.i18n()
+//					.tr("Error during cancellation reminder export."));
+//		} catch (ApplicationException e) {
+//			GUI.getStatusBar()
+//			.setErrorText(
+//					Settings.i18n()
+//					.tr("Error during cancellation reminder export."));
+//		}
 	}
 
 	public static ContractManagerPlugin getInstance() {

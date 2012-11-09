@@ -25,7 +25,6 @@ import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Costs;
-import de.janrieke.contractmanager.rmi.ICalUID;
 import de.janrieke.contractmanager.rmi.Transaction;
 import de.willuhn.datasource.db.AbstractDBObject;
 import de.willuhn.datasource.rmi.DBIterator;
@@ -185,11 +184,6 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			while (costs.hasNext()) {
 				Costs cost = (Costs) costs.next();
 				cost.delete();
-			}
-			DBIterator uids = getICalUIDs();
-			while (uids.hasNext()) {
-				ICalUID uid = (ICalUID) uids.next();
-				uid.delete();
 			}
 
 			super.delete(); // we delete the contract itself
@@ -473,20 +467,6 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		setAttribute("hibiscus_category", category);
 	}
 	
-
-	@Override
-	public DBIterator getICalUIDs() throws RemoteException {
-		DBIterator uidIterator = null;
-		try {
-			DBService service = this.getService();
-			uidIterator = service.createList(ICalUID.class);
-			uidIterator.addFilter("contract_id = " + this.getID());
-		} catch (Exception e) {
-			throw new RemoteException("unable to load uid list", e);
-		}
-		return uidIterator;
-	}	
-	
 	/**
 	 * Calculates the next contractual term's end after the given date.
 	 * 
@@ -513,7 +493,6 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 		if (minusCancellationPeriod) {
 			IntervalType cancellationPeriodType = getCancellationPeriodType();
-			// one more day, as this is a deadline
 			Integer cancellationPeriodCount = getCancellationPeriodCount();
 
 			// if the period is invalid, assume there is none
@@ -538,7 +517,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			}
 			//minus one day, as the last day of the running term is the reference,
 			// not the first of the new
-			//calendar.add(Calendar.DAY_OF_YEAR, -1);
+			calendar.add(Calendar.DAY_OF_YEAR, -1);
 		}
 
 		IntervalType firstMinRuntimeType = getFirstMinRuntimeType();
@@ -609,7 +588,9 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	@Override
 	public Date getNextTermBegin() throws RemoteException {
-		return calculateTermEnd(false, new Date());
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.DAY_OF_YEAR, -1);
+		return calculateTermEnd(false, calendar.getTime());
 	}
 
 	@Override
@@ -638,7 +619,9 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	@Override
 	public Date getNextCancellationDeadline() throws RemoteException {
-		return calculateTermEnd(true, new Date());
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.DAY_OF_YEAR, -1);
+		return calculateTermEnd(true, calendar.getTime());
 	}
 
 	@Override
