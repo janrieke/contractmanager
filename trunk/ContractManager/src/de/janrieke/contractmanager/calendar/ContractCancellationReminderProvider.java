@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.swt.graphics.RGB;
 
@@ -75,7 +76,12 @@ public class ContractCancellationReminderProvider implements
 		 */
 		public String getDescription() {
 			try {
-				return i18n.tr("Cancellation deadline of contract ") + contract.getName();
+				if (Settings.getNamedICalExport()) { 
+					return i18n.tr("Cancellation deadline of contract ") + contract.getName() + 
+							i18n.tr(". Check Jameica/ContractManager for details.");
+				} else {
+					return i18n.tr("Cancellation deadline of a contract. Check Jameica/ContractManager for details."); 
+				}
 			} catch (RemoteException e) {
 				return "Error while getting contract name";
 			}
@@ -86,7 +92,11 @@ public class ContractCancellationReminderProvider implements
 		 */
 		public String getName() {
 			try {
-				return i18n.tr("Cancellation Deadline: ") + contract.getName();
+				if (Settings.getNamedICalExport()) { 
+					return i18n.tr("Cancellation Deadline: ") + contract.getName();
+				} else {
+					return i18n.tr("Cancellation Deadline");
+				}
 			} catch (RemoteException e) {
 				return "Error while getting contract name";
 			}
@@ -118,11 +128,12 @@ public class ContractCancellationReminderProvider implements
 		}
 
 		@Override
-		public AlarmTime getAlarmTime() {
+		public int getAlarmTime() {
+			// return value is seconds
 			try {
-				return new AlarmTime(-Settings.getExtensionWarningTime(), 0, 0, 0);
+				return (int) TimeUnit.DAYS.toSeconds(Settings.getExtensionWarningTime());
 			} catch (RemoteException e) {
-				return new AlarmTime(-7, 0, 0, 0);
+				return super.getAlarmTime();
 			}
 		}
 	}

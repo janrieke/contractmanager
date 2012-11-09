@@ -15,6 +15,7 @@ CREATE TABLE contract (
   next_min_runtime_type int(4),
   uri varchar(4096),
   hibiscus_category varchar(255) NULL,
+  ignore_cancellations int(1) NOT NULL,
   UNIQUE (id),
   PRIMARY KEY (id)
 );
@@ -76,4 +77,4 @@ ALTER TABLE contract     ADD CONSTRAINT fk_address           FOREIGN KEY (addres
 ALTER TABLE transactions ADD CONSTRAINT fk_contract          FOREIGN KEY (contract_id) REFERENCES contract (id) DEFERRABLE;
 ALTER TABLE icaluids     ADD CONSTRAINT fk_icaluids_contract FOREIGN KEY (contract_id) REFERENCES contract (id) DEFERRABLE;
 
-INSERT INTO version (name,version) values ('contract_db',17);
+INSERT INTO version (name,version) values ('contract_db',18);

@@ -20,7 +20,6 @@ package de.janrieke.contractmanager.gui.control;
 import java.rmi.RemoteException;
 
 import de.janrieke.contractmanager.Settings;
-import de.janrieke.contractmanager.gui.input.ICSFileInput;
 import de.janrieke.contractmanager.server.SettingsUtil;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
@@ -54,8 +53,7 @@ public class SettingsControl extends AbstractControl {
 
 	private IntegerInput warningTime;
 	private IntegerInput noticeTime;
-	private ICSFileInput iCalFileLocation;
-	private CheckboxInput iCalAutoExport;
+//	private CheckboxInput iCalAutoExport;
 	private CheckboxInput anonICalExport;
 
 	/**
@@ -168,25 +166,18 @@ public class SettingsControl extends AbstractControl {
 		return noticeTime;
 	}
 
-	public CheckboxInput getICalAutoExport() throws RemoteException {
-		if (iCalAutoExport == null) {
-			iCalAutoExport = new CheckboxInput(Settings.getICalAutoExport());
-		}
-		return iCalAutoExport;
-	}
+//	public CheckboxInput getICalAutoExport() throws RemoteException {
+//		if (iCalAutoExport == null) {
+//			iCalAutoExport = new CheckboxInput(Settings.getICalAutoExport());
+//		}
+//		return iCalAutoExport;
+//	}
 
 	public CheckboxInput getNamedICalExport() throws RemoteException {
 		if (anonICalExport == null) {
 			anonICalExport = new CheckboxInput(Settings.getNamedICalExport());
 		}
 		return anonICalExport;
-	}
-
-	public ICSFileInput getICalFileLocation() throws RemoteException {
-		if (iCalFileLocation == null) {
-			iCalFileLocation = new ICSFileInput(Settings.getICalFileLocation(), true);
-		}
-		return iCalFileLocation;
 	}
 
 	/**
@@ -208,10 +199,8 @@ public class SettingsControl extends AbstractControl {
 					.getValue());
 			Settings.setExtensionWarningTime((Integer) getWarningTime()
 					.getValue());
-			Settings.setICalAutoExport((Boolean) getICalAutoExport().getValue());
+//			Settings.setICalAutoExport((Boolean) getICalAutoExport().getValue());
 			Settings.setNamedICalExport((Boolean) getNamedICalExport().getValue());
-			Settings.setICalFileLocation((String) getICalFileLocation()
-					.getValue());
 			
 			GUI.getStatusBar().setSuccessText(
 					Settings.i18n().tr("Settings saved."));
@@ -242,9 +231,8 @@ public class SettingsControl extends AbstractControl {
 			SettingsUtil.set("phone", "");
 			Settings.setExtensionNoticeTime(30);
 			Settings.setExtensionWarningTime(7);
-			Settings.setICalAutoExport(true);
+//			Settings.setICalAutoExport(true);
 			Settings.setNamedICalExport(true);
-			Settings.setICalFileLocation("");
 			
 			GUI.getStatusBar().setSuccessText(
 					Settings.i18n().tr("Settings reset to default."));
