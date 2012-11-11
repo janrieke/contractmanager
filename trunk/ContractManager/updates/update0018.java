@@ -30,62 +30,56 @@ import de.willuhn.sql.version.UpdateProvider;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
-
 /**
- * Adds a new column "hibiscus_category" to contract table.
+ * Removes table icaluids.
  */
-public class update0018 implements Update
-{
-  private Map<String, String> statements = new HashMap<String, String>();
-  
-  /**
-   * Default constructor
-   */
-  public update0018()
-  {
-    // Update for H2
-    statements.put(DBSupportH2Impl.class.getName(),
-			"ALTER TABLE contract ADD COLUMN ignore_cancellations int(1) NOT NULL\n");
-    statements.put(DBSupportH2Impl.class.getName(),
-			"DROP TABLE icaluids\n");
-  }
+public class update0018 implements Update {
+	private Map<String, String> statements = new HashMap<String, String>();
 
-  /**
-   * @see de.willuhn.sql.version.Update#execute(de.willuhn.sql.version.UpdateProvider)
-   */
-  public void execute(UpdateProvider provider) throws ApplicationException
-  {
-    ContractDBUpdateProvider myProvider = (ContractDBUpdateProvider) provider;
-    I18N i18n = myProvider.getResources().getI18N();
+	/**
+	 * Default constructor
+	 */
+	public update0018() {
+		// Update for H2
+		statements.put(DBSupportH2Impl.class.getName(),
+				"ALTER TABLE contract ADD COLUMN ignore_cancellations int(1);\n"
+						+ "DROP TABLE icaluids\n");
+	}
 
-    // Get the SQL dialect
-    String driver = ContractDBService.SETTINGS.getString("database.driver",null);
-    String sql = (String) statements.get(driver);
-    if (sql == null)
-      throw new ApplicationException(i18n.tr("Database {0} not supported",driver));
-    
-    try
-    {
-      ScriptExecutor.execute(new StringReader(sql),myProvider.getConnection(),myProvider.getProgressMonitor());
-      myProvider.getProgressMonitor().log(i18n.tr("Database updated."));
-    }
-    catch (ApplicationException ae)
-    {
-      throw ae;
-    }
-    catch (Exception e)
-    {
-      Logger.error("unable to execute update",e);
-      throw new ApplicationException(i18n.tr("Error during database update"),e);
-    }
-  }
+	/**
+	 * @see de.willuhn.sql.version.Update#execute(de.willuhn.sql.version.UpdateProvider)
+	 */
+	public void execute(UpdateProvider provider) throws ApplicationException {
+		ContractDBUpdateProvider myProvider = (ContractDBUpdateProvider) provider;
+		I18N i18n = myProvider.getResources().getI18N();
 
-  /**
-   * @see de.willuhn.sql.version.Update#getName()
-   */
-  public String getName()
-  {
-    return "Database update v17 to v18 (adding column for ignoring cancellation warnings)";
-  }
+		// Get the SQL dialect
+		String driver = ContractDBService.SETTINGS.getString("database.driver",
+				null);
+		String sql = (String) statements.get(driver);
+		if (sql == null)
+			throw new ApplicationException(i18n.tr(
+					"Database {0} not supported", driver));
+
+		try {
+			ScriptExecutor
+					.execute(new StringReader(sql), myProvider.getConnection(),
+							myProvider.getProgressMonitor());
+			myProvider.getProgressMonitor().log(i18n.tr("Database updated."));
+		} catch (ApplicationException ae) {
+			throw ae;
+		} catch (Exception e) {
+			Logger.error("unable to execute update", e);
+			throw new ApplicationException(
+					i18n.tr("Error during database update"), e);
+		}
+	}
+
+	/**
+	 * @see de.willuhn.sql.version.Update#getName()
+	 */
+	public String getName() {
+		return "Database update v17 to v18 (adding column for ignoring cancellation warnings)";
+	}
 
 }
