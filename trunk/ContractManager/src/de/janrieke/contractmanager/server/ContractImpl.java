@@ -432,6 +432,17 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	@Override
+	public Boolean isDoNotRemind() throws RemoteException {
+		Integer b = ((Integer) getAttribute("ignore_cancellations"));
+		return b == null ? false : b.equals(1);
+	}
+
+	@Override
+	public void setDoNotRemind(Boolean value) throws RemoteException {
+		setAttribute("ignore_cancellations", value);
+	}
+
+	@Override
 	public String getURI() throws RemoteException {
 		return (String) getAttribute("uri");
 	}
@@ -513,6 +524,10 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 				case YEARS:
 					calendar.add(Calendar.YEAR, -cancellationPeriodCount);
 					break;
+				case ONCE:
+					break;
+				default:
+					break;
 				}
 			}
 			//minus one day, as the last day of the running term is the reference,
@@ -561,6 +576,10 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 				case YEARS:
 					calendar.add(Calendar.YEAR, firstMinRuntimeCount);
 					break;
+				case ONCE:
+					break;
+				default:
+					break;
 				}
 				first = false;
 			} else {
@@ -578,6 +597,10 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 					break;
 				case YEARS:
 					calendar.add(Calendar.YEAR, nextMinRuntimeCount);
+					break;
+				case ONCE:
+					break;
+				default:
 					break;
 				}
 			}
@@ -612,6 +635,10 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			break;
 		case YEARS:
 			calendar.add(Calendar.YEAR, getNextMinRuntimeCount());
+			break;
+		case ONCE:
+			break;
+		default:
 			break;
 		}
 		return calendar.getTime();
@@ -669,6 +696,10 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			return nextMinRuntimeCount * 30;
 		case YEARS:
 			return nextMinRuntimeCount * 365;
+		case ONCE:
+			break;
+		default:
+			break;
 		}
 		return 0;
 	}

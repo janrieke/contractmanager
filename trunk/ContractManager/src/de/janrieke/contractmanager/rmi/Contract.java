@@ -144,6 +144,9 @@ public interface Contract extends DBObject {
 	public IntervalType getNextMinRuntimeType() throws RemoteException;
 	public void setNextMinRuntimeType(IntervalType type) throws RemoteException;
 	
+	public Boolean isDoNotRemind() throws RemoteException;
+	public void setDoNotRemind(Boolean value) throws RemoteException;
+
 	public String getURI() throws RemoteException;
 	public void setURI(String uri) throws RemoteException;
 

@@ -85,6 +85,7 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    //TODO: Show complete term instead of only beginning
 	    left.addLabelPair(Settings.i18n().tr("Next term"), control.getNextTerm());
 	    left.addLabelPair(Settings.i18n().tr("Deadline for next cancellation"), control.getNextCancellationDeadline());
+	    left.addLabelPair(Settings.i18n().tr("Do not remind about cancellations"), control.getDoNotRemind());
 
 	    right = new SimpleContainer(columns.getComposite(), true);
 	    right.addHeadline(Settings.i18n().tr("Contractual Partner Address"));
@@ -151,9 +152,10 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    right.addLabelPair(label, input);
 	}
 
-	public void addExtensionContainer(Part part) {
+	public void addExtensionContainer(Part part, String headline) {
 	    SimpleContainer scroller = new SimpleContainer(getParent());
 	    scroller.getComposite().setSize(200, 100);
+	    scroller.addHeadline(headline);
 	    scroller.addPart(part);
 	}
 	
