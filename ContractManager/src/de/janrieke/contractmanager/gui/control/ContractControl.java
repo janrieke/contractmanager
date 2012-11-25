@@ -54,6 +54,7 @@ import de.willuhn.jameica.gui.dialogs.CalendarDialog;
 import de.willuhn.jameica.gui.formatter.CurrencyFormatter;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
 import de.willuhn.jameica.gui.formatter.TableFormatter;
+import de.willuhn.jameica.gui.input.CheckboxInput;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.input.IntegerInput;
 import de.willuhn.jameica.gui.input.LabelInput;
@@ -97,6 +98,7 @@ public class ContractControl extends AbstractControl {
 	private Input nextMinRuntimeMulti;
 	private IntegerInput nextMinRuntimeCount;
 	private SelectInput nextMinRuntimeType;
+	private CheckboxInput doNotRemind;
 
 	private SelectInput partnerAddress;
 	private Input partnerName;
@@ -419,6 +421,13 @@ public class ContractControl extends AbstractControl {
 		}
 		return nextMinRuntimeType;
 	}
+	
+	public CheckboxInput getDoNotRemind() throws RemoteException {
+		if (doNotRemind == null) {
+			doNotRemind = new CheckboxInput(getContract().isDoNotRemind());
+		}
+		return doNotRemind;
+	}
 
 	private Address currentAddress = null;
 
@@ -674,6 +683,8 @@ public class ContractControl extends AbstractControl {
 			Calendar today = Calendar.getInstance();
 			Calendar calendar = Calendar.getInstance();
 			try {
+				if (contract.isDoNotRemind())
+					continue;
 				Date deadline = contract.getNextCancellationDeadline();
 				if (deadline == null)
 					continue;
@@ -864,6 +875,9 @@ public class ContractControl extends AbstractControl {
 					.getValue());
 			c.setNextMinRuntimeType((IntervalType) getNextMinRuntimeType()
 					.getValue());
+
+			c.setDoNotRemind((Boolean) getDoNotRemind().getValue());
+
 			c.setHibiscusCategoryID(hibiscusCategoryID);
 
 			Address a = (Address) getPartnerAddress().getValue();
