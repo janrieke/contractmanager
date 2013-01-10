@@ -1,5 +1,5 @@
 <info>
-  <name>backport-util-concurrent</name>
+  <name>backport-util-concurrent 3.1</name>
   <description>Backport ot JSR 166 (java.util.concurrent)</description>
   <url>http://backport-jsr166.sourceforge.net/</url>
   <license>Public Domain</license>
