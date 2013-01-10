@@ -3,3 +3,6 @@ Tango Desktop Project (PD, http://tango.freedesktop.org/):
  office-calendar.png
  edit-undo.png
  address-book-new.png
+ 
+Own work (PD):
+ chart.png

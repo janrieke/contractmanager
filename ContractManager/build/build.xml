@@ -62,7 +62,6 @@
       <pathelement location="../jameica/lib/de_willuhn_ds/de_willuhn_ds.jar" />
       <pathelement location="../jameica/lib/de_willuhn_util/de_willuhn_util.jar" />
       <pathelement location="../hibiscus/bin/" />
-      <pathelement location="lib/ical4j-1.0-rc3.jar" />
       <pathelement location="lib/odfdom.jar" />
       <pathelement location="lib/xercesImpl.jar" />
       <pathelement location="lib/xercesSamples.jar" />
@@ -72,6 +71,8 @@
       <pathelement location="lib/commons-logging-1.1.1.jar" />
       <pathelement location="lib/commons-lang-2.4.jar" />
       <pathelement location="lib/backport-util-concurrent-3.1.jar" />
+      <pathelement location="lib/org.swtchart_0.7.0.v20110128.jar" />
+      <pathelement location="lib/org.swtchart.ext_0.7.0.v20110128.jar" />
     </path>
 
   </target>
