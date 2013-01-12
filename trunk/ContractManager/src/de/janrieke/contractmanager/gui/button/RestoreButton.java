@@ -15,20 +15,6 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/**********************************************************************
- * Copied from Jameica
- * 
- * $Source: /cvsroot/jameica/jameica/src/de/willuhn/jameica/gui/internal/buttons/Back.java,v $
- * $Revision: 1.1 $
- * $Date: 2009-01-20 10:51:51 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
- *
- * Copyright (c) by willuhn software & services
- * All rights reserved
- *
- **********************************************************************/
 
 package de.janrieke.contractmanager.gui.button;
 

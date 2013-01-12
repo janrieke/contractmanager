@@ -15,20 +15,10 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/**********************************************************************
- * Copied from Hibiscus
- * 
- * $Source: /cvsroot/hibiscus/hibiscus/src/de/willuhn/jameica/hbci/gui/controller/LicenseControl.java,v $
- * $Revision: 1.14 $
- * $Date: 2009-03-10 23:51:31 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
- *
- * Copyright (c) by willuhn.webdesign
- * All rights reserved
- *
- **********************************************************************/
+
+/*
+ * Partially copied from Hibiscus/Syntax, (c) by willuhn.webdesign
+ */
 package de.janrieke.contractmanager.gui.control;
 
 import de.janrieke.contractmanager.gui.parts.AnalysisChartPart;
@@ -58,7 +48,7 @@ public class AnalysisControl extends AbstractControl {
 
 	private AnalysisChartPart chart = null;
 	
-	public Part getChart() {
+	public Part getChartPart() {
 		if (chart == null)
 			chart = new AnalysisChartPart();
 		return chart;

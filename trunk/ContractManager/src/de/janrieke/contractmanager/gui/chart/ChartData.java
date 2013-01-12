@@ -19,7 +19,6 @@
 /*
  * Partially copied from Hibiscus/Syntax, (c) by willuhn.webdesign
  */
-
 package de.janrieke.contractmanager.gui.chart;
 
 import java.rmi.RemoteException;
