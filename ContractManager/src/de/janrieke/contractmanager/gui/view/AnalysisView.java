@@ -39,7 +39,7 @@ public class AnalysisView extends AbstractView {
 		// instanciate controller
 		final AnalysisControl control = new AnalysisControl(this);
 		
-	    SimpleContainer left = new SimpleContainer(getParent());
+	    SimpleContainer left = new SimpleContainer(getParent(), true);
 	    
 //	    GridData gridData = new GridData();
 //	    gridData.horizontalAlignment = GridData.FILL;
@@ -51,8 +51,8 @@ public class AnalysisView extends AbstractView {
 	    left.addHeadline(Settings.i18n().tr("Analysis Type"));
 
 //	    left.addLabelPair(Settings.i18n().tr("Type"), control.getType());
-	    
-	    left.addPart(control.getChart());
+
+	    left.addPart(control.getChartPart());
 	    
 	}
 
