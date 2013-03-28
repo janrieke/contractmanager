@@ -78,33 +78,33 @@ public class AnalysisChartPart implements Part {
 				return list;
 			}
 		});
-		chart.addData(new ChartData() {
-			
-			@Override
-			public String getLabelAttribute() throws RemoteException {
-				return "Label";
-			}
-			
-			@Override
-			public String getLabel() throws RemoteException {
-				return "Monat";
-			}
-			
-			@Override
-			public String getDataAttribute() throws RemoteException {
-				// TODO Auto-generated method stub
-				return "Costs";
-			}
-			
-			@Override
-			public List<?> getData() throws RemoteException {
-				List<ContractAnalysisData> list = new ArrayList<ContractAnalysisData>();
-				list.add(new ContractAnalysisData(1.2f, "Januar"));
-				list.add(new ContractAnalysisData(1.7f, "Februar"));
-				list.add(new ContractAnalysisData(2.2f, "März"));
-				return list;
-			}
-		});
+//		chart.addData(new ChartData() {
+//			
+//			@Override
+//			public String getLabelAttribute() throws RemoteException {
+//				return "Label";
+//			}
+//			
+//			@Override
+//			public String getLabel() throws RemoteException {
+//				return "Monat";
+//			}
+//			
+//			@Override
+//			public String getDataAttribute() throws RemoteException {
+//				// TODO Auto-generated method stub
+//				return "Costs";
+//			}
+//			
+//			@Override
+//			public List<?> getData() throws RemoteException {
+//				List<ContractAnalysisData> list = new ArrayList<ContractAnalysisData>();
+//				list.add(new ContractAnalysisData(1.2f, "Januar"));
+//				list.add(new ContractAnalysisData(1.7f, "Februar"));
+//				list.add(new ContractAnalysisData(2.2f, "März"));
+//				return list;
+//			}
+//		});
 
 		chart.paint(parent);
 	}

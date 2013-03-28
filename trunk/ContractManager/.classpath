@@ -15,7 +15,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/hibiscus"/>
 	<classpathentry kind="lib" path="/jameica/lib/swt/win64/swt.jar" sourcepath="/jameica/lib.src/swt/linux/swt.src.zip"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jameica"/>
-	<classpathentry kind="lib" path="lib/org.swtchart_0.7.0.v20110128.jar"/>
-	<classpathentry kind="lib" path="lib/org.swtchart.ext_0.7.0.v20110128.jar"/>
+	<classpathentry kind="lib" path="lib/org.swtchart_0.8.0.v20120301.jar"/>
+	<classpathentry kind="lib" path="lib/org.swtchart.ext_0.8.0.v20120301.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

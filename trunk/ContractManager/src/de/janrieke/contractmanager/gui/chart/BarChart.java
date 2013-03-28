@@ -166,20 +166,52 @@ public class BarChart extends AbstractChart<ChartData>
       IAxis axis = this.chart.getAxisSet().getXAxis(0);
       axis.setCategorySeries(labelLine.toArray(new String[labelLine.size()]));
       axis.enableCategory(true);
+      axis.setCategorySeries(new String[] { "Januar", "Februar", "März" });
 
-      IBarSeries barSeries = (IBarSeries) this.chart.getSeriesSet().createSeries(SeriesType.BAR,Integer.toString(i));
-      barSeries.setYSeries(toArray(dataLine));
-      
-      //////////////////////////////////////////////////////////////////////////
-      // Layout
+      IBarSeries barSeries1 = (IBarSeries) this.chart.getSeriesSet().createSeries(SeriesType.BAR,Integer.toString(i));
+      barSeries1.setYSeries(toArray(dataLine));
       int[] cValues = ColorGenerator.create(ColorGenerator.PALETTE_OFFICE + i);
-      barSeries.setBarColor(getColor(new RGB(cValues[0],cValues[1],cValues[2])));
-      
-      ISeriesLabel label = barSeries.getLabel();
+      barSeries1.setBarColor(getColor(new RGB(cValues[0],cValues[1],cValues[2])));
+      ISeriesLabel label = barSeries1.getLabel();
       label.setFont(Font.SMALL.getSWTFont());
       label.setFormat(HBCI.DECIMALFORMAT.toPattern()); // BUGZILLA 1123
       label.setForeground(GUI.getDisplay().getSystemColor(SWT.COLOR_WHITE));
       label.setVisible(true);
+
+      IBarSeries barSeries2 = (IBarSeries) this.chart.getSeriesSet().createSeries(SeriesType.BAR,Integer.toString(i)+"a");
+      barSeries2.setYSeries(toArray(dataLine));
+      cValues = ColorGenerator.create(ColorGenerator.PALETTE_OFFICE + i+1);
+      barSeries2.setBarColor(getColor(new RGB(cValues[0],cValues[1],cValues[2])));
+      label = barSeries2.getLabel();
+      label.setFont(Font.SMALL.getSWTFont());
+      label.setFormat(HBCI.DECIMALFORMAT.toPattern()); // BUGZILLA 1123
+      label.setForeground(GUI.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+      label.setVisible(true);
+      
+      IBarSeries barSeries3 = (IBarSeries) this.chart.getSeriesSet().createSeries(SeriesType.BAR,Integer.toString(i)+"b");
+      barSeries3.setYSeries(toArray(dataLine));
+      cValues = ColorGenerator.create(ColorGenerator.PALETTE_OFFICE + i+2);
+      barSeries3.setBarColor(getColor(new RGB(cValues[0],cValues[1],cValues[2])));
+      label = barSeries3.getLabel();
+      label.setFont(Font.SMALL.getSWTFont());
+      label.setFormat(HBCI.DECIMALFORMAT.toPattern()); // BUGZILLA 1123
+      label.setForeground(GUI.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+      label.setVisible(true);
+
+      IBarSeries barSeries4 = (IBarSeries) this.chart.getSeriesSet().createSeries(SeriesType.BAR,Integer.toString(i)+"c");
+      barSeries4.setYSeries(toArray(dataLine));
+      cValues = ColorGenerator.create(ColorGenerator.PALETTE_OFFICE + i+3);
+      barSeries4.setBarColor(getColor(new RGB(cValues[0],cValues[1],cValues[2])));
+      label = barSeries4.getLabel();
+      label.setFont(Font.SMALL.getSWTFont());
+      label.setFormat(HBCI.DECIMALFORMAT.toPattern()); // BUGZILLA 1123
+      label.setForeground(GUI.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+      label.setVisible(true);
+
+      barSeries1.enableStack(true);
+      barSeries2.enableStack(true);
+      barSeries3.enableStack(true);
+      barSeries4.enableStack(true);
       //
       //////////////////////////////////////////////////////////////////////////
     }
