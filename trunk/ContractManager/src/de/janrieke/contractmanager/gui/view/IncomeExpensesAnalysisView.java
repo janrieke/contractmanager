@@ -18,7 +18,7 @@
 package de.janrieke.contractmanager.gui.view;
 
 import de.janrieke.contractmanager.Settings;
-import de.janrieke.contractmanager.gui.control.AnalysisControl;
+import de.janrieke.contractmanager.gui.control.IncomeExpensesAnalysisControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.util.SimpleContainer;
@@ -27,17 +27,17 @@ import de.willuhn.util.ApplicationException;
 /**
  * this is the dialog for the contract details.
  */
-public class AnalysisView extends AbstractView {
+public class IncomeExpensesAnalysisView extends AbstractView {
 
     /**
 	 * @see de.willuhn.jameica.gui.AbstractView#bind()
 	 */
 	public void bind() throws Exception {
 		// draw the title
-		GUI.getView().setTitle(Settings.i18n().tr("Financial Analysis"));
+		GUI.getView().setTitle(Settings.i18n().tr("Income/Expenses Analysis"));
 
 		// instanciate controller
-		final AnalysisControl control = new AnalysisControl(this);
+		final IncomeExpensesAnalysisControl control = new IncomeExpensesAnalysisControl(this);
 		
 	    SimpleContainer left = new SimpleContainer(getParent(), true);
 	    
@@ -48,7 +48,7 @@ public class AnalysisView extends AbstractView {
 //	    gridData.grabExcessVerticalSpace = true;
 //	    left.getComposite().setLayoutData(gridData);
 
-	    left.addHeadline(Settings.i18n().tr("Analysis Type"));
+	    left.addHeadline(Settings.i18n().tr("Chart"));
 
 //	    left.addLabelPair(Settings.i18n().tr("Type"), control.getType());
 

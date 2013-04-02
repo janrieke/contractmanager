@@ -313,7 +313,7 @@ public class ContractControl extends AbstractControl {
 		if (costsPerTerm != null)
 			return costsPerTerm;
 
-		double costs = getContract().getCostsPerTerm();
+		double costs = getContract().getMoneyPerTerm();
 		costsPerTerm = new LabelInput(Settings.DECIMALFORMAT.format(costs));
 		costsPerTerm.setComment(Settings.CURRENCY);
 		return costsPerTerm;
@@ -323,7 +323,7 @@ public class ContractControl extends AbstractControl {
 		if (costsPerMonth != null)
 			return costsPerMonth;
 
-		double costs = getContract().getCostsPerMonth();
+		double costs = getContract().getMoneyPerMonth();
 		costsPerMonth = new LabelInput(Settings.DECIMALFORMAT.format(costs));
 		costsPerMonth.setComment(Settings.CURRENCY);
 		return costsPerMonth;
@@ -605,11 +605,11 @@ public class ContractControl extends AbstractControl {
 				Settings.i18n().tr("Next Cancellation Deadline"),
 				Contract.NEXT_CANCELLATION_DEADLINE, new DateFormatter(
 						Settings.getNewDateFormat()));
-		contractList.addColumn(Settings.i18n().tr("Costs per Term"),
-				Contract.COSTS_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
+		contractList.addColumn(Settings.i18n().tr("Money per Term"),
+				Contract.MONEY_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
 						Settings.DECIMALFORMAT));
-		contractList.addColumn(Settings.i18n().tr("Costs per Month"),
-				Contract.COSTS_PER_MONTH, new CurrencyFormatter(Settings.CURRENCY,
+		contractList.addColumn(Settings.i18n().tr("Money per Month"),
+				Contract.MONEY_PER_MONTH, new CurrencyFormatter(Settings.CURRENCY,
 						Settings.DECIMALFORMAT));
 
 		// 7) we are adding a context menu
@@ -720,11 +720,11 @@ public class ContractControl extends AbstractControl {
 				Settings.i18n().tr("Next Cancellation Deadline"),
 				Contract.NEXT_CANCELLATION_DEADLINE, new DateFormatter(
 						Settings.getNewDateFormat()));
-		contractListWarnings.addColumn(Settings.i18n().tr("Costs per Term"),
-				Contract.COSTS_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
+		contractListWarnings.addColumn(Settings.i18n().tr("Money per Term"),
+				Contract.MONEY_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
 						Settings.DECIMALFORMAT));
-		contractListWarnings.addColumn(Settings.i18n().tr("Costs per Month"),
-				Contract.COSTS_PER_MONTH, new CurrencyFormatter(Settings.CURRENCY,
+		contractListWarnings.addColumn(Settings.i18n().tr("Money per Month"),
+				Contract.MONEY_PER_MONTH, new CurrencyFormatter(Settings.CURRENCY,
 						Settings.DECIMALFORMAT));
 
 		// 7) we are adding a context menu
@@ -954,10 +954,10 @@ public class ContractControl extends AbstractControl {
 //	}
 
 	private void updateDerivedAttributes() throws RemoteException {
-		double costs = getContract().getCostsPerTerm();
+		double costs = getContract().getMoneyPerTerm();
 		costsPerTerm.setValue(Settings.DECIMALFORMAT.format(costs));
 
-		costs = getContract().getCostsPerMonth();
+		costs = getContract().getMoneyPerMonth();
 		costsPerMonth.setValue(Settings.DECIMALFORMAT.format(costs));
 
 		Date ne = getContract().getNextCancellationDeadline();

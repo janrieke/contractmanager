@@ -15,43 +15,23 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.janrieke.contractmanager.gui.action;
 
-/*
- * Partially copied from Hibiscus/Syntax, (c) by willuhn.webdesign
- */
-package de.janrieke.contractmanager.gui.control;
-
-import de.janrieke.contractmanager.gui.parts.AnalysisChartPart;
-import de.willuhn.jameica.gui.AbstractControl;
-import de.willuhn.jameica.gui.AbstractView;
-import de.willuhn.jameica.gui.Part;
-import de.willuhn.jameica.gui.input.Input;
+import de.willuhn.jameica.gui.Action;
+import de.willuhn.jameica.gui.GUI;
+import de.willuhn.util.ApplicationException;
 
 /**
- * Controller fuer den Dialog Lizenzinformationen.
+ * Action to open the project list.
  */
-public class AnalysisControl extends AbstractControl {
+public class ShowIncomeExpensesAnalysisView implements Action {
 
 	/**
-	 * ct.
-	 * 
-	 * @param view
+	 * @see de.willuhn.jameica.gui.Action#handleAction(java.lang.Object)
 	 */
-	public AnalysisControl(AbstractView view) {
-		super(view);
-	}
-
-	public Input getType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private AnalysisChartPart chart = null;
-	
-	public Part getChartPart() {
-		if (chart == null)
-			chart = new AnalysisChartPart();
-		return chart;
+	public void handleAction(Object context) throws ApplicationException {
+		GUI.startView(de.janrieke.contractmanager.gui.view.IncomeExpensesAnalysisView.class
+				.getName(), null);
 	}
 
 }
