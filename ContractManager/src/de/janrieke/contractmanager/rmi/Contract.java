@@ -165,11 +165,11 @@ public interface Contract extends DBObject {
 	
 	public Date getNextCancellationDeadline(Date after) throws RemoteException;
 	
-	public static final String COSTS_PER_TERM = "costs_per_term";
-	public double getCostsPerTerm() throws RemoteException;
+	public static final String MONEY_PER_TERM = "costs_per_term";
+	public double getMoneyPerTerm() throws RemoteException;
 
-	public static final String COSTS_PER_MONTH = "costs_per_month";
-	public double getCostsPerMonth() throws RemoteException;
+	public static final String MONEY_PER_MONTH = "costs_per_month";
+	public double getMoneyPerMonth() throws RemoteException;
 
 	public String getHibiscusCategoryID() throws RemoteException;
 	public void setHibiscusCategoryID(String category) throws RemoteException;

@@ -252,8 +252,8 @@ public class AddressControl extends AbstractControl {
 					Settings.i18n().tr("Next cancellation deadline"),
 					Contract.NEXT_CANCELLATION_DEADLINE, new DateFormatter(
 							Settings.getNewDateFormat()));
-			contractList.addColumn(Settings.i18n().tr("Costs per Term"),
-					Contract.COSTS_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
+			contractList.addColumn(Settings.i18n().tr("Money per Term"),
+					Contract.MONEY_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
 							Settings.DECIMALFORMAT));
 		}
 		// TODO Auto-generated method stub

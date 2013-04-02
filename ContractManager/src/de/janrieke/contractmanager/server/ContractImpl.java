@@ -212,12 +212,12 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			return getNextCancellationDeadline();
 		else if (NEXT_TERM_BEGIN.equals(arg0))
 			return getNextTermBegin();
-		else if (COSTS_PER_TERM.equals(arg0))
-			return getCostsPerTerm();
+		else if (MONEY_PER_TERM.equals(arg0))
+			return getMoneyPerTerm();
 		else if (NEXT_TERM_END.equals(arg0))
 			return getNextTermEnd();
-		else if (COSTS_PER_MONTH.equals(arg0))
-			return getCostsPerMonth();
+		else if (MONEY_PER_MONTH.equals(arg0))
+			return getMoneyPerMonth();
 		else
 			return super.getAttribute(arg0);
 	}
@@ -705,7 +705,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	@Override
-	public double getCostsPerTerm() throws RemoteException {
+	public double getMoneyPerTerm() throws RemoteException {
 		// FIXME: Calculate costs based on a real calendar
 		int termLength = getNextRuntimeDays();
 		if (termLength == 0) {
@@ -738,7 +738,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 
 	@Override
-	public double getCostsPerMonth() throws RemoteException {
+	public double getMoneyPerMonth() throws RemoteException {
 		// FIXME: Calculate costs based on a real calendar
 		double costsPerMonth = 0; 
 		DBIterator costsIterator = getCosts();
