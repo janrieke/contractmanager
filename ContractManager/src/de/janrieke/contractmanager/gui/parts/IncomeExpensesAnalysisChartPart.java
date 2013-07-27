@@ -58,67 +58,43 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 	@Override
 	public void paint(Composite parent) throws RemoteException {
 		chart = new BarChart();
-		chart.setTitle("Income/Expenses Comparison");
-		chart.addData(new ChartData() {
-			
-			@Override
-			public String getLabelAttribute() throws RemoteException {
-				return Settings.i18n().tr("Label");
-			}
-			
-			@Override
-			public String getLabel() throws RemoteException {
-				return Settings.i18n().tr("Income");
-			}
-			
-			@Override
-			public String getDataAttribute() throws RemoteException {
-				return Settings.i18n().tr("Amount");
-			}
-			
-			@Override
-			public List<?> getData() throws RemoteException {
-				List<ContractIncomeExpensesAnalysisData> list = new ArrayList<ContractIncomeExpensesAnalysisData>();
-				GenericIterator contracts = ContractControl.getContracts();
-				while (contracts.hasNext()) {
-					Contract c = (Contract) contracts.next();
-					float amount = (float)c.getMoneyPerMonth();
-					if (amount > 0)
-						list.add(new ContractIncomeExpensesAnalysisData(amount, c.getName()));
+		chart.setTitle(Settings.i18n().tr("Income/Expenses Comparison"));
+		GenericIterator contracts = ContractControl.getContracts();
+		while (contracts.hasNext()) {
+			final Contract c = (Contract) contracts.next();
+			chart.addData(new ChartData() {
+
+				@Override
+				public String getLabelAttribute() throws RemoteException {
+					return "Label";
 				}
-				return list;
-			}
-		});
-		chart.addData(new ChartData() {
-			
-			@Override
-			public String getLabelAttribute() throws RemoteException {
-				return Settings.i18n().tr("Label");
-			}
-			
-			@Override
-			public String getLabel() throws RemoteException {
-				return Settings.i18n().tr("Expense");
-			}
-			
-			@Override
-			public String getDataAttribute() throws RemoteException {
-				return Settings.i18n().tr("Amount");
-			}
-			
-			@Override
-			public List<?> getData() throws RemoteException {
-				List<ContractIncomeExpensesAnalysisData> list = new ArrayList<ContractIncomeExpensesAnalysisData>();
-				GenericIterator contracts = ContractControl.getContracts();
-				while (contracts.hasNext()) {
-					Contract c = (Contract) contracts.next();
-					float amount = (float)c.getMoneyPerMonth();
-					if (amount < 0)
-						list.add(new ContractIncomeExpensesAnalysisData(-amount, c.getName()));
+
+				@Override
+				public String getLabel() throws RemoteException {
+					return c.getName();
 				}
-				return list;
-			}
-		});
+
+				@Override
+				public String getDataAttribute() throws RemoteException {
+					return "Amount";
+				}
+
+				@Override
+				public List<?> getData() throws RemoteException {
+					List<ContractIncomeExpensesAnalysisData> list = new ArrayList<ContractIncomeExpensesAnalysisData>();
+					float amount = (float)c.getMoneyPerMonth();
+					if (amount > 0) {
+						list.add(new ContractIncomeExpensesAnalysisData(amount, Settings.i18n().tr("Income")));
+						list.add(new ContractIncomeExpensesAnalysisData(0, Settings.i18n().tr("Expenses")));
+					}
+					if (amount < 0) {
+						list.add(new ContractIncomeExpensesAnalysisData(0, Settings.i18n().tr("Income")));
+						list.add(new ContractIncomeExpensesAnalysisData(-amount, Settings.i18n().tr("Expenses")));
+					}
+					return list;
+				}
+			});
+		}
 
 		chart.paint(parent);
 	}

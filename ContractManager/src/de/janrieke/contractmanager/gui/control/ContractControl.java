@@ -126,6 +126,7 @@ public class ContractControl extends AbstractControl {
 	private LabelInput costsPerMonth;
 
 	private List<Costs> newCosts = new ArrayList<Costs>();
+	private List<Costs> deletedCosts = new ArrayList<Costs>();
 	
 	//holds the current Hibiscus category of the selection box (used for 
 	//  storing to DB on store button click)
@@ -625,6 +626,8 @@ public class ContractControl extends AbstractControl {
 					Calendar today = Calendar.getInstance();
 					Calendar calendar = Calendar.getInstance();
 					try {
+						if (contract.isDoNotRemind())
+							return;
 						Date deadline = contract.getNextCancellationDeadline();
 						if (deadline == null)
 							return;
@@ -912,7 +915,10 @@ public class ContractControl extends AbstractControl {
 				costsIterator.begin();
 				while (costsIterator.hasNext()) {
 					Costs cost = (Costs) costsIterator.next();
-					cost.store();
+					if (!deletedCosts.contains(cost))
+						cost.store();
+					else
+						cost.delete();
 				}
 				for (Costs cost : newCosts) {
 					// Again: Set the contract's new ID.
@@ -976,6 +982,7 @@ public class ContractControl extends AbstractControl {
 	public void removeCostEntry(Costs c) {
 		costsList.removeItem(c);
 		newCosts.remove(c);
+		deletedCosts.add(c);
 	}
 
 	public void addTemporaryCostEntry(Costs c) {

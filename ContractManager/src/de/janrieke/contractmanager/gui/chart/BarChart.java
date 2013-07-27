@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -35,10 +36,11 @@ import org.swtchart.IAxisTick;
 import org.swtchart.IBarSeries;
 import org.swtchart.IGrid;
 import org.swtchart.ISeries.SeriesType;
-import org.swtchart.ISeriesLabel;
 import org.swtchart.ITitle;
 import org.swtchart.LineStyle;
 import org.swtchart.ext.InteractiveChart;
+import org.swtchart.internal.series.BarSeries;
+import org.swtchart.internal.series.SeriesLabel;
 
 import de.janrieke.contractmanager.Settings;
 import de.willuhn.datasource.BeanUtil;
@@ -155,8 +157,8 @@ public class BarChart extends AbstractChart<ChartData>
             continue;
 
           Number n = (Number) value;
-          if (Math.abs(n.doubleValue()) < 0.01d)
-            continue; // ueberspringen, nix drin
+          //if (Math.abs(n.doubleValue()) < 0.01d)
+          //  continue; // ueberspringen, nix drin
           dataLine.add(n);
           labelLine.add(label.toString());
         }
@@ -167,19 +169,30 @@ public class BarChart extends AbstractChart<ChartData>
       IAxis axis = this.chart.getAxisSet().getXAxis(0);
       axis.setCategorySeries(labelLine.toArray(new String[labelLine.size()]));
       axis.enableCategory(true);
-      axis.setCategorySeries(new String[] { Settings.i18n().tr("Income"), Settings.i18n().tr("Expense") });
+      //axis.setCategorySeries(new String[] { Settings.i18n().tr("Income"), Settings.i18n().tr("Expense") });
 
-      IBarSeries barSeries1 = (IBarSeries) this.chart.getSeriesSet().createSeries(SeriesType.BAR,Integer.toString(i));
-      barSeries1.setYSeries(toArray(dataLine));
+      IBarSeries barSeries = (IBarSeries) this.chart.getSeriesSet().createSeries(SeriesType.BAR,cd.getLabel());
+      barSeries.setYSeries(toArray(dataLine));
       int[] cValues = ColorGenerator.create(ColorGenerator.PALETTE_RICH + i);
-      barSeries1.setBarColor(getColor(new RGB(cValues[0],cValues[1],cValues[2])));
-      ISeriesLabel label = barSeries1.getLabel();
+      barSeries.setBarColor(getColor(new RGB(cValues[0],cValues[1],cValues[2])));
+      
+      SeriesLabel label = new SeriesLabel() {
+
+		@Override
+		protected void draw(GC gc, int h, int v, double ySeriesValue,
+				int seriesIndex, int alignment) {
+			if (ySeriesValue > 0.0)
+				super.draw(gc, h, v, ySeriesValue, seriesIndex, alignment);
+		}
+    	  
+      };
       label.setFont(Font.SMALL.getSWTFont());
-      label.setFormat(Settings.DECIMALFORMAT.toPattern());
+      label.setFormat("'"+cd.getLabel()+": '"+Settings.DECIMALFORMAT.toPattern()+" ¤");
       label.setForeground(GUI.getDisplay().getSystemColor(SWT.COLOR_WHITE));
       label.setVisible(true);
-      
-      //barSeries1.enableStack(true);
+      ((BarSeries)barSeries).setLabel(label);
+
+      barSeries.enableStack(true);
       //
       //////////////////////////////////////////////////////////////////////////
     }
