@@ -34,7 +34,7 @@ public class IncomeExpensesAnalysisView extends AbstractView {
 	 */
 	public void bind() throws Exception {
 		// draw the title
-		GUI.getView().setTitle(Settings.i18n().tr("Income/Expenses Analysis"));
+		GUI.getView().setTitle(Settings.i18n().tr("Income/Expenses Comparison"));
 
 		// instanciate controller
 		final IncomeExpensesAnalysisControl control = new IncomeExpensesAnalysisControl(this);

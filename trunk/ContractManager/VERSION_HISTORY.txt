@@ -14,12 +14,12 @@ VERSION HISTORY:
 	- Include payments from Hibiscus
 
 
+0.3.1:
+	- Moving iCal import/export to Jameica's calander + jameica.ical 
+
 
 
 ROADMAP:
-
-0.3.1:
-	- Moving iCal import/export to Jameica's calander + jameica.ical 
 
 0.4:
 	- Financial analysis
