@@ -143,8 +143,8 @@ public class BarChart extends AbstractChart<ChartData>
       if (list == null || list.size() == 0 || dataAttribute == null || labelAttribute == null)
       {
         Logger.debug("skipping data line, contains no data");
-        dataLine.add(new Double(0));
-        labelLine.add("");
+        //dataLine.add(new Double(0));
+        //labelLine.add("");
       }
       else
       {
