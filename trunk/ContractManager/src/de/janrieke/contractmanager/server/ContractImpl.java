@@ -489,16 +489,16 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 */
 	private Date calculateTermEnd(boolean minusCancellationPeriod, Date after)
 			throws RemoteException {
-		if (getEndDate() != null)
-			return null; // if the end is already set, there is no need for
-							// further cancellations
-		// FIXME: If EndDate is in the future, it may be possible to cancel before!
-
 		Date startDate = getStartDate();
 		if (startDate == null)
 			return null;
 		Calendar today = Calendar.getInstance();
 		today.setTime(after);
+
+		if (getEndDate() != null && getEndDate().before(today.getTime()))
+			return null; // if the end has already passed, there is no need for
+							// further cancellations
+
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(startDate);
 
@@ -530,9 +530,6 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 					break;
 				}
 			}
-			//minus one day, as the last day of the running term is the reference,
-			// not the first of the new
-			calendar.add(Calendar.DAY_OF_YEAR, -1);
 		}
 
 		IntervalType firstMinRuntimeType = getFirstMinRuntimeType();
@@ -606,6 +603,12 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			}
 		}
 
+		if (minusCancellationPeriod) {
+			//minus one day, as the last day of the running term is the reference,
+			// not the first of the new
+			calendar.add(Calendar.DAY_OF_YEAR, -1);
+		}
+
 		return calendar.getTime();
 	}
 
@@ -641,6 +644,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		default:
 			break;
 		}
+		calendar.add(Calendar.DAY_OF_YEAR, -1);
 		return calendar.getTime();
 	}
 
