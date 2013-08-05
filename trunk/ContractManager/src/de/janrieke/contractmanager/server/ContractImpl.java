@@ -130,7 +130,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			if (getFirstMinRuntimeCount() < 0)
 				throw new ApplicationException(Settings.i18n().tr(
 						"First minimal runtime must not be negative."));
-			if (getNextMinRuntimeCount() < 0)
+			if (getFollowingMinRuntimeCount() < 0)
 				throw new ApplicationException(Settings.i18n().tr(
 						"Next minimal runtime must not be negative."));
 
@@ -212,10 +212,14 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			return getNextCancellationDeadline();
 		else if (NEXT_TERM_BEGIN.equals(arg0))
 			return getNextTermBegin();
-		else if (MONEY_PER_TERM.equals(arg0))
-			return getMoneyPerTerm();
 		else if (NEXT_TERM_END.equals(arg0))
 			return getNextTermEnd();
+		else if (NEXT_CANCEL_TERM_BEGIN.equals(arg0))
+			return getNextCancelableTermBegin();
+		else if (NEXT_CANCEL_TERM_END.equals(arg0))
+			return getNextCancelableTermEnd();
+		else if (MONEY_PER_TERM.equals(arg0))
+			return getMoneyPerTerm();
 		else if (MONEY_PER_MONTH.equals(arg0))
 			return getMoneyPerMonth();
 		else
@@ -409,25 +413,25 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	@Override
-	public Integer getNextMinRuntimeCount() throws RemoteException {
+	public Integer getFollowingMinRuntimeCount() throws RemoteException {
 		Integer i = (Integer) getAttribute("next_min_runtime_count");
 		return i == null ? 0 : i;
 	}
 
 	@Override
-	public void setNextMinRuntimeCount(Integer count) throws RemoteException {
+	public void setFollowingMinRuntimeCount(Integer count) throws RemoteException {
 		setAttribute("next_min_runtime_count", count);
 	}
 
 	@Override
-	public IntervalType getNextMinRuntimeType() throws RemoteException {
+	public IntervalType getFollowingMinRuntimeType() throws RemoteException {
 		Object type = getAttribute("next_min_runtime_type");
 		return type == null ? IntervalType.DAYS
 				: IntervalType.values()[(Integer) type];
 	}
 
 	@Override
-	public void setNextMinRuntimeType(IntervalType type) throws RemoteException {
+	public void setFollowingMinRuntimeType(IntervalType type) throws RemoteException {
 		setAttribute("next_min_runtime_type", type.ordinal());
 	}
 
@@ -481,13 +485,11 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	/**
 	 * Calculates the next contractual term's end after the given date.
 	 * 
-	 * @param minusCancellationPeriod
-	 *            If true, the cancellation date is returned.
 	 * @param after
 	 * @return The end of the term.
 	 * @throws RemoteException
 	 */
-	private Date calculateTermEnd(boolean minusCancellationPeriod, Date after)
+	private Date calculateTermEnd(Date after)
 			throws RemoteException {
 		Date startDate = getStartDate();
 		if (startDate == null)
@@ -495,62 +497,28 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		Calendar today = Calendar.getInstance();
 		today.setTime(after);
 
-		if (getEndDate() != null && getEndDate().before(today.getTime()))
-			return null; // if the end has already passed, there is no need for
-							// further cancellations
-
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(startDate);
 
-		if (minusCancellationPeriod) {
-			IntervalType cancellationPeriodType = getCancellationPeriodType();
-			Integer cancellationPeriodCount = getCancellationPeriodCount();
-
-			// if the period is invalid, assume there is none
-			if (cancellationPeriodType != null
-					&& cancellationPeriodCount != null
-					&& cancellationPeriodCount > 0) {
-				switch (cancellationPeriodType) {
-				case DAYS:
-					calendar.add(Calendar.DAY_OF_YEAR, -cancellationPeriodCount);
-					break;
-				case WEEKS:
-					calendar.add(Calendar.WEEK_OF_YEAR,
-							-cancellationPeriodCount);
-					break;
-				case MONTHS:
-					calendar.add(Calendar.MONTH, -cancellationPeriodCount);
-					break;
-				case YEARS:
-					calendar.add(Calendar.YEAR, -cancellationPeriodCount);
-					break;
-				case ONCE:
-					break;
-				default:
-					break;
-				}
-			}
-		}
-
 		IntervalType firstMinRuntimeType = getFirstMinRuntimeType();
 		Integer firstMinRuntimeCount = getFirstMinRuntimeCount();
-		IntervalType nextMinRuntimeType = getNextMinRuntimeType();
-		Integer nextMinRuntimeCount = getNextMinRuntimeCount();
+		IntervalType followingMinRuntimeType = getFollowingMinRuntimeType();
+		Integer followingMinRuntimeCount = getFollowingMinRuntimeCount();
 
 		// if one of the runtime definition is invalid, use the other one
 		if (firstMinRuntimeType == null || firstMinRuntimeCount == null
 				|| firstMinRuntimeCount < 0) {
-			firstMinRuntimeCount = nextMinRuntimeCount;
-			firstMinRuntimeType = nextMinRuntimeType;
+			firstMinRuntimeCount = followingMinRuntimeCount;
+			firstMinRuntimeType = followingMinRuntimeType;
 		}
-		if (nextMinRuntimeType == null || nextMinRuntimeCount == null
-				|| nextMinRuntimeCount < 0) {
-			nextMinRuntimeCount = firstMinRuntimeCount;
-			nextMinRuntimeType = firstMinRuntimeType;
+		if (followingMinRuntimeType == null || followingMinRuntimeCount == null
+				|| followingMinRuntimeCount < 0) {
+			followingMinRuntimeCount = firstMinRuntimeCount;
+			followingMinRuntimeType = firstMinRuntimeType;
 		}
 		// do nothing if both are invalid
-		if (nextMinRuntimeType == null || nextMinRuntimeCount == null
-				|| nextMinRuntimeCount < 0)
+		if (followingMinRuntimeType == null || followingMinRuntimeCount == null
+				|| followingMinRuntimeCount < 0)
 			return null;
 
 		if (firstMinRuntimeCount == 0)
@@ -560,54 +528,50 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 		while (!calendar.after(today)) {
 			if (first) {
-				switch (firstMinRuntimeType) {
-				case DAYS:
-					calendar.add(Calendar.DAY_OF_YEAR, firstMinRuntimeCount);
-					break;
-				case WEEKS:
-					calendar.add(Calendar.WEEK_OF_YEAR, firstMinRuntimeCount);
-					break;
-				case MONTHS:
-					calendar.add(Calendar.MONTH, firstMinRuntimeCount);
-					break;
-				case YEARS:
-					calendar.add(Calendar.YEAR, firstMinRuntimeCount);
-					break;
-				case ONCE:
-					break;
-				default:
-					break;
-				}
+				addToCalendar(calendar, firstMinRuntimeType, firstMinRuntimeCount);
 				first = false;
 			} else {
-				if (nextMinRuntimeCount == 0)
+				if (followingMinRuntimeCount == 0)
 					return null; // "0" encodes a daily runtime extension
-				switch (nextMinRuntimeType) {
-				case DAYS:
-					calendar.add(Calendar.DAY_OF_YEAR, nextMinRuntimeCount);
-					break;
-				case WEEKS:
-					calendar.add(Calendar.WEEK_OF_YEAR, nextMinRuntimeCount);
-					break;
-				case MONTHS:
-					calendar.add(Calendar.MONTH, nextMinRuntimeCount);
-					break;
-				case YEARS:
-					calendar.add(Calendar.YEAR, nextMinRuntimeCount);
-					break;
-				case ONCE:
-					break;
-				default:
-					break;
-				}
+				addToCalendar(calendar, followingMinRuntimeType, followingMinRuntimeCount);
 			}
 		}
 
-		if (minusCancellationPeriod) {
-			//minus one day, as the last day of the running term is the reference,
-			// not the first of the new
-			calendar.add(Calendar.DAY_OF_YEAR, -1);
-		}
+		if (getEndDate() != null && getEndDate().before(calendar.getTime()))
+			return null; // if the end has already passed, there is no need for
+							// further cancellations
+
+		return calendar.getTime();
+	}
+
+	/**
+	 * Calculates the next cancellation deadline after the given date.
+	 * 
+	 * @param after
+	 * @return The cancellation deadline.
+	 * @throws RemoteException
+	 */
+	private Date calculateNextCancellationDeadline(Date after)
+			throws RemoteException {
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(after);
+
+		IntervalType cancellationPeriodType = getCancellationPeriodType();
+		Integer cancellationPeriodCount = getCancellationPeriodCount();
+
+		addToCalendar(calendar, cancellationPeriodType, cancellationPeriodCount);
+
+		Date termEnd = calculateTermEnd(calendar.getTime());
+		if (termEnd == null)
+			return null;
+		
+		calendar.setTime(termEnd);
+		
+		addToCalendar(calendar, cancellationPeriodType, -cancellationPeriodCount);
+
+		//cancellation is due one day BEFORE the new term begins
+		calendar.add(Calendar.DAY_OF_YEAR, -1);
 
 		return calendar.getTime();
 	}
@@ -615,8 +579,8 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public Date getNextTermBegin() throws RemoteException {
 		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.DAY_OF_YEAR, -1);
-		return calculateTermEnd(false, calendar.getTime());
+		//calendar.add(Calendar.DAY_OF_YEAR, -1);
+		return calculateTermEnd(calendar.getTime());
 	}
 
 	@Override
@@ -626,54 +590,57 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			return null;
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(begin);
-		switch (getNextMinRuntimeType()) {
-		case DAYS:
-			calendar.add(Calendar.DAY_OF_YEAR, getNextMinRuntimeCount());
-			break;
-		case WEEKS:
-			calendar.add(Calendar.WEEK_OF_YEAR, getNextMinRuntimeCount());
-			break;
-		case MONTHS:
-			calendar.add(Calendar.MONTH, getNextMinRuntimeCount());
-			break;
-		case YEARS:
-			calendar.add(Calendar.YEAR, getNextMinRuntimeCount());
-			break;
-		case ONCE:
-			break;
-		default:
-			break;
-		}
+		addToCalendar(calendar, getFollowingMinRuntimeType(), getFollowingMinRuntimeCount());
 		calendar.add(Calendar.DAY_OF_YEAR, -1);
 		return calendar.getTime();
 	}
 
 	@Override
+	public Date getNextCancelableTermBegin() throws RemoteException {
+		Calendar calendar = Calendar.getInstance();
+		addToCalendar(calendar, getCancellationPeriodType(), getCancellationPeriodCount());
+		
+		//calendar.add(Calendar.DAY_OF_YEAR, -1);
+		return calculateTermEnd(calendar.getTime());
+	}
+
+	@Override
+	public Date getNextCancelableTermEnd() throws RemoteException {
+		Date begin = getNextCancelableTermBegin();
+		if (begin == null)
+			return null;
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(begin);
+		addToCalendar(calendar, getFollowingMinRuntimeType(), getFollowingMinRuntimeCount());
+		calendar.add(Calendar.DAY_OF_YEAR, -1);
+		return calendar.getTime();
+	}
+	
+	@Override
 	public Date getNextCancellationDeadline() throws RemoteException {
 		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.DAY_OF_YEAR, -1);
-		return calculateTermEnd(true, calendar.getTime());
+		return calculateNextCancellationDeadline(calendar.getTime());
 	}
 
 	@Override
 	public Date getNextCancellationDeadline(Date after) throws RemoteException {
-		return calculateTermEnd(true, after);
+		return calculateNextCancellationDeadline(after);
 	}
 
 	private int getNextRuntimeDays() throws RemoteException {
 		// FIXME: Calculate costs based on a real calendar
-		if (getEndDate() != null)
-			return 0; // if the end is already set, there is no need for
+		Calendar today = Calendar.getInstance();
+		if (getEndDate() != null && getEndDate().before(today.getTime()))
+			return 0; 	// if the end has already passed, there is no need for
 						// further cancellations
-		// FIXME: If EndDate is in the future, it may be possible to cancel before!
 
 		Date startDate = getStartDate();
 		if (startDate == null)
 			return 0;
 		IntervalType firstMinRuntimeType = getFirstMinRuntimeType();
 		Integer firstMinRuntimeCount = getFirstMinRuntimeCount();
-		IntervalType nextMinRuntimeType = getNextMinRuntimeType();
-		Integer nextMinRuntimeCount = getNextMinRuntimeCount();
+		IntervalType nextMinRuntimeType = getFollowingMinRuntimeType();
+		Integer nextMinRuntimeCount = getFollowingMinRuntimeCount();
 
 		// if one of the runtime definitions is invalid, use the other one
 		if (firstMinRuntimeType == null || firstMinRuntimeCount == null
@@ -767,5 +734,31 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			}
 		}
 		return costsPerMonth;
+	}
+
+	public static final boolean addToCalendar(Calendar calendar, IntervalType interval, int count) {
+		// if the period is invalid, assume there is none
+		if (interval != null) {
+			switch (interval) {
+			case DAYS:
+				calendar.add(Calendar.DAY_OF_YEAR, count);
+				return true;
+			case WEEKS:
+				calendar.add(Calendar.WEEK_OF_YEAR,
+						count);
+				return true;
+			case MONTHS:
+				calendar.add(Calendar.MONTH, count);
+				return true;
+			case YEARS:
+				calendar.add(Calendar.YEAR, count);
+				return true;
+			case ONCE:
+				return false;
+			default:
+				return false;
+			}
+		}
+		return false;
 	}
 }

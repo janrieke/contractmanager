@@ -103,7 +103,7 @@ public class GenerateCancelation implements Action {
 			values.put("TODAY", Settings.dateformat(new Date()));
 			values.put("CONTRACT_NAME", p.getName());
 
-			Date nextExtension = p.getNextTermBegin();
+			Date nextExtension = p.getNextCancelableTermBegin();
 			if (nextExtension != null)
 				values.put("CANCELLATION_DATE",
 						Settings.dateformat(nextExtension));

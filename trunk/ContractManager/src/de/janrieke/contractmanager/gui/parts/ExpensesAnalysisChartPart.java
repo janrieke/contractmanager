@@ -24,25 +24,25 @@ import java.util.List;
 import org.eclipse.swt.widgets.Composite;
 
 import de.janrieke.contractmanager.Settings;
-import de.janrieke.contractmanager.gui.chart.StackedBarChart;
+import de.janrieke.contractmanager.gui.chart.BarChart;
 import de.janrieke.contractmanager.gui.chart.ChartData;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.jameica.gui.Part;
 
-public class IncomeExpensesAnalysisChartPart implements Part {
+public class ExpensesAnalysisChartPart implements Part {
 
-	public IncomeExpensesAnalysisChartPart() {
+	public ExpensesAnalysisChartPart() {
 	}
 
-    private StackedBarChart chart = null;
+    private BarChart chart = null;
 
-    public class ContractIncomeExpensesAnalysisData {
+    public class ContractExpensesAnalysisData {
     	
 		private float amount;
 		private String label;
-		public ContractIncomeExpensesAnalysisData(float amount, String label) {
+		public ContractExpensesAnalysisData(float amount, String label) {
 			super();
 			this.amount = amount;
 			this.label = label;
@@ -57,43 +57,37 @@ public class IncomeExpensesAnalysisChartPart implements Part {
     
 	@Override
 	public void paint(Composite parent) throws RemoteException {
-		chart = new StackedBarChart();
-		chart.setTitle(Settings.i18n().tr("Income/Expenses Comparison"));
+		chart = new BarChart();
+		chart.setTitle(Settings.i18n().tr("Expenses Overview"));
 		GenericIterator contracts = ContractControl.getContracts();
 		while (contracts.hasNext()) {
 			final Contract c = (Contract) contracts.next();
-			chart.addData(new ChartData() {
+			if ((float)c.getMoneyPerMonth() < 0 ) {
+				chart.addData(new ChartData() {
 
-				@Override
-				public String getLabelAttribute() throws RemoteException {
-					return "Label";
-				}
-
-				@Override
-				public String getLabel() throws RemoteException {
-					return c.getName();
-				}
-
-				@Override
-				public String getDataAttribute() throws RemoteException {
-					return "Amount";
-				}
-
-				@Override
-				public List<?> getData() throws RemoteException {
-					List<ContractIncomeExpensesAnalysisData> list = new ArrayList<ContractIncomeExpensesAnalysisData>();
-					float amount = (float)c.getMoneyPerMonth();
-					if (amount > 0) {
-						list.add(new ContractIncomeExpensesAnalysisData(amount, Settings.i18n().tr("Income")));
-						list.add(new ContractIncomeExpensesAnalysisData(0, Settings.i18n().tr("Expenses")));
+					@Override
+					public String getLabelAttribute() throws RemoteException {
+						return "Label";
 					}
-					if (amount < 0) {
-						list.add(new ContractIncomeExpensesAnalysisData(0, Settings.i18n().tr("Income")));
-						list.add(new ContractIncomeExpensesAnalysisData(-amount, Settings.i18n().tr("Expenses")));
+
+					@Override
+					public String getLabel() throws RemoteException {
+						return c.getName();
 					}
-					return list;
-				}
-			});
+
+					@Override
+					public String getDataAttribute() throws RemoteException {
+						return "Amount";
+					}
+
+					@Override
+					public List<?> getData() throws RemoteException {
+						List<ContractExpensesAnalysisData> list = new ArrayList<ContractExpensesAnalysisData>();
+						list.add(new ContractExpensesAnalysisData(-(float)c.getMoneyPerMonth(), c.getName()));
+						return list;
+					}
+				});
+			}
 		}
 
 		chart.paint(parent);

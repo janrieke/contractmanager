@@ -288,8 +288,8 @@ public class ContractControl extends AbstractControl {
 		if (nextExtension != null)
 			return nextExtension;
 
-		Date ntb = getContract().getNextTermBegin();
-		Date nte = getContract().getNextTermEnd();
+		Date ntb = getContract().getNextCancelableTermBegin();
+		Date nte = getContract().getNextCancelableTermEnd();
 		if (ntb != null && nte != null) {
 			nextExtension = new MultiInput(new LabelInput(
 					Settings.dateformat(ntb) + " "
@@ -405,7 +405,7 @@ public class ContractControl extends AbstractControl {
 	public IntegerInput getNextMinRuntimeCount() throws RemoteException {
 		if (nextMinRuntimeCount == null) {
 			nextMinRuntimeCount = new IntegerInput(getContract()
-					.getNextMinRuntimeCount());
+					.getFollowingMinRuntimeCount());
 		}
 		return nextMinRuntimeCount;
 	}
@@ -418,7 +418,7 @@ public class ContractControl extends AbstractControl {
 			list.add(Contract.IntervalType.MONTHS);
 			list.add(Contract.IntervalType.YEARS);
 			nextMinRuntimeType = new SelectInput(list, getContract()
-					.getNextMinRuntimeType());
+					.getFollowingMinRuntimeType());
 		}
 		return nextMinRuntimeType;
 	}
@@ -874,9 +874,9 @@ public class ContractControl extends AbstractControl {
 					.getValue());
 			c.setFirstMinRuntimeType((IntervalType) getFirstMinRuntimeType()
 					.getValue());
-			c.setNextMinRuntimeCount((Integer) getNextMinRuntimeCount()
+			c.setFollowingMinRuntimeCount((Integer) getNextMinRuntimeCount()
 					.getValue());
-			c.setNextMinRuntimeType((IntervalType) getNextMinRuntimeType()
+			c.setFollowingMinRuntimeType((IntervalType) getNextMinRuntimeType()
 					.getValue());
 
 			c.setDoNotRemind((Boolean) getDoNotRemind().getValue());
@@ -969,8 +969,8 @@ public class ContractControl extends AbstractControl {
 		Date ne = getContract().getNextCancellationDeadline();
 		nextCancellationDeadline.setValue(ne == null ? "" : Settings.dateformat(ne));
 
-		Date ntb = getContract().getNextTermBegin();
-		Date nte = getContract().getNextTermEnd();
+		Date ntb = getContract().getNextCancelableTermBegin();
+		Date nte = getContract().getNextCancelableTermEnd();
 		if (ntb != null && nte != null) {
 			nextExtension.setValue(Settings.dateformat(ntb) + " "
 					+ Settings.i18n().tr("to") + " "
