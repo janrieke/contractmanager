@@ -35,6 +35,7 @@
       <item name="Settings" icon-close="document-properties.png" icon-open="document-properties.png" action="de.janrieke.contractmanager.gui.action.ShowSettingsView" />
 	  <item name="Analyses" icon-close="folder.gif" icon-open="folderopen.gif">
         <item name="Income/Expenses" icon-close="chart.png" icon-open="chart.png" action="de.janrieke.contractmanager.gui.action.ShowIncomeExpensesAnalysisView" />
+        <item name="Expenses" icon-close="chart.png" icon-open="chart.png" action="de.janrieke.contractmanager.gui.action.ShowExpensesAnalysisView" />
       </item>
     </item>
   </navigation>

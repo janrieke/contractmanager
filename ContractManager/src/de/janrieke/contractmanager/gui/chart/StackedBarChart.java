@@ -22,14 +22,12 @@
 package de.janrieke.contractmanager.gui.chart;
 
 import java.rmi.RemoteException;
-import java.text.DecimalFormat;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -41,7 +39,6 @@ import org.swtchart.ISeries.SeriesType;
 import org.swtchart.ITitle;
 import org.swtchart.LineStyle;
 import org.swtchart.ext.InteractiveChart;
-import org.swtchart.internal.Util;
 import org.swtchart.internal.series.BarSeries;
 import org.swtchart.internal.series.SeriesLabel;
 
@@ -57,7 +54,7 @@ import de.willuhn.util.ColorGenerator;
 /**
  * Implementierung eines Balken-Diagramms.
  */
-public class BarChart extends AbstractChart<ChartData>
+public class StackedBarChart extends AbstractChart<ChartData>
 {
   private Composite comp = null;
   
@@ -77,7 +74,7 @@ public class BarChart extends AbstractChart<ChartData>
     this.chart = new InteractiveChart(this.comp,SWT.BORDER);
     this.chart.setLayoutData(new GridData(GridData.FILL_BOTH));
     this.chart.getLegend().setVisible(false);
-    this.chart.setOrientation(SWT.VERTICAL);
+    this.chart.setOrientation(SWT.HORIZONTAL);
 
     ////////////////////////////////////////////////////////////////////////////
     // Farben des Charts
@@ -133,7 +130,6 @@ public class BarChart extends AbstractChart<ChartData>
     ////////////////////////////////////////////////////////////////////////////
     // Neu zeichnen
     List<ChartData> data = getData();
-    final int[][] cValues = new int[data.size()][];
     for (int i=0;i<data.size();++i)
     {
       final List<String> labelLine = new LinkedList<String>();
@@ -171,53 +167,32 @@ public class BarChart extends AbstractChart<ChartData>
         continue; // wir haben gar keine Werte
 
       IAxis axis = this.chart.getAxisSet().getXAxis(0);
-      axis.getTick().setVisible(false);
       axis.setCategorySeries(labelLine.toArray(new String[labelLine.size()]));
       axis.enableCategory(true);
-      //axis.getTitle().setText("Expenses");
+      //axis.setCategorySeries(new String[] { Settings.i18n().tr("Income"), Settings.i18n().tr("Expense") });
 
       IBarSeries barSeries = (IBarSeries) this.chart.getSeriesSet().createSeries(SeriesType.BAR,cd.getLabel());
       barSeries.setYSeries(toArray(dataLine));
-      cValues[i] = ColorGenerator.create(ColorGenerator.PALETTE_RICH + i);
-      barSeries.setBarColor(getColor(new RGB(cValues[i][0],cValues[i][1],cValues[i][2])));
-
+      int[] cValues = ColorGenerator.create(ColorGenerator.PALETTE_RICH + i);
+      barSeries.setBarColor(getColor(new RGB(cValues[0],cValues[1],cValues[2])));
+      
       SeriesLabel label = new SeriesLabel() {
 
 		@Override
 		protected void draw(GC gc, int h, int v, double ySeriesValue,
 				int seriesIndex, int alignment) {
-			if (ySeriesValue > 0.0) {
-		        gc.setForeground(color);
-				gc.setFont(getFont());
-
-				// get format
-				String format1 = getFormat();
-				if (format1 == null || format1.equals("")) {
-					return;
-				}
-
-				// get text
-				String text;
-				text = new DecimalFormat(format1).format(ySeriesValue);
-
-				// draw label
-				Point p = Util.getExtentInGC(font, text);
-				if (h - p.x / 2d > 0) {
-					gc.drawString(text, (int) (h - p.x / 2d), (int) (v - p.y / 2d), true);
-				} else {
-					gc.drawString(text, 2*h + 6, (int) (v - p.y / 2d), true);
-				}
-			}
+			if (ySeriesValue > 0.0)
+				super.draw(gc, h, v, ySeriesValue, seriesIndex, alignment);
 		}
     	  
       };
       label.setFont(Font.SMALL.getSWTFont());
       label.setFormat("'"+cd.getLabel()+": '"+Settings.DECIMALFORMAT.toPattern()+" ¤");
-      //label.setForeground(GUI.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+      label.setForeground(GUI.getDisplay().getSystemColor(SWT.COLOR_BLACK));
       label.setVisible(true);
       ((BarSeries)barSeries).setLabel(label);
 
-      //barSeries.enableStack(true);
+      barSeries.enableStack(true);
       //
       //////////////////////////////////////////////////////////////////////////
     }

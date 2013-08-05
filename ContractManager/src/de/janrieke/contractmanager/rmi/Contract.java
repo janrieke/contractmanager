@@ -138,11 +138,11 @@ public interface Contract extends DBObject {
 	public IntervalType getFirstMinRuntimeType() throws RemoteException;
 	public void setFirstMinRuntimeType(IntervalType type) throws RemoteException;
 
-	public Integer getNextMinRuntimeCount() throws RemoteException;
-	public void setNextMinRuntimeCount(Integer count) throws RemoteException;
+	public Integer getFollowingMinRuntimeCount() throws RemoteException;
+	public void setFollowingMinRuntimeCount(Integer count) throws RemoteException;
 	
-	public IntervalType getNextMinRuntimeType() throws RemoteException;
-	public void setNextMinRuntimeType(IntervalType type) throws RemoteException;
+	public IntervalType getFollowingMinRuntimeType() throws RemoteException;
+	public void setFollowingMinRuntimeType(IntervalType type) throws RemoteException;
 	
 	public Boolean isDoNotRemind() throws RemoteException;
 	public void setDoNotRemind(Boolean value) throws RemoteException;
@@ -160,6 +160,12 @@ public interface Contract extends DBObject {
 	public static final String NEXT_TERM_END = "next_term_end";
 	public Date getNextTermEnd() throws RemoteException;
 	
+	public static final String NEXT_CANCEL_TERM_BEGIN = "next_cancel_term_begin";
+	public Date getNextCancelableTermBegin() throws RemoteException;
+	
+	public static final String NEXT_CANCEL_TERM_END = "next_cancel_term_end";
+	public Date getNextCancelableTermEnd() throws RemoteException;
+
 	public static final String NEXT_CANCELLATION_DEADLINE = "next_cancellation_deadline";
 	public Date getNextCancellationDeadline() throws RemoteException;
 	
