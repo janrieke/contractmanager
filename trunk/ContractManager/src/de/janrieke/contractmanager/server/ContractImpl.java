@@ -218,8 +218,10 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			return getNextCancelableTermBegin();
 		else if (NEXT_CANCEL_TERM_END.equals(arg0))
 			return getNextCancelableTermEnd();
-		else if (MONEY_PER_TERM.equals(arg0))
-			return getMoneyPerTerm();
+		else if (MONEY_PER_TERM.equals(arg0)) {
+			Double money = getMoneyPerTerm();
+			return money.isNaN()?null:money;
+		}
 		else if (MONEY_PER_MONTH.equals(arg0))
 			return getMoneyPerMonth();
 		else
@@ -627,62 +629,15 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		return calculateNextCancellationDeadline(after);
 	}
 
-	private int getNextRuntimeDays() throws RemoteException {
-		// FIXME: Calculate costs based on a real calendar
-		Calendar today = Calendar.getInstance();
-		if (getEndDate() != null && getEndDate().before(today.getTime()))
-			return 0; 	// if the end has already passed, there is no need for
-						// further cancellations
-
-		Date startDate = getStartDate();
-		if (startDate == null)
-			return 0;
-		IntervalType firstMinRuntimeType = getFirstMinRuntimeType();
-		Integer firstMinRuntimeCount = getFirstMinRuntimeCount();
-		IntervalType nextMinRuntimeType = getFollowingMinRuntimeType();
-		Integer nextMinRuntimeCount = getFollowingMinRuntimeCount();
-
-		// if one of the runtime definitions is invalid, use the other one
-		if (firstMinRuntimeType == null || firstMinRuntimeCount == null
-				|| firstMinRuntimeCount < 0) {
-			firstMinRuntimeCount = nextMinRuntimeCount;
-			firstMinRuntimeType = nextMinRuntimeType;
-		}
-		if (nextMinRuntimeType == null || nextMinRuntimeCount == null
-				|| nextMinRuntimeCount < 0) {
-			nextMinRuntimeCount = firstMinRuntimeCount;
-			nextMinRuntimeType = firstMinRuntimeType;
-		}
-		// do nothing if both are invalid
-		if (nextMinRuntimeType == null || nextMinRuntimeCount == null
-				|| nextMinRuntimeCount < 0)
-			return 0;
-
-		switch (nextMinRuntimeType) {
-		case DAYS:
-			return nextMinRuntimeCount;
-		case WEEKS:
-			return nextMinRuntimeCount * 7;
-		case MONTHS:
-			return nextMinRuntimeCount * 30;
-		case YEARS:
-			return nextMinRuntimeCount * 365;
-		case ONCE:
-			break;
-		default:
-			break;
-		}
-		return 0;
-	}
 
 	@Override
 	public double getMoneyPerTerm() throws RemoteException {
-		// FIXME: Calculate costs based on a real calendar
-		int termLength = getNextRuntimeDays();
-		if (termLength == 0) {
-			return 0;
-		}
+		if (getFollowingMinRuntimeCount() <= 0)
+			return Double.NaN;
 		double costsPerDay = 0; 
+		double costsPerWeek = 0; 
+		double costsPerMonth = 0; 
+		double costsPerYear = 0; 
 		DBIterator costsIterator = getCosts();
 		while (costsIterator.hasNext()) {
 			Costs costEntry = (Costs) costsIterator.next();
@@ -691,20 +646,44 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 				costsPerDay += costEntry.getMoney();
 				break;
 			case WEEKS:
-				costsPerDay += costEntry.getMoney()/7;
+				costsPerWeek += costEntry.getMoney();
 				break;
 			case MONTHS:
-				costsPerDay += costEntry.getMoney()/30.42;
+				costsPerMonth += costEntry.getMoney();
 				break;
 			case YEARS:
-				costsPerDay += costEntry.getMoney()/365;
+				costsPerYear += costEntry.getMoney();
 				break;
 
 			default:
 				break;
 			}
 		}
-		return costsPerDay*termLength;
+
+		double result = 0;
+		switch (getFollowingMinRuntimeType()) {
+		case DAYS:
+			result = costsPerDay + costsPerWeek/7 + costsPerMonth/30.42 + costsPerYear/365;
+			break;
+
+		case WEEKS:
+			result = costsPerDay+7 + costsPerWeek + costsPerMonth/4.35 + costsPerYear/52.14;
+			break;
+
+		case MONTHS:
+			result = costsPerDay*30.42 + costsPerWeek*4.35 + costsPerMonth + costsPerYear*12;
+			break;
+
+		case YEARS:
+			result = costsPerDay*365 + costsPerWeek*52.14 + costsPerMonth*12 + costsPerYear;
+			break;
+
+		default:
+			break;
+		}
+
+		
+		return result * getFollowingMinRuntimeCount();
 	}
 
 

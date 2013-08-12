@@ -62,6 +62,7 @@ import de.willuhn.jameica.gui.input.MultiInput;
 import de.willuhn.jameica.gui.input.SelectInput;
 import de.willuhn.jameica.gui.input.TextAreaInput;
 import de.willuhn.jameica.gui.input.TextInput;
+import de.willuhn.jameica.gui.parts.Column;
 import de.willuhn.jameica.gui.parts.TableChangeListener;
 import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.jameica.gui.util.Color;
@@ -315,8 +316,12 @@ public class ContractControl extends AbstractControl {
 			return costsPerTerm;
 
 		double costs = getContract().getMoneyPerTerm();
-		costsPerTerm = new LabelInput(Settings.DECIMALFORMAT.format(costs));
-		costsPerTerm.setComment(Settings.CURRENCY);
+		if (Double.isNaN(costs)) {
+			costsPerTerm = new LabelInput("");
+		} else {
+			costsPerTerm = new LabelInput(Settings.DECIMALFORMAT.format(costs));
+			costsPerTerm.setComment(Settings.CURRENCY);
+		}
 		return costsPerTerm;
 	}
 
@@ -608,7 +613,7 @@ public class ContractControl extends AbstractControl {
 						Settings.getNewDateFormat()));
 		contractList.addColumn(Settings.i18n().tr("Money per Term"),
 				Contract.MONEY_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
-						Settings.DECIMALFORMAT));
+						Settings.DECIMALFORMAT), false, Column.ALIGN_RIGHT);
 		contractList.addColumn(Settings.i18n().tr("Money per Month"),
 				Contract.MONEY_PER_MONTH, new CurrencyFormatter(Settings.CURRENCY,
 						Settings.DECIMALFORMAT));
