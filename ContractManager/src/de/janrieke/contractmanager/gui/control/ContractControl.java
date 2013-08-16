@@ -966,7 +966,12 @@ public class ContractControl extends AbstractControl {
 
 	private void updateDerivedAttributes() throws RemoteException {
 		double costs = getContract().getMoneyPerTerm();
-		costsPerTerm.setValue(Settings.DECIMALFORMAT.format(costs));
+		if (Double.isNaN(costs)) {
+			costsPerTerm.setValue("");
+		} else {
+			costsPerTerm.setValue(Settings.DECIMALFORMAT.format(costs));
+			costsPerTerm.setComment(Settings.CURRENCY);
+		}
 
 		costs = getContract().getMoneyPerMonth();
 		costsPerMonth.setValue(Settings.DECIMALFORMAT.format(costs));

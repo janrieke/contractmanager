@@ -77,7 +77,7 @@ public class DateDialogInputAutoCompletion extends DialogInput {
 						case 1: /* Y[Y]YY */
 						case 2: /* YY[Y]Y */
 						case 3: /* YYY[Y] */ {
-							buffer.append('Y'); 	break;
+							buffer.append('Y'); break;
 						}
 						case 5: /* [M]M */
 						case 6: /* M[M] */{
@@ -95,6 +95,7 @@ public class DateDialogInputAutoCompletion extends DialogInput {
 							return;
 						}
 					}
+					
 					text.setSelection(e.start, e.start + buffer.length());
 					ignore = true;
 					text.insert(buffer.toString());
@@ -127,6 +128,9 @@ public class DateDialogInputAutoCompletion extends DialogInput {
 					if (start + index == 8 &&  '3' < chars[i]) return; /* [D]D */
 					index++;
 				}
+				
+				boolean updateMonth = false;
+				boolean updateDay = false;
 				String newText = buffer.toString();
 				int length = newText.length();
 				StringBuffer date = new StringBuffer(text.getText());
@@ -143,25 +147,54 @@ public class DateDialogInputAutoCompletion extends DialogInput {
 				if (mm.indexOf('M') == -1) {
 					int month =  Integer.parseInt(mm) - 1;
 					int maxMonth = calendar.getActualMaximum(Calendar.MONTH);
-					if (0 > month || month > maxMonth) return;
+					if (0 > month)
+						month = 0;
+					if (month > maxMonth)
+						month = maxMonth;
 					calendar.set(Calendar.MONTH, month);
+					updateMonth = true;
 				}
 				String dd = date.substring(8, 10);
 				if (dd.indexOf('D') == -1) {
 					int day = Integer.parseInt(dd);
 					int maxDay = calendar.getActualMaximum(Calendar.DATE);
-					if (1 > day || day > maxDay) return;
-					calendar.set(Calendar.DATE, day);
+					if (1 > day) 
+						day = 1;
+					if (day > maxDay) 
+						day = maxDay;
+					calendar.set(Calendar.DAY_OF_MONTH, day);
+					updateDay = true;
 				} else {
 					if (calendar.get(Calendar.MONTH)  == Calendar.FEBRUARY) {
-						char firstChar = date.charAt(0);
+						char firstChar = dd.charAt(0);
 						if (firstChar != 'D' && '2' < firstChar) return;
 					}
 				}
+				
+				//apply the entered character
 				text.setSelection(e.start, e.start + length);
 				ignore = true;
 				text.insert(newText);
 				ignore = false;
+				
+				//also update month and/or day
+				if (updateMonth) {
+					text.setSelection(5, 7);
+					ignore = true;
+					String month = Integer.toString(calendar.get(Calendar.MONTH)+1);
+					text.insert(month.length()==1?"0"+month:month);
+					ignore = false;
+				}
+				if (updateDay) {
+					text.setSelection(8, 10);
+					ignore = true;
+					String day = Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));
+					text.insert(day.length()==1?"0"+day:day);
+					ignore = false;
+				}
+
+				//reset the cursor position
+				text.setSelection(e.start+1, e.start+1);
 				
 				//this is a valid date, so set the dialog's calendar and the current object
 				calendarDialog.setDate(calendar.getTime());
