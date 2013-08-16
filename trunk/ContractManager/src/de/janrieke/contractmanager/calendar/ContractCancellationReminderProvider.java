@@ -2,6 +2,7 @@ package de.janrieke.contractmanager.calendar;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +44,10 @@ public class ContractCancellationReminderProvider implements
 			while (nextCancellationDeadline != null && nextCancellationDeadline.before(to)) {
 				if (nextCancellationDeadline.after(from))
 					result.add(new ContractCancellationAppointment(contract, nextCancellationDeadline));
-				nextCancellationDeadline = contract.getNextCancellationDeadline(nextCancellationDeadline);
+				Calendar next = Calendar.getInstance();
+				next.setTime(nextCancellationDeadline);
+				next.add(Calendar.DAY_OF_YEAR, 1);
+				nextCancellationDeadline = contract.getNextCancellationDeadline(next.getTime());
 			}
 		}
 		} catch (RemoteException e) {

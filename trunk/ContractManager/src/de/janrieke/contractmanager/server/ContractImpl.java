@@ -574,7 +574,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 		//cancellation is due one day BEFORE the new term begins
 		calendar.add(Calendar.DAY_OF_YEAR, -1);
-
+		
 		return calendar.getTime();
 	}
 
