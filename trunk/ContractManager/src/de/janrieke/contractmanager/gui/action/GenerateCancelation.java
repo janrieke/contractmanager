@@ -19,6 +19,7 @@ package de.janrieke.contractmanager.gui.action;
 
 import java.io.FileInputStream;
 import java.rmi.RemoteException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -59,13 +60,25 @@ public class GenerateCancelation implements Action {
 		FileDialog fd = new FileDialog(GUI.getShell(), SWT.SAVE);
 		fd.setText(Settings.i18n().tr("Select Filename for Cancellation"));
 		fd.setOverwrite(true);
+		
+		String contractName = "";
 		try {
-			fd.setFileName(Settings.i18n().tr("cancellation-{0}-{1}.odt",
-					Settings.dateformat(new Date()), p.getName()));
+			contractName = p.getName();
 		} catch (RemoteException e1) {
 			throw new ApplicationException(Settings.i18n().tr(
 					"Error while accessing contract"), e1);
 		}
+
+		StringBuilder suggestedFilename = new StringBuilder();
+		for (char c : contractName.toCharArray()) {
+			if (c=='.' || Character.isLetterOrDigit(c))
+				suggestedFilename.append(c);
+			else 
+				suggestedFilename.append('_');
+		}
+		
+		fd.setFileName(Settings.i18n().tr("cancellation-{0}-{1}.odt",
+				Settings.dateformat(new Date()), suggestedFilename.toString()));
 
 		// String path = System.getProperty("user.home");
 		// if (path != null && path.length() > 0)
@@ -104,9 +117,14 @@ public class GenerateCancelation implements Action {
 			values.put("CONTRACT_NAME", p.getName());
 
 			Date nextExtension = p.getNextCancelableTermBegin();
-			if (nextExtension != null)
+			if (nextExtension != null) {
+				//cancel on the last day of the previous term
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(nextExtension);
+				cal.add(Calendar.DAY_OF_YEAR, -1);
 				values.put("CANCELLATION_DATE",
-						Settings.dateformat(nextExtension));
+						Settings.dateformat(cal.getTime()));
+			}
 			else
 				values.put("CANCELLATION_DATE",
 						Settings.dateformat(new Date()));

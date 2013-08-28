@@ -35,6 +35,7 @@ import org.swtchart.IAxis;
 import org.swtchart.IAxisTick;
 import org.swtchart.IBarSeries;
 import org.swtchart.IGrid;
+import org.swtchart.ISeriesLabel;
 import org.swtchart.ISeries.SeriesType;
 import org.swtchart.ITitle;
 import org.swtchart.LineStyle;
@@ -190,7 +191,19 @@ public class StackedBarChart extends AbstractChart<ChartData>
       label.setFormat("'"+cd.getLabel()+": '"+Settings.DECIMALFORMAT.toPattern()+" ¤");
       label.setForeground(GUI.getDisplay().getSystemColor(SWT.COLOR_BLACK));
       label.setVisible(true);
-      ((BarSeries)barSeries).setLabel(label);
+      
+      try {
+    	  ((BarSeries)barSeries).setLabel(label);
+      } catch (NoSuchMethodError e) {
+    	  //wrong SWTChart version loaded, custom labels won't work
+    	  GUI.getStatusBar().setErrorText(
+    			  Settings.i18n().tr("Unable to set custom labels in SWTChart, charts may look weird. Wrong SWTChart version loaded?"));
+    	  ISeriesLabel altlabel = ((BarSeries)barSeries).getLabel();
+    	  altlabel.setFont(Font.SMALL.getSWTFont());
+    	  altlabel.setFormat("'"+cd.getLabel()+": '"+Settings.DECIMALFORMAT.toPattern()+" ¤");
+    	  altlabel.setForeground(GUI.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+    	  altlabel.setVisible(true);
+      }
 
       barSeries.enableStack(true);
       //

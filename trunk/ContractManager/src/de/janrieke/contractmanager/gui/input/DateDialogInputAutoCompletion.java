@@ -112,23 +112,23 @@ public class DateDialogInputAutoCompletion extends DialogInput {
 					return;
 				}
 
-				int start = e.start;
-				if (start > 9) return;
-				int index = 0;
-				for (int i = 0; i < chars.length; i++) {
-					if (start + index == 4 || start + index == 7) {
+				int offset = 0;
+				for (int i = 0; i < chars.length && e.start+i+offset<10; i++) {
+					if (e.start + offset + i == 4 || e.start + offset + i == 7) { //positions of the "-"
 						if (chars[i] == '-') {
-							index++;
 							continue;
 						}
-						buffer.insert(index++, '-');
+						buffer.insert(i+offset, '-'); //allow entering dates without dashes
+						offset++; //increase offset, as we added a new character not contained in chars
 					}
 					if (chars[i] < '0' || '9' < chars[i]) return;
-					if (start + index == 5 &&  '1' < chars[i]) return; /* [M]M */
-					if (start + index == 8 &&  '3' < chars[i]) return; /* [D]D */
-					index++;
+					if (e.start + offset + i == 5 &&  '1' < chars[i]) return; /* [M]M */
+					if (e.start + offset + i == 8 &&  '3' < chars[i]) return; /* [D]D */
 				}
 				
+				buffer.setLength(chars.length+offset);
+				
+				boolean validDate = true;
 				boolean updateMonth = false;
 				boolean updateDay = false;
 				String newText = buffer.toString();
@@ -142,7 +142,9 @@ public class DateDialogInputAutoCompletion extends DialogInput {
 				if (yyyy.indexOf('Y') == -1) {
 					int year = Integer.parseInt(yyyy);
 					calendar.set(Calendar.YEAR, year);
-				}
+				} else
+					validDate = false;
+				
 				String mm = date.substring(5, 7);
 				if (mm.indexOf('M') == -1) {
 					int month =  Integer.parseInt(mm) - 1;
@@ -153,7 +155,9 @@ public class DateDialogInputAutoCompletion extends DialogInput {
 						month = maxMonth;
 					calendar.set(Calendar.MONTH, month);
 					updateMonth = true;
-				}
+				} else
+					validDate = false;
+				
 				String dd = date.substring(8, 10);
 				if (dd.indexOf('D') == -1) {
 					int day = Integer.parseInt(dd);
@@ -165,6 +169,7 @@ public class DateDialogInputAutoCompletion extends DialogInput {
 					calendar.set(Calendar.DAY_OF_MONTH, day);
 					updateDay = true;
 				} else {
+					validDate = false;
 					if (calendar.get(Calendar.MONTH)  == Calendar.FEBRUARY) {
 						char firstChar = dd.charAt(0);
 						if (firstChar != 'D' && '2' < firstChar) return;
@@ -194,11 +199,13 @@ public class DateDialogInputAutoCompletion extends DialogInput {
 				}
 
 				//reset the cursor position
-				text.setSelection(e.start+1, e.start+1);
+				text.setSelection(e.start+length, e.start+length);
 				
-				//this is a valid date, so set the dialog's calendar and the current object
-				calendarDialog.setDate(calendar.getTime());
-				DateDialogInputAutoCompletion.this.setValue(calendar.getTime());
+				if (validDate) {
+					//this is a valid date, so set the dialog's calendar and the current object
+					calendarDialog.setDate(calendar.getTime());
+					DateDialogInputAutoCompletion.this.setValue(calendar.getTime());
+				}
 			}
 		});		
 
