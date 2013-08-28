@@ -211,7 +211,7 @@ public class ContractControl extends AbstractControl {
 	 */
 	public Input getComment() throws RemoteException {
 		if (comment == null)
-			comment = new TextAreaInput(getContract().getComment());
+			comment = new TextAreaInput(getContract().getComment(), 10000);
 		return comment;
 	}
 
@@ -510,7 +510,7 @@ public class ContractControl extends AbstractControl {
 		if (partnerNumber == null)
 			partnerNumber = new TextInput(
 					getContract().getAddress() == null ? "" : getContract()
-							.getAddress().getNumber(), 255);
+							.getAddress().getNumber(), 16);
 		return partnerNumber;
 	}
 
@@ -537,7 +537,7 @@ public class ContractControl extends AbstractControl {
 		if (partnerZipcode == null)
 			partnerZipcode = new TextInput(
 					getContract().getAddress() == null ? "" : getContract()
-							.getAddress().getZipcode(), 255);
+							.getAddress().getZipcode(), 5);
 		return partnerZipcode;
 	}
 
@@ -834,13 +834,15 @@ public class ContractControl extends AbstractControl {
 					String newValue) throws ApplicationException {
 				assert object instanceof Costs;
 				try {
-					if ("description".equals(attribute))
-						((Costs) object).setDescription(newValue);
+					if ("description".equals(attribute)) {
+						((Costs) object).setDescription(newValue.substring(0, Math.min(newValue.length(), 255)));
+					}
 					else if ("money".equals(attribute)) {
 						try {
 							Number num = NumberFormat.getInstance().parse(newValue);
 							((Costs) object).setMoney(num.doubleValue());
 						} catch (ParseException e) {
+							((Costs) object).setMoney(0d);
 						}
 					} else if ("period".equals(attribute))
 						((Costs) object).setPeriod(Contract.IntervalType

@@ -30,6 +30,7 @@ import de.willuhn.datasource.db.AbstractDBObject;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.datasource.rmi.ObjectNotFoundException;
+import de.willuhn.jameica.util.DateUtil;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
@@ -491,13 +492,15 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 * @return The end of the term.
 	 * @throws RemoteException
 	 */
-	private Date calculateTermEnd(Date after)
+	private Date calculateNextTermBegin(Date after)
 			throws RemoteException {
-		Date startDate = getStartDate();
+		Date startDate = DateUtil.startOfDay(getStartDate());
 		if (startDate == null)
 			return null;
-		Calendar today = Calendar.getInstance();
-		today.setTime(after);
+		if (after == null)
+			return null;
+		Calendar afterCal = Calendar.getInstance();
+		afterCal.setTime(DateUtil.endOfDay(after));
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(startDate);
@@ -523,12 +526,12 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 				|| followingMinRuntimeCount < 0)
 			return null;
 
-		if (firstMinRuntimeCount == 0)
+		if (followingMinRuntimeCount == 0)
 			return null; // "0" encodes a daily runtime extension
 
 		boolean first = true;
 
-		while (!calendar.after(today)) {
+		while (!calendar.after(afterCal)) {
 			if (first) {
 				addToCalendar(calendar, firstMinRuntimeType, firstMinRuntimeCount);
 				first = false;
@@ -539,9 +542,9 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			}
 		}
 
-		if (getEndDate() != null && getEndDate().before(calendar.getTime()))
+		if (getEndDate() != null && DateUtil.endOfDay(getEndDate()).before(calendar.getTime()))
 			return null; // if the end has already passed, there is no need for
-							// further cancellations
+						 // further cancellations
 
 		return calendar.getTime();
 	}
@@ -557,14 +560,14 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			throws RemoteException {
 
 		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(after);
+		calendar.setTime(DateUtil.endOfDay(after));
 
 		IntervalType cancellationPeriodType = getCancellationPeriodType();
 		Integer cancellationPeriodCount = getCancellationPeriodCount();
 
 		addToCalendar(calendar, cancellationPeriodType, cancellationPeriodCount);
 
-		Date termEnd = calculateTermEnd(calendar.getTime());
+		Date termEnd = calculateNextTermBegin(calendar.getTime());
 		if (termEnd == null)
 			return null;
 		
@@ -572,17 +575,16 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		
 		addToCalendar(calendar, cancellationPeriodType, -cancellationPeriodCount);
 
-		//cancellation is due one day BEFORE the new term begins
-		calendar.add(Calendar.DAY_OF_YEAR, -1);
-		
+		calendar.add(Calendar.DAY_OF_YEAR, -1); //term end is one day before next term's start
+
 		return calendar.getTime();
 	}
 
 	@Override
 	public Date getNextTermBegin() throws RemoteException {
 		Calendar calendar = Calendar.getInstance();
-		//calendar.add(Calendar.DAY_OF_YEAR, -1);
-		return calculateTermEnd(calendar.getTime());
+		
+		return calculateNextTermBegin(calendar.getTime());
 	}
 
 	@Override
@@ -593,7 +595,8 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(begin);
 		addToCalendar(calendar, getFollowingMinRuntimeType(), getFollowingMinRuntimeCount());
-		calendar.add(Calendar.DAY_OF_YEAR, -1);
+		calendar.add(Calendar.DAY_OF_YEAR, -1); //term end is one day before next term's start
+		
 		return calendar.getTime();
 	}
 
@@ -602,8 +605,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		Calendar calendar = Calendar.getInstance();
 		addToCalendar(calendar, getCancellationPeriodType(), getCancellationPeriodCount());
 		
-		//calendar.add(Calendar.DAY_OF_YEAR, -1);
-		return calculateTermEnd(calendar.getTime());
+		return calculateNextTermBegin(calendar.getTime());
 	}
 
 	@Override
@@ -614,7 +616,8 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(begin);
 		addToCalendar(calendar, getFollowingMinRuntimeType(), getFollowingMinRuntimeCount());
-		calendar.add(Calendar.DAY_OF_YEAR, -1);
+		calendar.add(Calendar.DAY_OF_YEAR, -1); //term end is one day before next term's start
+
 		return calendar.getTime();
 	}
 	

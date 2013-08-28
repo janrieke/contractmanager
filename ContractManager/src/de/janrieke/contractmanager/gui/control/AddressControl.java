@@ -115,7 +115,7 @@ public class AddressControl extends AbstractControl {
 
 	public Input getPartnerNumber() throws RemoteException {
 		if (partnerNumber == null)
-			partnerNumber = new TextInput(getAddress().getNumber(), 255);
+			partnerNumber = new TextInput(getAddress().getNumber(), 16);
 		return partnerNumber;
 	}
 
@@ -139,7 +139,7 @@ public class AddressControl extends AbstractControl {
 
 	public Input getPartnerZipcode() throws RemoteException {
 		if (partnerZipcode == null)
-			partnerZipcode = new TextInput(getAddress().getZipcode(), 255);
+			partnerZipcode = new TextInput(getAddress().getZipcode(), 5);
 		return partnerZipcode;
 	}
 
