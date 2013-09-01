@@ -18,8 +18,12 @@ VERSION HISTORY:
 	- Moving iCal import/export to Jameica's calander + jameica.ical 
 
 
-
+0.4:
+	- Analysis diagrams
+	
+	
 ROADMAP:
 
-0.4:
-	- Financial analysis
+0.5:
+	- Improved financial analysis
+	

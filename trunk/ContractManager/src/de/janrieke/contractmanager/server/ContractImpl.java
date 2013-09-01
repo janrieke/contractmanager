@@ -670,11 +670,11 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			break;
 
 		case WEEKS:
-			result = costsPerDay+7 + costsPerWeek + costsPerMonth/4.35 + costsPerYear/52.14;
+			result = costsPerDay*7 + costsPerWeek + costsPerMonth/4.35 + costsPerYear/52.14;
 			break;
 
 		case MONTHS:
-			result = costsPerDay*30.42 + costsPerWeek*4.35 + costsPerMonth + costsPerYear*12;
+			result = costsPerDay*30.42 + costsPerWeek*4.35 + costsPerMonth + costsPerYear/12;
 			break;
 
 		case YEARS:
