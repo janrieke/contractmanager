@@ -21,16 +21,30 @@
  */
 package de.janrieke.contractmanager.gui.control;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import de.janrieke.contractmanager.gui.parts.ExpensesAnalysisChartPart;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Part;
-import de.willuhn.jameica.gui.input.Input;
+import de.willuhn.jameica.gui.input.MultiInput;
+import de.willuhn.jameica.gui.input.SelectInput;
+import de.willuhn.jameica.gui.input.SpinnerInput;
 
 /**
  * Controller fuer den Dialog Lizenzinformationen.
  */
 public class ExpensesAnalysisControl extends AbstractControl {
+
+	private Map<String, Integer> monthNames;
+	private SelectInput monthSelector;
+	private SpinnerInput yearSelector;
+	private MultiInput monthYearSelector;
+	private ExpensesAnalysisChartPart chart = null;
 
 	/**
 	 * ct.
@@ -39,19 +53,56 @@ public class ExpensesAnalysisControl extends AbstractControl {
 	 */
 	public ExpensesAnalysisControl(AbstractView view) {
 		super(view);
+		Calendar cal = Calendar.getInstance();
+		monthNames = cal.getDisplayNames(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
 	}
 
-	public Input getType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private ExpensesAnalysisChartPart chart = null;
-	
 	public Part getChartPart() {
 		if (chart == null)
-			chart = new ExpensesAnalysisChartPart();
+			chart = new ExpensesAnalysisChartPart(this);
 		return chart;
 	}
 
+	public int getMonthNumber (String name) {
+		return monthNames.get(name);
+	}
+	public void redrawChart() {
+		if (chart == null)
+			getChartPart();
+		chart.redraw();
+	}
+
+	public MultiInput getMonthYearSelector() {
+		if (monthYearSelector == null)
+			monthYearSelector = new MultiInput(getMonthSelector(),
+					getYearSelector());
+		return monthYearSelector;
+	}
+
+	public SelectInput getMonthSelector() {
+		if (monthSelector == null) {
+			int curMonth = Calendar.getInstance().get(Calendar.MONTH);
+			String curMonthName = null;
+			List<String> list = new ArrayList<String>();
+			for (int i = 0; i<12; i++) {
+				outer:
+					for (Map.Entry<String, Integer> entry : monthNames.entrySet()) {
+						if (entry.getValue().equals(i)) {
+							if (curMonth == i)
+								curMonthName = entry.getKey(); 
+							list.add(entry.getKey());
+							continue outer;
+						}
+					}
+			}
+			monthSelector = new SelectInput(list, curMonthName);
+		}
+		return monthSelector;
+	}
+
+	public SpinnerInput getYearSelector() {
+		if (yearSelector == null)
+			yearSelector = new SpinnerInput(1900, 3000, Calendar.getInstance().get(Calendar.YEAR));
+		return yearSelector;
+	}
 }

@@ -19,6 +19,7 @@ package de.janrieke.contractmanager.gui.parts;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
@@ -27,13 +28,17 @@ import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.chart.StackedBarChart;
 import de.janrieke.contractmanager.gui.chart.ChartData;
 import de.janrieke.contractmanager.gui.control.ContractControl;
+import de.janrieke.contractmanager.gui.control.IncomeExpensesAnalysisControl;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.jameica.gui.Part;
 
 public class IncomeExpensesAnalysisChartPart implements Part {
 
-	public IncomeExpensesAnalysisChartPart() {
+	private IncomeExpensesAnalysisControl control;
+
+	public IncomeExpensesAnalysisChartPart(IncomeExpensesAnalysisControl control) {
+		this.control = control;
 	}
 
     private StackedBarChart chart = null;
@@ -59,9 +64,32 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 	public void paint(Composite parent) throws RemoteException {
 		chart = new StackedBarChart();
 		chart.setTitle(Settings.i18n().tr("Income/Expenses Comparison"));
+		addChartData();
+
+		chart.paint(parent);
+	}
+
+	protected void addChartData() throws RemoteException {
+		int month = control.getMonthNumber((String)control.getMonthSelector().getValue());
+		int year = (Integer)control.getYearSelector().getValue();
+		
+		Calendar calBegin = Calendar.getInstance();
+		calBegin.set(year, month, 1, 0, 0, 0);
+		Calendar calEnd = Calendar.getInstance();
+		if (month==11)
+			calEnd.set(year+1, 0, 1, 23, 59, 59);
+		else
+			calEnd.set(year, month+1, 1, 23, 59, 59);
+		calEnd.add(Calendar.DAY_OF_MONTH, -1);
+		
 		GenericIterator contracts = ContractControl.getContracts();
 		while (contracts.hasNext()) {
 			final Contract c = (Contract) contracts.next();
+			if ((c.getEndDate() != null && c.getEndDate().before(calBegin.getTime())) ||
+					(c.getStartDate() != null && c.getStartDate().after(calEnd.getTime()))) {
+				continue;
+			}
+						
 			chart.addData(new ChartData() {
 
 				@Override
@@ -95,8 +123,17 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 				}
 			});
 		}
-
-		chart.paint(parent);
+	}
+	
+	public void redraw() {
+        chart.removeAllData();
+        try {
+    		addChartData();
+			chart.redraw();
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
