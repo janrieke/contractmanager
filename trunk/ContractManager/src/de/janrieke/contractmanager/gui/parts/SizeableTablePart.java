@@ -18,6 +18,7 @@
 package de.janrieke.contractmanager.gui.parts;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -79,6 +80,11 @@ public class SizeableTablePart extends TablePart {
 	}
 
 	public SizeableTablePart(GenericIterator list, Action action) {
+		super(list, action);
+	}
+	
+	public SizeableTablePart(@SuppressWarnings("rawtypes") List list, Action action)
+	{
 		super(list, action);
 	}
 

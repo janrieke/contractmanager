@@ -58,7 +58,7 @@ public class ContractDetailView extends AbstractView implements Extendable {
 
 	    ScrolledContainer scroller = new ScrolledContainer(getParent());
 		
-	    ColumnLayout columns = new ColumnLayout(scroller.getComposite(), 2);
+	    ColumnLayout columns = new ColumnLayout(scroller.getComposite(), 2, true);
 	    SimpleContainer left = new SimpleContainer(columns.getComposite());
 
 	    left.addHeadline(Settings.i18n().tr("Contract Information"));
@@ -153,10 +153,9 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	}
 
 	public void addExtensionContainer(Part part, String headline) {
-	    SimpleContainer scroller = new SimpleContainer(getParent());
-	    scroller.getComposite().setSize(200, 100);
-	    scroller.addHeadline(headline);
-	    scroller.addPart(part);
+		SimpleContainer container = new SimpleContainer(getParent());
+		container.addHeadline(headline);
+		container.addPart(part);
 	}
 	
 	@Override
