@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Listener;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.control.ContractControl;
+import de.janrieke.contractmanager.gui.parts.SizeableTablePart;
 import de.janrieke.contractmanager.gui.view.ContractDetailView;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Transaction;
@@ -39,7 +40,6 @@ import de.willuhn.jameica.gui.extension.Extendable;
 import de.willuhn.jameica.gui.extension.Extension;
 import de.willuhn.jameica.gui.formatter.CurrencyFormatter;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
-import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.HBCIProperties;
 import de.willuhn.jameica.hbci.gui.action.UmsatzDetail;
@@ -56,7 +56,7 @@ import de.willuhn.util.I18N;
  */
 public class ContractDetailViewHibiscusCategories implements Extension {
 
-	private TablePart umsatzList;
+	private SizeableTablePart umsatzList;
 	
 	private final static I18N hibiscusI18n = Application.getPluginLoader().getPlugin(HBCI.class).getResources().getI18N();
 
@@ -137,7 +137,8 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 				if (umsatz != null)
 					umsaetze.add(umsatz);
 			}
-			umsatzList = new TablePart(umsaetze, new UmsatzDetail());
+			umsatzList = new SizeableTablePart(umsaetze, new UmsatzDetail());
+			umsatzList.setHeightHint(105);
 			umsatzList.setContextMenu(new UmsatzListContextMenu(contract, this));
 			umsatzList.addColumn("#","id-int");
 			umsatzList.addColumn(hibiscusI18n.tr("Flags"),                     "flags");
