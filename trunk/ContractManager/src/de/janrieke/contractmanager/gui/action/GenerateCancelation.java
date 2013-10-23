@@ -17,6 +17,8 @@
  */
 package de.janrieke.contractmanager.gui.action;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.FileInputStream;
 import java.rmi.RemoteException;
 import java.util.Calendar;
@@ -36,6 +38,7 @@ import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.server.SettingsUtil;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
+import de.willuhn.jameica.gui.dialogs.YesNoDialog;
 import de.willuhn.util.ApplicationException;
 
 /**
@@ -52,7 +55,7 @@ public class GenerateCancelation implements Action {
 		if (context == null || !(context instanceof Contract))
 			throw new ApplicationException(Settings.i18n().tr(
 					"Please choose a contract."));
-		
+
 		//TODO: Also generate PDFs
 
 		Contract p = (Contract) context;
@@ -60,7 +63,7 @@ public class GenerateCancelation implements Action {
 		FileDialog fd = new FileDialog(GUI.getShell(), SWT.SAVE);
 		fd.setText(Settings.i18n().tr("Select Filename for Cancellation"));
 		fd.setOverwrite(true);
-		
+
 		String contractName = "";
 		try {
 			contractName = p.getName();
@@ -76,7 +79,7 @@ public class GenerateCancelation implements Action {
 			else 
 				suggestedFilename.append('_');
 		}
-		
+
 		fd.setFileName(Settings.i18n().tr("cancellation-{0}-{1}.odt",
 				Settings.dateformat(new Date()), suggestedFilename.toString()));
 
@@ -115,6 +118,8 @@ public class GenerateCancelation implements Action {
 
 			values.put("TODAY", Settings.dateformat(new Date()));
 			values.put("CONTRACT_NAME", p.getName());
+			values.put("CUSTOMER_NUMBER", p.getCustomerNumber());
+			values.put("CONTRACT_NUMBER", p.getContractNumber());
 
 			Date nextExtension = p.getNextCancelableTermBegin();
 			if (nextExtension != null) {
@@ -153,7 +158,25 @@ public class GenerateCancelation implements Action {
 					Settings.i18n().tr("Cancellation successfully generated."));
 		} catch (Exception e) {
 			throw new ApplicationException(Settings.i18n().tr(
-				"Error while storing document"), e);
+					"Error while storing document"), e);
+		}
+
+		if (Desktop.isDesktopSupported()) {
+			YesNoDialog d = new YesNoDialog(YesNoDialog.POSITION_CENTER);
+			d.setTitle(Settings.i18n().tr("Open file?"));
+			d.setText(Settings.i18n().tr(
+					"Would you like to open the generated cancellation file?"));
+
+			Boolean choice;
+			try {
+				choice = (Boolean) d.open();
+				if (choice.booleanValue()) {
+					Desktop.getDesktop().open(new File(filename));
+				}
+			} catch (Exception e) {
+				throw new ApplicationException(Settings.i18n().tr(
+						"Error while opening document"), e);
+			}
 		}
 	}
 
