@@ -18,6 +18,7 @@
 package de.janrieke.contractmanager.gui.input;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -33,15 +34,15 @@ public class DateDialogInputAutoCompletion extends DialogInput {
 
 	private Control clientControl1;
 	private CalendarDialog calendarDialog;
-	//private String pattern = "YYYY-MM-DD";
 
 	public DateDialogInputAutoCompletion(String value) {
 		super(value);
 	}
 
-	public DateDialogInputAutoCompletion(String value, CalendarDialog d) {
+	public DateDialogInputAutoCompletion(String value, Date date, CalendarDialog d) {
 		super(value, d);
 		this.calendarDialog = d;
+		calendarDialog.setDate(date);
 	}
 
 	//	public void setPattern(String pattern) {
