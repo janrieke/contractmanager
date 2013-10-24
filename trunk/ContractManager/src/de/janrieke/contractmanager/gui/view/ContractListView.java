@@ -43,7 +43,7 @@ public class ContractListView extends AbstractView {
 
 		ButtonArea buttons = new ButtonArea(this.getParent(), 3);
 		//buttons.addButton(new Back(false));
-
+		
 		buttons.addButton(Settings.i18n().tr("Create new contract..."),
 				new ShowContractDetailView(), null, true, "document-new.png");
 	}

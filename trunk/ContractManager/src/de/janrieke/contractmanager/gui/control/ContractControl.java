@@ -128,9 +128,9 @@ public class ContractControl extends AbstractControl {
 
 	private List<Costs> newCosts = new ArrayList<Costs>();
 	private List<Costs> deletedCosts = new ArrayList<Costs>();
-	
-	//holds the current Hibiscus category of the selection box (used for 
-	//  storing to DB on store button click)
+
+	// holds the current Hibiscus category of the selection box (used for
+	// storing to DB on store button click)
 	public String hibiscusCategoryID = null;
 
 	/**
@@ -168,7 +168,7 @@ public class ContractControl extends AbstractControl {
 	/**
 	 * Returns an iterator with all contracts in the database.
 	 * 
-	 * @throws RemoteException 
+	 * @throws RemoteException
 	 * @return iterator containing all addresses
 	 */
 	public static GenericIterator getContracts() throws RemoteException {
@@ -176,7 +176,7 @@ public class ContractControl extends AbstractControl {
 		DBIterator contracts = service.createList(Contract.class);
 		return contracts;
 	}
-	
+
 	/**
 	 * Returns the input field for the contract name.
 	 * 
@@ -241,10 +241,11 @@ public class ContractControl extends AbstractControl {
 		});
 
 		Date initial = getContract().getStartDate();
-		String s = initial == null ? "YYYY-MM-DD" : Settings.dateformat(initial);
+		String s = initial == null ? "YYYY-MM-DD" : Settings
+				.dateformat(initial);
 
 		// Dialog-Input is an Input field that gets its data from a dialog.
-		startDate = new DateDialogInputAutoCompletion(s, d);
+		startDate = new DateDialogInputAutoCompletion(s, initial, d);
 
 		// we store the initial value
 		startDate.setValue(initial);
@@ -274,10 +275,11 @@ public class ContractControl extends AbstractControl {
 		});
 
 		Date initial = getContract().getEndDate();
-		String s = initial == null ? "YYYY-MM-DD" : Settings.dateformat(initial);
+		String s = initial == null ? "YYYY-MM-DD" : Settings
+				.dateformat(initial);
 
 		// Dialog-Input is an Input field that gets its data from a dialog.
-		endDate = new DateDialogInputAutoCompletion(s, d);
+		endDate = new DateDialogInputAutoCompletion(s, initial, d);
 
 		// we store the initial value
 		endDate.setValue(initial);
@@ -293,9 +295,8 @@ public class ContractControl extends AbstractControl {
 		Date nte = getContract().getNextCancelableTermEnd();
 		if (ntb != null && nte != null) {
 			nextExtension = new MultiInput(new LabelInput(
-					Settings.dateformat(ntb) + " "
-							+ Settings.i18n().tr("to") + " "
-							+ Settings.dateformat(nte)));
+					Settings.dateformat(ntb) + " " + Settings.i18n().tr("to")
+							+ " " + Settings.dateformat(nte)));
 		} else
 			nextExtension = new LabelInput("");
 		return nextExtension;
@@ -427,7 +428,7 @@ public class ContractControl extends AbstractControl {
 		}
 		return nextMinRuntimeType;
 	}
-	
+
 	public CheckboxInput getDoNotRemind() throws RemoteException {
 		if (doNotRemind == null) {
 			doNotRemind = new CheckboxInput(getContract().isDoNotRemind());
@@ -437,7 +438,7 @@ public class ContractControl extends AbstractControl {
 
 	private Address currentAddress = null;
 
-	public Input getPartnerAddress() throws RemoteException {
+	public SelectInput getPartnerAddress() throws RemoteException {
 		if (partnerAddress == null) {
 			currentAddress = getContract().getAddress();
 			partnerAddress = new SelectInput(AddressControl.getAddresses(),
@@ -584,19 +585,28 @@ public class ContractControl extends AbstractControl {
 		if (contractList != null)
 			return contractList;
 
-		// 1) get the dataservice
-		DBService service = Settings.getDBService();
+		GenericIterator contracts = getContracts();
 
-		// 2) now we can create the contract list.
-		// We do not need to specify the implementing class for
-		// the interface "Contract". Jameica's classloader knows
-		// all classes an finds the right implementation automatically. ;)
-		DBIterator contracts = service.createList(Contract.class);
-
+		double total = 0d;
+		while (contracts.hasNext()) {
+			Contract c = (Contract) contracts.next();
+			total += c.getMoneyPerMonth();
+		}
+		final double finalTotal = total;
+		
+		contracts.begin();
+		
 		// 4) create the table
 		contractList = new TablePart(
 				contracts,
-				new de.janrieke.contractmanager.gui.action.ShowContractDetailView());
+				new de.janrieke.contractmanager.gui.action.ShowContractDetailView()) {
+
+			@Override
+			protected String getSummary() {
+				return Settings.i18n().tr("Total per Month") + ": " + Math.round(finalTotal*100d)/100d + " EUR"; 
+			};
+
+		};
 
 		// 5) now we have to add some columns.
 		contractList.addColumn(Settings.i18n().tr("Name of Contract"), "name");
@@ -609,14 +619,15 @@ public class ContractControl extends AbstractControl {
 				new DateFormatter(Settings.getNewDateFormat()));
 		contractList.addColumn(
 				Settings.i18n().tr("Next Cancellation Deadline"),
-				Contract.NEXT_CANCELLATION_DEADLINE, new DateFormatter(
-						Settings.getNewDateFormat()));
+				Contract.NEXT_CANCELLATION_DEADLINE,
+				new DateFormatter(Settings.getNewDateFormat()));
 		contractList.addColumn(Settings.i18n().tr("Money per Term"),
-				Contract.MONEY_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
-						Settings.DECIMALFORMAT), false, Column.ALIGN_RIGHT);
+				Contract.MONEY_PER_TERM, new CurrencyFormatter(
+						Settings.CURRENCY, Settings.DECIMALFORMAT), false,
+				Column.ALIGN_RIGHT);
 		contractList.addColumn(Settings.i18n().tr("Money per Month"),
-				Contract.MONEY_PER_MONTH, new CurrencyFormatter(Settings.CURRENCY,
-						Settings.DECIMALFORMAT));
+				Contract.MONEY_PER_MONTH, new CurrencyFormatter(
+						Settings.CURRENCY, Settings.DECIMALFORMAT));
 
 		// 7) we are adding a context menu
 		contractList.setContextMenu(new ContractListMenu(true));
@@ -726,14 +737,14 @@ public class ContractControl extends AbstractControl {
 				"enddate", new DateFormatter(Settings.getNewDateFormat()));
 		contractListWarnings.addColumn(
 				Settings.i18n().tr("Next Cancellation Deadline"),
-				Contract.NEXT_CANCELLATION_DEADLINE, new DateFormatter(
-						Settings.getNewDateFormat()));
+				Contract.NEXT_CANCELLATION_DEADLINE,
+				new DateFormatter(Settings.getNewDateFormat()));
 		contractListWarnings.addColumn(Settings.i18n().tr("Money per Term"),
-				Contract.MONEY_PER_TERM, new CurrencyFormatter(Settings.CURRENCY,
-						Settings.DECIMALFORMAT));
+				Contract.MONEY_PER_TERM, new CurrencyFormatter(
+						Settings.CURRENCY, Settings.DECIMALFORMAT));
 		contractListWarnings.addColumn(Settings.i18n().tr("Money per Month"),
-				Contract.MONEY_PER_MONTH, new CurrencyFormatter(Settings.CURRENCY,
-						Settings.DECIMALFORMAT));
+				Contract.MONEY_PER_MONTH, new CurrencyFormatter(
+						Settings.CURRENCY, Settings.DECIMALFORMAT));
 
 		// 7) we are adding a context menu
 		contractListWarnings.setContextMenu(new ContractListMenu(false));
@@ -835,11 +846,12 @@ public class ContractControl extends AbstractControl {
 				assert object instanceof Costs;
 				try {
 					if ("description".equals(attribute)) {
-						((Costs) object).setDescription(newValue.substring(0, Math.min(newValue.length(), 255)));
-					}
-					else if ("money".equals(attribute)) {
+						((Costs) object).setDescription(newValue.substring(0,
+								Math.min(newValue.length(), 255)));
+					} else if ("money".equals(attribute)) {
 						try {
-							Number num = NumberFormat.getInstance().parse(newValue);
+							Number num = NumberFormat.getInstance().parse(
+									newValue);
 							((Costs) object).setMoney(num.doubleValue());
 						} catch (ParseException e) {
 							((Costs) object).setMoney(0d);
@@ -935,6 +947,12 @@ public class ContractControl extends AbstractControl {
 
 				updateDerivedAttributes();
 
+				// update the dropdown box with the saved address
+				getPartnerAddress().setList(
+						PseudoIterator.asList(AddressControl.getAddresses()));
+				getPartnerAddress().setValue(a);
+				currentAddress = a;
+
 				if (view instanceof ContractDetailView)
 					((ContractDetailView) view).setButtonActivationState(true);
 
@@ -949,22 +967,28 @@ public class ContractControl extends AbstractControl {
 					Settings.i18n().tr("Error while storing contract"));
 		}
 	}
-	
-//	private boolean equalCheck(Object o1, Object o2) {
-//		return (o1 == o2 || o1 != null && o1.equals(o2));
-//	}
-//
-//	private boolean cancellationsChanged(Contract c) throws RemoteException {
-//		return !(equalCheck(getName().getValue(), c.getName()) &&
-//				equalCheck(getStartDate().getValue(), c.getStartDate()) &&
-//				equalCheck(getCancellationPeriodCount().getValue(), c.getCancellationPeriodCount()) &&
-//				equalCheck(getCancellationPeriodType().getValue(), c.getCancellationPeriodType()) &&
-//				equalCheck(getEndDate().getValue(), c.getEndDate()) &&
-//				equalCheck(getFirstMinRuntimeCount().getValue(), c.getFirstMinRuntimeCount()) &&
-//				equalCheck(getFirstMinRuntimeType().getValue(), c.getFirstMinRuntimeType()) &&
-//				equalCheck(getNextMinRuntimeCount().getValue(), c.getNextMinRuntimeCount()) &&
-//				equalCheck(getNextMinRuntimeType().getValue(), c.getNextMinRuntimeType()));
-//	}
+
+	// private boolean equalCheck(Object o1, Object o2) {
+	// return (o1 == o2 || o1 != null && o1.equals(o2));
+	// }
+	//
+	// private boolean cancellationsChanged(Contract c) throws RemoteException {
+	// return !(equalCheck(getName().getValue(), c.getName()) &&
+	// equalCheck(getStartDate().getValue(), c.getStartDate()) &&
+	// equalCheck(getCancellationPeriodCount().getValue(),
+	// c.getCancellationPeriodCount()) &&
+	// equalCheck(getCancellationPeriodType().getValue(),
+	// c.getCancellationPeriodType()) &&
+	// equalCheck(getEndDate().getValue(), c.getEndDate()) &&
+	// equalCheck(getFirstMinRuntimeCount().getValue(),
+	// c.getFirstMinRuntimeCount()) &&
+	// equalCheck(getFirstMinRuntimeType().getValue(),
+	// c.getFirstMinRuntimeType()) &&
+	// equalCheck(getNextMinRuntimeCount().getValue(),
+	// c.getNextMinRuntimeCount()) &&
+	// equalCheck(getNextMinRuntimeType().getValue(),
+	// c.getNextMinRuntimeType()));
+	// }
 
 	private void updateDerivedAttributes() throws RemoteException {
 		double costs = getContract().getMoneyPerTerm();
@@ -979,14 +1003,16 @@ public class ContractControl extends AbstractControl {
 		costsPerMonth.setValue(Settings.DECIMALFORMAT.format(costs));
 
 		Date ne = getContract().getNextCancellationDeadline();
-		nextCancellationDeadline.setValue(ne == null ? "" : Settings.dateformat(ne));
+		nextCancellationDeadline.setValue(ne == null ? "" : Settings
+				.dateformat(ne));
 
 		Date ntb = getContract().getNextCancelableTermBegin();
 		Date nte = getContract().getNextCancelableTermEnd();
 		if (ntb != null && nte != null) {
-			nextExtension.setValue(Settings.dateformat(ntb) + " "
-					+ Settings.i18n().tr("to") + " "
-					+ Settings.dateformat(nte));
+			nextExtension
+					.setValue(Settings.dateformat(ntb) + " "
+							+ Settings.i18n().tr("to") + " "
+							+ Settings.dateformat(nte));
 		} else
 			nextExtension.setValue("");
 	}
