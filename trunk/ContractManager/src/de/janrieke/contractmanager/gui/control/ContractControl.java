@@ -617,7 +617,7 @@ public class ContractControl extends AbstractControl {
 
 			@Override
 			protected String getSummary() {
-				return Settings.i18n().tr("Total in this month") + ": " + Math.round(finalTotal*100d)/100d + " EUR"; 
+				return Settings.i18n().tr("Total in this month") + ": " + Settings.DECIMALFORMAT.format(Math.round(finalTotal*100d)/100d) + " EUR"; 
 			};
 
 		};
