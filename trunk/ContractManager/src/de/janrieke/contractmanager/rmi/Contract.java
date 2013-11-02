@@ -179,4 +179,6 @@ public interface Contract extends DBObject {
 
 	public String getHibiscusCategoryID() throws RemoteException;
 	public void setHibiscusCategoryID(String category) throws RemoteException;
+	
+	public boolean isActiveInMonth(Date month) throws RemoteException;
 }

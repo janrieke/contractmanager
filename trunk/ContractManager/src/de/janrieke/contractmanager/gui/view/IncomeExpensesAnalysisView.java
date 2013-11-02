@@ -22,7 +22,8 @@ import de.janrieke.contractmanager.gui.control.IncomeExpensesAnalysisControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
-import de.willuhn.jameica.gui.parts.ButtonArea;
+import de.willuhn.jameica.gui.parts.Button;
+import de.willuhn.jameica.gui.util.ColumnLayout;
 import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.util.ApplicationException;
 
@@ -44,22 +45,24 @@ public class IncomeExpensesAnalysisView extends AbstractView {
 		
 		control = new IncomeExpensesAnalysisControl(this);
 		
-	    SimpleContainer left = new SimpleContainer(getParent(), true);
-	    left.addLabelPair(Settings.i18n().tr("Month:"), control.getMonthYearSelector());
+	    SimpleContainer container = new SimpleContainer(getParent(), true);
+	    
+	    ColumnLayout top = new ColumnLayout(container.getComposite(), 2);
 
-	    ButtonArea buttons = new ButtonArea();
-	    buttons.addButton(Settings.i18n().tr("Update"), new Action()
+	    SimpleContainer inner = new SimpleContainer(top.getComposite(), true);
+
+	    inner.addLabelPair(Settings.i18n().tr("Month:"), control.getMonthYearSelector());
+
+	    top.add(new Button(Settings.i18n().tr("Update"), new Action()
 	    {
 	    	public void handleAction(Object context) throws ApplicationException
 	    	{
 	    		handleReload(true);
 	    	}
-	    },null,true,"view-refresh.png");
-
-	    left.addButtonArea(buttons);
+	    },null,true,"view-refresh.png"));
 
 	    //left.addHeadline(Settings.i18n().tr("Chart"));
-	    left.addPart(control.getChartPart());
+	    container.addPart(control.getChartPart());
 	}
 
 	private synchronized void handleReload(boolean force)
