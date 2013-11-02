@@ -21,6 +21,7 @@ import java.rmi.RemoteException;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
+import de.janrieke.contractmanager.rmi.Contract.IntervalType;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.util.ApplicationException;
@@ -44,6 +45,9 @@ public class ShowContractDetailView implements Action {
 			try {
 				p = (Contract) Settings.getDBService().createObject(
 						Contract.class, null);
+				p.setCancelationPeriodType(IntervalType.MONTHS);
+				p.setFirstMinRuntimeType(IntervalType.MONTHS);
+				p.setFollowingMinRuntimeType(IntervalType.MONTHS);
 			} catch (RemoteException e) {
 				throw new ApplicationException(Settings.i18n().tr(
 						"Error while creating new contract"), e);

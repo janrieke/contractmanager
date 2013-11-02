@@ -131,8 +131,7 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 				}
 				catch (ObjectNotFoundException e)
 				{
-					// Der Umsatz wurde in Hibiscus zwischenzeitlich geloescht
-					// TODO: Transaction löschen
+					transaction.delete();
 				}
 				if (umsatz != null)
 					umsaetze.add(umsatz);

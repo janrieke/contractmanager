@@ -25,8 +25,8 @@ import java.util.List;
 import org.eclipse.swt.widgets.Composite;
 
 import de.janrieke.contractmanager.Settings;
-import de.janrieke.contractmanager.gui.chart.StackedBarChart;
 import de.janrieke.contractmanager.gui.chart.ChartData;
+import de.janrieke.contractmanager.gui.chart.IncomeExpensesBarChart;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.janrieke.contractmanager.gui.control.IncomeExpensesAnalysisControl;
 import de.janrieke.contractmanager.rmi.Contract;
@@ -41,7 +41,7 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 		this.control = control;
 	}
 
-    private StackedBarChart chart = null;
+    private IncomeExpensesBarChart chart = null;
 
     public class ContractIncomeExpensesAnalysisData {
     	
@@ -62,33 +62,29 @@ public class IncomeExpensesAnalysisChartPart implements Part {
     
 	@Override
 	public void paint(Composite parent) throws RemoteException {
-		chart = new StackedBarChart();
+		chart = new IncomeExpensesBarChart();
 		chart.setTitle(Settings.i18n().tr("Income/Expenses Comparison"));
 		addChartData();
-
+		
 		chart.paint(parent);
 	}
 
+    private double sum = 0;
 	protected void addChartData() throws RemoteException {
 		int month = control.getMonthNumber((String)control.getMonthSelector().getValue());
 		int year = (Integer)control.getYearSelector().getValue();
 		
-		Calendar calBegin = Calendar.getInstance();
-		calBegin.set(year, month, 1, 0, 0, 0);
-		Calendar calEnd = Calendar.getInstance();
-		if (month==11)
-			calEnd.set(year+1, 0, 1, 23, 59, 59);
-		else
-			calEnd.set(year, month+1, 1, 23, 59, 59);
-		calEnd.add(Calendar.DAY_OF_MONTH, -1);
+		Calendar monthCal = Calendar.getInstance();
+		monthCal.set(year, month, 1, 0, 0, 0);
 		
+	    sum = 0;
 		GenericIterator contracts = ContractControl.getContracts();
 		while (contracts.hasNext()) {
 			final Contract c = (Contract) contracts.next();
-			if ((c.getEndDate() != null && c.getEndDate().before(calBegin.getTime())) ||
-					(c.getStartDate() != null && c.getStartDate().after(calEnd.getTime()))) {
+			if (!c.isActiveInMonth(monthCal.getTime())) {
 				continue;
 			}
+			sum += c.getMoneyPerMonth();
 						
 			chart.addData(new ChartData() {
 
@@ -123,6 +119,7 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 				}
 			});
 		}
+		chart.setSum(sum);
 	}
 	
 	public void redraw() {

@@ -80,8 +80,8 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    left.addLabelPair(Settings.i18n().tr("End date"), control.getEndDate());
 	    //TODO: Show how long the contract is already running
 	    left.addLabelPair(Settings.i18n().tr("Cancellation period"), control.getCancellationPeriod());
-	    left.addLabelPair(Settings.i18n().tr("First minimum term"), control.getFirstMinRuntime());
-	    left.addLabelPair(Settings.i18n().tr("Following minimum terms"), control.getNextMinRuntime());
+	    left.addLabelPair(Settings.i18n().tr("Minimum term"), control.getFirstRuntime());
+	    left.addLabelPair(Settings.i18n().tr("Following terms"), control.getNextRuntime());
 	    //TODO: Show complete term instead of only beginning
 	    left.addLabelPair(Settings.i18n().tr("Next cancelable term"), control.getNextTerm());
 	    left.addLabelPair(Settings.i18n().tr("Deadline for next cancellation"), control.getNextCancellationDeadline());

@@ -743,4 +743,31 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		}
 		return false;
 	}
+
+	@Override
+	public boolean isActiveInMonth(Date month) throws RemoteException {
+		Calendar monthBegin = Calendar.getInstance();
+		monthBegin.setTime(month);
+		monthBegin.set(Calendar.DAY_OF_MONTH, 1);
+		monthBegin.set(Calendar.HOUR_OF_DAY, 0);
+		monthBegin.set(Calendar.MINUTE, 0);
+		monthBegin.set(Calendar.SECOND, 0);
+		monthBegin.set(Calendar.MILLISECOND, 0);
+		monthBegin.add(Calendar.MILLISECOND, -1);
+		
+		Calendar monthEnd = Calendar.getInstance();
+		monthEnd.setTime(month);
+		monthEnd.add(Calendar.MONTH, 1);
+		monthEnd.set(Calendar.DAY_OF_MONTH, 1);
+		monthEnd.set(Calendar.HOUR_OF_DAY, 0);
+		monthEnd.set(Calendar.MINUTE, 0);
+		monthEnd.set(Calendar.SECOND, 0);
+		monthEnd.set(Calendar.MILLISECOND, 0);
+		
+		if ((this.getStartDate() == null || this.getStartDate().before(monthEnd.getTime())) && 
+				(this.getEndDate() == null || this.getEndDate().after(monthBegin.getTime())))
+			return true;
+		else
+			return false;
+	}
 }

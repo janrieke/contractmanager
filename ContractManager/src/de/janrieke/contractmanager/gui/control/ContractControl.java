@@ -31,11 +31,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableItem;
 
 import de.janrieke.contractmanager.Settings;
-import de.janrieke.contractmanager.gui.action.ShowTransactionDetailsView;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion;
 import de.janrieke.contractmanager.gui.menu.ContractListMenu;
 import de.janrieke.contractmanager.gui.menu.CostsListMenu;
-import de.janrieke.contractmanager.gui.menu.TransactionListMenu;
 import de.janrieke.contractmanager.gui.parts.SizeableTablePart;
 import de.janrieke.contractmanager.gui.view.ContractDetailView;
 import de.janrieke.contractmanager.rmi.Address;
@@ -92,13 +90,13 @@ public class ContractControl extends AbstractControl {
 	private IntegerInput cancellationPeriodCount;
 	private SelectInput cancellationPeriodType;
 
-	private Input firstMinRuntimeMulti;
-	private IntegerInput firstMinRuntimeCount;
-	private SelectInput firstMinRuntimeType;
+	private Input firstRuntimeMulti;
+	private IntegerInput firstRuntimeCount;
+	private SelectInput firstRuntimeType;
 
-	private Input nextMinRuntimeMulti;
-	private IntegerInput nextMinRuntimeCount;
-	private SelectInput nextMinRuntimeType;
+	private Input nextRuntimeMulti;
+	private IntegerInput nextRuntimeCount;
+	private SelectInput nextRuntimeType;
 	private CheckboxInput doNotRemind;
 
 	private SelectInput partnerAddress;
@@ -121,7 +119,6 @@ public class ContractControl extends AbstractControl {
 
 	private LabelInput nextCancellationDeadline;
 
-	private TablePart transactionList;
 	private SizeableTablePart costsList;
 	private LabelInput costsPerTerm;
 	private LabelInput costsPerMonth;
@@ -367,66 +364,81 @@ public class ContractControl extends AbstractControl {
 		return cancellationPeriodType;
 	}
 
-	public Input getFirstMinRuntime() throws RemoteException {
-		if (firstMinRuntimeMulti != null)
-			return firstMinRuntimeMulti;
+	public Input getFirstRuntime() throws RemoteException {
+		if (firstRuntimeMulti != null)
+			return firstRuntimeMulti;
 
-		firstMinRuntimeMulti = new MultiInput(getFirstMinRuntimeCount(),
-				getFirstMinRuntimeType());
+		firstRuntimeMulti = new MultiInput(getFirstRuntimeCount(),
+				getFirstRuntimeType());
 
-		return firstMinRuntimeMulti;
+		return firstRuntimeMulti;
 	}
 
-	public IntegerInput getFirstMinRuntimeCount() throws RemoteException {
-		if (firstMinRuntimeCount == null) {
-			firstMinRuntimeCount = new IntegerInput(getContract()
+	public IntegerInput getFirstRuntimeCount() throws RemoteException {
+		if (firstRuntimeCount == null) {
+			firstRuntimeCount = new IntegerInput(getContract()
 					.getFirstMinRuntimeCount());
 		}
-		return firstMinRuntimeCount;
+		return firstRuntimeCount;
 	}
 
-	public SelectInput getFirstMinRuntimeType() throws RemoteException {
-		if (firstMinRuntimeType == null) {
+	public SelectInput getFirstRuntimeType() throws RemoteException {
+		if (firstRuntimeType == null) {
 			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>();
 			list.add(Contract.IntervalType.DAYS);
 			list.add(Contract.IntervalType.WEEKS);
 			list.add(Contract.IntervalType.MONTHS);
 			list.add(Contract.IntervalType.YEARS);
-			firstMinRuntimeType = new SelectInput(list, getContract()
+			firstRuntimeType = new SelectInput(list, getContract()
 					.getFirstMinRuntimeType());
 		}
-		return firstMinRuntimeType;
+		return firstRuntimeType;
 	}
 
-	public Input getNextMinRuntime() throws RemoteException {
-		if (nextMinRuntimeMulti != null)
-			return nextMinRuntimeMulti;
+	public Input getNextRuntime() throws RemoteException {
+		if (nextRuntimeMulti != null)
+			return nextRuntimeMulti;
 
-		nextMinRuntimeMulti = new MultiInput(getNextMinRuntimeCount(),
-				getNextMinRuntimeType());
+		nextRuntimeMulti = new MultiInput(getNextRuntimeCount(),
+				getNextRuntimeType());
 
-		return nextMinRuntimeMulti;
+		return nextRuntimeMulti;
 	}
 
-	public IntegerInput getNextMinRuntimeCount() throws RemoteException {
-		if (nextMinRuntimeCount == null) {
-			nextMinRuntimeCount = new IntegerInput(getContract()
+	public IntegerInput getNextRuntimeCount() throws RemoteException {
+		if (nextRuntimeCount == null) {
+			nextRuntimeCount = new IntegerInput(getContract()
 					.getFollowingMinRuntimeCount());
+			
+			// when focusing this input, transfer the values from the first runtime 
+			//  as default values if no value is set, yet
+			nextRuntimeCount.addListener(new Listener() {
+				
+				@Override
+				public void handleEvent(Event event) {
+					if (event.type == SWT.FocusIn) {
+						if (((Integer)0).equals(nextRuntimeCount.getValue()) && Contract.IntervalType.MONTHS.equals(nextRuntimeType.getValue())) {
+							nextRuntimeCount.setValue(firstRuntimeCount.getValue());
+							nextRuntimeType.setValue(firstRuntimeType.getValue());
+						}
+					}
+				}
+			});
 		}
-		return nextMinRuntimeCount;
+		return nextRuntimeCount;
 	}
 
-	public SelectInput getNextMinRuntimeType() throws RemoteException {
-		if (nextMinRuntimeType == null) {
+	public SelectInput getNextRuntimeType() throws RemoteException {
+		if (nextRuntimeType == null) {
 			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>();
 			list.add(Contract.IntervalType.DAYS);
 			list.add(Contract.IntervalType.WEEKS);
 			list.add(Contract.IntervalType.MONTHS);
 			list.add(Contract.IntervalType.YEARS);
-			nextMinRuntimeType = new SelectInput(list, getContract()
+			nextRuntimeType = new SelectInput(list, getContract()
 					.getFollowingMinRuntimeType());
 		}
-		return nextMinRuntimeType;
+		return nextRuntimeType;
 	}
 
 	public CheckboxInput getDoNotRemind() throws RemoteException {
@@ -586,11 +598,13 @@ public class ContractControl extends AbstractControl {
 			return contractList;
 
 		GenericIterator contracts = getContracts();
+		Date today = new Date(); 
 
 		double total = 0d;
 		while (contracts.hasNext()) {
 			Contract c = (Contract) contracts.next();
-			total += c.getMoneyPerMonth();
+			if (c.isActiveInMonth(today))
+				total += c.getMoneyPerMonth();
 		}
 		final double finalTotal = total;
 		
@@ -603,7 +617,7 @@ public class ContractControl extends AbstractControl {
 
 			@Override
 			protected String getSummary() {
-				return Settings.i18n().tr("Total per Month") + ": " + Math.round(finalTotal*100d)/100d + " EUR"; 
+				return Settings.i18n().tr("Total in this month") + ": " + Math.round(finalTotal*100d)/100d + " EUR"; 
 			};
 
 		};
@@ -789,26 +803,6 @@ public class ContractControl extends AbstractControl {
 	 * @return list of transactions in this contract
 	 * @throws RemoteException
 	 */
-	public Part getTransactionList() throws RemoteException {
-		if (transactionList != null)
-			return transactionList;
-
-		GenericIterator transactions = getContract().getTransactions();
-		transactionList = new TablePart(transactions,
-				new ShowTransactionDetailsView());
-		transactionList.addColumn(Settings.i18n().tr("Money"), "money");
-		TransactionListMenu tlm = new TransactionListMenu();
-		transactionList.setContextMenu(tlm);
-		transactionList.setSummary(false);
-		return transactionList;
-	}
-
-	/**
-	 * Returns a list of transactions in this contract.
-	 * 
-	 * @return list of transactions in this contract
-	 * @throws RemoteException
-	 */
 	public Part getCostsList() throws RemoteException {
 		if (costsList != null)
 			return costsList;
@@ -889,13 +883,13 @@ public class ContractControl extends AbstractControl {
 					.getValue());
 			c.setCancelationPeriodType((IntervalType) getCancellationPeriodType()
 					.getValue());
-			c.setFirstMinRuntimeCount((Integer) getFirstMinRuntimeCount()
+			c.setFirstMinRuntimeCount((Integer) getFirstRuntimeCount()
 					.getValue());
-			c.setFirstMinRuntimeType((IntervalType) getFirstMinRuntimeType()
+			c.setFirstMinRuntimeType((IntervalType) getFirstRuntimeType()
 					.getValue());
-			c.setFollowingMinRuntimeCount((Integer) getNextMinRuntimeCount()
+			c.setFollowingMinRuntimeCount((Integer) getNextRuntimeCount()
 					.getValue());
-			c.setFollowingMinRuntimeType((IntervalType) getNextMinRuntimeType()
+			c.setFollowingMinRuntimeType((IntervalType) getNextRuntimeType()
 					.getValue());
 
 			c.setDoNotRemind((Boolean) getDoNotRemind().getValue());
