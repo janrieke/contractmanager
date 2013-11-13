@@ -44,11 +44,9 @@ import de.willuhn.datasource.rmi.DBObject;
  *   first_min_runtime_type int(4),
  *   next_min_runtime_count int(4),
  *   next_min_runtime_type int(4),
- *   money_once double,
- *   money_per_day double,
- *   money_per_week double,
- *   money_per_month double,
- *   money_per_year double,
+ *   uri varchar(4096),
+ *   hibiscus_category varchar(255) NULL,
+ *   ignore_cancellations int(1) NOT NULL,
  *   UNIQUE (id),
  *   PRIMARY KEY (id)
  * );
@@ -144,7 +142,7 @@ public interface Contract extends DBObject {
 	public IntervalType getFollowingMinRuntimeType() throws RemoteException;
 	public void setFollowingMinRuntimeType(IntervalType type) throws RemoteException;
 	
-	public Boolean isDoNotRemind() throws RemoteException;
+	public Boolean getDoNotRemind() throws RemoteException;
 	public void setDoNotRemind(Boolean value) throws RemoteException;
 
 	public String getURI() throws RemoteException;
@@ -176,6 +174,12 @@ public interface Contract extends DBObject {
 
 	public static final String MONEY_PER_MONTH = "costs_per_month";
 	public double getMoneyPerMonth() throws RemoteException;
+
+	public static final String PARTNER_NAME = "partner_name";
+	public String getPartnerName() throws RemoteException;
+
+	public static final String CONTRACT_NAME_PLUS_PARTNER_NAME = "contract_name_plus_partner_name";
+	public String getContractAndPartnerName() throws RemoteException;
 
 	public String getHibiscusCategoryID() throws RemoteException;
 	public void setHibiscusCategoryID(String category) throws RemoteException;

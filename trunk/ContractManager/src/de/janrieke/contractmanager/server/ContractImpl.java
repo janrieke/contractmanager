@@ -225,6 +225,10 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		}
 		else if (MONEY_PER_MONTH.equals(arg0))
 			return getMoneyPerMonth();
+		else if (PARTNER_NAME.equals(arg0))
+			return getPartnerName();
+		else if (CONTRACT_NAME_PLUS_PARTNER_NAME.equals(arg0))
+			return getContractAndPartnerName();
 		else
 			return super.getAttribute(arg0);
 	}
@@ -439,14 +443,14 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	@Override
-	public Boolean isDoNotRemind() throws RemoteException {
+	public Boolean getDoNotRemind() throws RemoteException {
 		Integer b = ((Integer) getAttribute("ignore_cancellations"));
 		return b == null ? false : b.equals(1);
 	}
 
 	@Override
 	public void setDoNotRemind(Boolean value) throws RemoteException {
-		setAttribute("ignore_cancellations", value);
+		setAttribute("ignore_cancellations", value?1:0);
 	}
 
 	@Override
@@ -716,6 +720,17 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			}
 		}
 		return costsPerMonth;
+	}
+
+	
+	@Override
+	public String getPartnerName() throws RemoteException {
+		return getAddress().getName();
+	}
+	
+	@Override
+	public String getContractAndPartnerName() throws RemoteException {
+		return getName() + " [" + getPartnerName() + "]";
 	}
 
 	public static final boolean addToCalendar(Calendar calendar, IntervalType interval, int count) {

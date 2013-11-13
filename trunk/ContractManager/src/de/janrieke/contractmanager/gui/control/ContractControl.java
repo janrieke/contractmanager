@@ -34,7 +34,8 @@ import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion;
 import de.janrieke.contractmanager.gui.menu.ContractListMenu;
 import de.janrieke.contractmanager.gui.menu.CostsListMenu;
-import de.janrieke.contractmanager.gui.parts.SizeableTablePart;
+import de.janrieke.contractmanager.gui.parts.ContractListTablePart;
+import de.janrieke.contractmanager.gui.parts.CostsListTablePart;
 import de.janrieke.contractmanager.gui.view.ContractDetailView;
 import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
@@ -51,6 +52,7 @@ import de.willuhn.jameica.gui.Part;
 import de.willuhn.jameica.gui.dialogs.CalendarDialog;
 import de.willuhn.jameica.gui.formatter.CurrencyFormatter;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
+import de.willuhn.jameica.gui.formatter.Formatter;
 import de.willuhn.jameica.gui.formatter.TableFormatter;
 import de.willuhn.jameica.gui.input.CheckboxInput;
 import de.willuhn.jameica.gui.input.Input;
@@ -73,7 +75,7 @@ import de.willuhn.util.ApplicationException;
 public class ContractControl extends AbstractControl {
 
 	// list of all contracts
-	private TablePart contractList;
+	private ContractListTablePart contractList;
 	// list of all contracts with cancellation warnings
 	private TablePart contractListWarnings;
 
@@ -97,7 +99,7 @@ public class ContractControl extends AbstractControl {
 	private Input nextRuntimeMulti;
 	private IntegerInput nextRuntimeCount;
 	private SelectInput nextRuntimeType;
-	private CheckboxInput doNotRemind;
+	private CheckboxInput remindCheckbox;
 
 	private SelectInput partnerAddress;
 	private Input partnerName;
@@ -119,7 +121,7 @@ public class ContractControl extends AbstractControl {
 
 	private LabelInput nextCancellationDeadline;
 
-	private SizeableTablePart costsList;
+	private CostsListTablePart costsList;
 	private LabelInput costsPerTerm;
 	private LabelInput costsPerMonth;
 
@@ -441,11 +443,11 @@ public class ContractControl extends AbstractControl {
 		return nextRuntimeType;
 	}
 
-	public CheckboxInput getDoNotRemind() throws RemoteException {
-		if (doNotRemind == null) {
-			doNotRemind = new CheckboxInput(getContract().isDoNotRemind());
+	public CheckboxInput getRemind() throws RemoteException {
+		if (remindCheckbox == null) {
+			remindCheckbox = new CheckboxInput(!getContract().getDoNotRemind());
 		}
-		return doNotRemind;
+		return remindCheckbox;
 	}
 
 	private Address currentAddress = null;
@@ -606,27 +608,18 @@ public class ContractControl extends AbstractControl {
 			if (c.isActiveInMonth(today))
 				total += c.getMoneyPerMonth();
 		}
-		final double finalTotal = total;
 		
 		contracts.begin();
 		
 		// 4) create the table
-		contractList = new TablePart(
+		contractList = new ContractListTablePart(
 				contracts,
-				new de.janrieke.contractmanager.gui.action.ShowContractDetailView()) {
-
-			@Override
-			protected String getSummary() {
-				return Settings.i18n().tr("Total in this month") + ": " + Settings.DECIMALFORMAT.format(Math.round(finalTotal*100d)/100d) + " EUR"; 
-			};
-
-		};
+				new de.janrieke.contractmanager.gui.action.ShowContractDetailView());
+		contractList.setSum(total);
 
 		// 5) now we have to add some columns.
 		contractList.addColumn(Settings.i18n().tr("Name of Contract"), "name");
-
-		// 6) the following fields are a date fields. So we add a date
-		// formatter.
+		contractList.addColumn(Settings.i18n().tr("Contract Partner"), Contract.PARTNER_NAME);
 		contractList.addColumn(Settings.i18n().tr("Start Date"), "startdate",
 				new DateFormatter(Settings.getNewDateFormat()));
 		contractList.addColumn(Settings.i18n().tr("End Date"), "enddate",
@@ -642,6 +635,19 @@ public class ContractControl extends AbstractControl {
 		contractList.addColumn(Settings.i18n().tr("Money per Month"),
 				Contract.MONEY_PER_MONTH, new CurrencyFormatter(
 						Settings.CURRENCY, Settings.DECIMALFORMAT));
+		contractList.addColumn(Settings.i18n().tr("Remind?"), "ignore_cancellations", new Formatter() {
+			
+			@Override
+			public String format(Object o) {
+				if (o instanceof Integer) {
+					if (((Integer)o).intValue() == 0)
+						return "☑";
+					else
+						return "☐";
+				}
+				else return "";
+			}
+		}, true, Column.ALIGN_LEFT);
 
 		// 7) we are adding a context menu
 		contractList.setContextMenu(new ContractListMenu(true));
@@ -656,7 +662,11 @@ public class ContractControl extends AbstractControl {
 					Calendar today = Calendar.getInstance();
 					Calendar calendar = Calendar.getInstance();
 					try {
-						if (contract.isDoNotRemind())
+						if (!contract.isActiveInMonth(new Date())) {
+							item.setForeground(item.getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
+						}
+
+						if (contract.getDoNotRemind())
 							return;
 						Date deadline = contract.getNextCancellationDeadline();
 						if (deadline == null)
@@ -716,7 +726,7 @@ public class ContractControl extends AbstractControl {
 			Calendar today = Calendar.getInstance();
 			Calendar calendar = Calendar.getInstance();
 			try {
-				if (contract.isDoNotRemind())
+				if (contract.getDoNotRemind())
 					continue;
 				Date deadline = contract.getNextCancellationDeadline();
 				if (deadline == null)
@@ -808,14 +818,14 @@ public class ContractControl extends AbstractControl {
 			return costsList;
 
 		costsIterator = getContract().getCosts();
-		costsList = new SizeableTablePart(costsIterator, null);
+		costsList = new CostsListTablePart(costsIterator, null);
 		costsList.setFormatter(new TableFormatter() {
 
 			@Override
 			public void format(TableItem item) {
 				try {
 					double money = ((Costs) item.getData()).getMoney(); // Double.parseDouble(item.getText(1));
-					String text = String.format("%1$.2f", money) + " �";
+					String text = String.format("%1$.2f", money) + " €";
 					item.setText(1, text);
 					item.setText(2, ((Costs) item.getData()).getPeriod()
 							.toAdjectiveString());
@@ -892,7 +902,7 @@ public class ContractControl extends AbstractControl {
 			c.setFollowingMinRuntimeType((IntervalType) getNextRuntimeType()
 					.getValue());
 
-			c.setDoNotRemind((Boolean) getDoNotRemind().getValue());
+			c.setDoNotRemind(!(Boolean) getRemind().getValue());
 
 			c.setHibiscusCategoryID(hibiscusCategoryID);
 

@@ -85,7 +85,7 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    //TODO: Show complete term instead of only beginning
 	    left.addLabelPair(Settings.i18n().tr("Next cancelable term"), control.getNextTerm());
 	    left.addLabelPair(Settings.i18n().tr("Deadline for next cancellation"), control.getNextCancellationDeadline());
-	    left.addLabelPair(Settings.i18n().tr("Do not remind about cancellations"), control.getDoNotRemind());
+	    left.addLabelPair(Settings.i18n().tr("Remind about cancellations?"), control.getRemind());
 
 	    right = new SimpleContainer(columns.getComposite(), true);
 	    right.addHeadline(Settings.i18n().tr("Contractual Partner Address"));

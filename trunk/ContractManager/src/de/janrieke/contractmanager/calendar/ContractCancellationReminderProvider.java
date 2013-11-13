@@ -38,7 +38,7 @@ public class ContractCancellationReminderProvider implements
 			iterator = ContractControl.getContracts();
 		while (iterator.hasNext()) {
 			Contract contract = (Contract) iterator.next();
-			if (contract.isDoNotRemind())
+			if (contract.getDoNotRemind())
 				continue;
 			Date nextCancellationDeadline = contract.getNextCancellationDeadline();
 			while (nextCancellationDeadline != null && nextCancellationDeadline.before(to)) {
