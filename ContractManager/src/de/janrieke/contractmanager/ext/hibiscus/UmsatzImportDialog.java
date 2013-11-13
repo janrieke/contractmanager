@@ -136,6 +136,7 @@ public class UmsatzImportDialog extends AbstractDialog<Contract> {
 
 		importButtonEnabled = true;
 		contractList = new SelectInput(contracts, null);
+		((SelectInput)contractList).setAttribute(Contract.CONTRACT_NAME_PLUS_PARTNER_NAME); 
 		return contractList;
 	}
 
