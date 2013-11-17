@@ -129,7 +129,7 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 			throw new ApplicationException(i18n.tr("No assigned contract in database"));
 		
 		if (contract == null) {
-			contract = new UmsatzImportDialog().open();
+			contract = new UmsatzImportDialog(u).open();
 		}
 
 		if (contract != null) {
