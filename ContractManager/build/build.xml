@@ -73,8 +73,8 @@
       <pathelement location="lib/xercesImpl.jar" />
       <pathelement location="lib/xercesSamples.jar" />
       <pathelement location="lib/xml-apis.jar" />
+      <pathelement path="${class.dir}" />
     </path>
-
   </target>
 
 
@@ -85,7 +85,9 @@
     <javac fork="true" debug="true" deprecation="true" destdir="${class.dir}" srcdir="${src.dir}">
       <classpath refid="compilepath" />
     </javac>
-    <javac fork="true" debug="true" deprecation="true" destdir="${class.dir}" srcdir="${updates.src.dir}">
+  	
+    <mkdir dir="${project.zipdir}/updates" />
+    <javac fork="true" debug="true" deprecation="true" destdir="${project.zipdir}/updates" srcdir="${updates.src.dir}">
       <classpath refid="compilepath" />
     </javac>
 
