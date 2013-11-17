@@ -30,7 +30,7 @@ public class ContractListTablePart extends TablePart {
 					throws ApplicationException {
 				assert object instanceof Contract;
 				try {
-					((Contract)object).setDoNotRemind(!"☑".equals(newValue));
+					((Contract)object).setDoNotRemind(!"\u2611".equals(newValue));
 					((Contract)object).store();
 				} catch (RemoteException e) {
 					Logger.error("error while storing contract", e);
@@ -44,16 +44,16 @@ public class ContractListTablePart extends TablePart {
 	@Override
 	protected String getControlValue(Control control) {
 		if (control instanceof Button) {
-			return ((Button) control).getSelection()?"☑":"☐";
+			return ((Button) control).getSelection()?"\u2611":"\u2610";
 		} else
 			return super.getControlValue(control);
 	}
 
 	@Override
 	protected Control getEditorControl(int row, TableItem item, String oldValue) {
-			if (item.getData() instanceof Contract && row == 6) {
+			if (item.getData() instanceof Contract && row == 7) {
 				Button newButton = new Button(item.getParent(), SWT.CHECK);
-				newButton.setSelection("☑".equals(oldValue));
+				newButton.setSelection("\u2611".equals(oldValue));
 				newButton.setFocus();
 			    return newButton;
 			}

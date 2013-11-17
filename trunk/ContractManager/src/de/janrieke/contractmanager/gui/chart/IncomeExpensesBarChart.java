@@ -216,7 +216,7 @@ public class IncomeExpensesBarChart extends AbstractChart<ChartData>
 			public void paintControl(PaintEvent e) {
 				String sumLabel1 = Settings.i18n().tr("Summe") + ":";
 				String sumLabel2 = Settings.DECIMALFORMAT.format(Math.round(sum*100)/100d);
-				sumLabel2 = sumLabel2 + " €";
+				sumLabel2 = sumLabel2 + " \u20AC";
 				int width1 = e.gc.textExtent(sumLabel1).x;
 				int width2 = e.gc.textExtent(sumLabel2).x;
 				e.gc.drawText(sumLabel1, (e.width-width1)/2, 5);
