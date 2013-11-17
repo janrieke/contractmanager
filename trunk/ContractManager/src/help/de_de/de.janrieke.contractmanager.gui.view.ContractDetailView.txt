@@ -7,7 +7,15 @@
 		Geben Sie hier die Vertragsdetails ein. 
 	</p>
 	<li>
+		Wenn Sie finanzielle Details eingeben, werden die Kosten pro Monat und pro Vertragsperiod berechnet.
+		So können Sie einfacher über über eine mögliche Kündigung entscheiden.
+		Verwenden Sie negative Werte für Ausgaben (z.B. Wohnungsmiete), positive für Einnahmen (z.B. Ihren Arbeitsvertrag). 
+	</li>
+	<li>
 		Angaben zur Laufzeit sind wichtig, um Sie automatisch an Vertragsverlängerungen und mögliche Kündigungen zu erinnern. 
+	</li>
+	<li>
+		Sie können für jeden Vertrag festlegen, ob Sie an anstehende Kündigungsfristen erinnert werden wollen. 
 	</li>
 	<li>
 		Verwenden Sie die Schaltfläche <b>Kündigung generieren</b>, um automatisch ein Kündungsschreiben zu generieren (OpenOffice-Format).

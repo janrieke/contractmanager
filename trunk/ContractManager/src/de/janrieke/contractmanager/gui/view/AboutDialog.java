@@ -54,7 +54,7 @@ public class AboutDialog extends AbstractDialog<Object> {
 				+ "<br/>Licence: GPL 3.0 (http://www.gnu.org/licenses/gpl-3.0.txt)"
 				+ "<br/><p>Copyright by Jan Rieke [it@janrieke.de]</p>"
 				+ "<p>http://www.janrieke.de/projects/contractmanager</p>"
-				+ "<br/><p>Contains code from Jameica Example Plugin, Hibiscus, and Syntax; copyright by Olaf Willuhn [info@jameica.org], GPL</p>"
+				+ "<br/><p>Contains code from Jameica, Jameica Example Plugin, Hibiscus, and Syntax; copyright by Olaf Willuhn [info@jameica.org], GPL</p>"
 				+ "<p>http://www.jameica.org</p>" + "</form>");
 
 		text.paint(parent);

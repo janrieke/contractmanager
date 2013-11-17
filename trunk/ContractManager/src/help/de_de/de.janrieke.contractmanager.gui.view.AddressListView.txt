@@ -12,4 +12,7 @@
 	<li>
 		Verwenden Sie die Schaltfläche am unteren Rand, um eine neue Adresse zu erstellen. 
 	</li>
+	<li>
+		Nutzen Sie das Kontextmenü, um nicht mehr genutzte Adressen zu löschen. (Sie können nur Adressen löschen, die aktuell in keinem Vertrag verwendet werden.)
+	</li>
 </form>

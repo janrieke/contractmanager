@@ -7,12 +7,12 @@
 		Hier finden Sie die Übersicht aller Verträge.
 	</p>
 	<li>
-		Gelb und rot hinterlegte Vertäge sind kurz vor einer Kündigungsfrist. 
+		Gelb und rot hinterlegte Vertäge sind kurz vor einer Kündigungsfrist. (Sie können die Fristen unter "Einstellungen" anpassen.)
 	</li>
 	<li>
 		Doppelklicken Sie auf einen Vertrag, um die Vertragsdetails anzuzeigen. 
 	</li>
 	<li>
-		Verwenden Sie die Schaltflächen am unteren Rand, um neue Verträge zu erstellen oder manuell Erinnerungen in eine iCalendar-Datei zu exportieren. 
+		Verwenden Sie die Schaltfläche am unteren Rand, um neue Verträge zu erstellen. 
 	</li>
 </form>
