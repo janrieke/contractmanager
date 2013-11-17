@@ -23,6 +23,7 @@ package de.janrieke.contractmanager.ext.hibiscus;
 
 import java.rmi.RemoteException;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -38,6 +39,7 @@ import de.willuhn.jameica.gui.input.SelectInput;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.util.ButtonArea;
 import de.willuhn.jameica.gui.util.LabelGroup;
+import de.willuhn.jameica.hbci.rmi.Umsatz;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
@@ -53,6 +55,8 @@ public class UmsatzImportDialog extends AbstractDialog<Contract> {
 	private Contract selectedContract = null;
 
 	private boolean importButtonEnabled = false;
+
+	private Umsatz transaction;
 	
 	/**
 	 * ct.
@@ -60,9 +64,9 @@ public class UmsatzImportDialog extends AbstractDialog<Contract> {
 	 * @param umsatz
 	 *            Zu importierender Umsatz.
 	 */
-	public UmsatzImportDialog() {
+	public UmsatzImportDialog(Umsatz transaction) {
 		super(POSITION_CENTER);
-
+		this.transaction = transaction;
 		setTitle(i18n.tr("Import of Transactions"));
 		this.setSize(WINDOW_WIDTH, SWT.DEFAULT);
 	}
@@ -133,11 +137,110 @@ public class UmsatzImportDialog extends AbstractDialog<Contract> {
 					i18n.tr("No existing contracts."));
 			return contractList;
 		}
-
+		
+		float minSimilarity = 1;
+		Contract maxSimilarContract = null;
+		while (contracts.hasNext()) {
+			Contract c = (Contract)contracts.next();
+			float similarity = calculateSimilarity(c, transaction);
+			//System.out.println("Contract " + c.getName() + ": " + similarity);
+			if (similarity < minSimilarity) {
+				maxSimilarContract = c;
+				minSimilarity = similarity;
+			}
+		}
+		
+		contracts.begin();
 		importButtonEnabled = true;
-		contractList = new SelectInput(contracts, null);
-		((SelectInput)contractList).setAttribute(Contract.CONTRACT_NAME_PLUS_PARTNER_NAME); 
+		contractList = new SelectInput(contracts, maxSimilarContract);
+		((SelectInput)contractList).setAttribute(Contract.CONTRACT_NAME_PLUS_PARTNER_NAME);
 		return contractList;
+	}
+	
+	private float getRelativeLevenshteinDistance(String a, String b){
+		int distance = StringUtils.getLevenshteinDistance(a.toLowerCase(), b.toLowerCase());
+		int maxLength = Math.max(a.length(), b.length());
+		int minLength = Math.min(a.length(), b.length());
+		int maxDistance = maxLength;
+		int minDistance = maxLength-minLength;
+		return (float) Math.sqrt(Math.sqrt((((float)(distance - minDistance))/((float)maxDistance))));
+	}
+	
+	private static final int MINIMUM_TOKEN_SIZE = 3; // do not count 1 or 2 character tokens
+
+	private float calculateSimilarity(Contract c, Umsatz transaction) {
+		try {
+			String trName = "";
+			if (transaction.getGegenkontoName() != null)
+				trName = transaction.getGegenkontoName();
+			String trUse = "";
+			if (transaction.getZweck() != null)
+				trUse += transaction.getZweck();
+			if (transaction.getZweck2() != null)
+				trUse += transaction.getZweck2();
+			for (String more : transaction.getWeitereVerwendungszwecke()) {
+				trUse += more;
+			}
+			
+			String[] trNameTokens = trName.split("\\s+");
+			String[] trUseTokens = trUse.split("\\s+");
+			
+			float[] distanceName = new float[trNameTokens.length];
+			float[] distanceUse1 = new float[trUseTokens.length];
+			float[] distanceUse2 = new float[trUseTokens.length];
+			float[] distanceUse3 = new float[trUseTokens.length];
+
+			// try finding the partner name in the owner of the opposite account
+			for (int i = 0; i<trNameTokens.length; i++) {
+				if (trNameTokens[i].length() < MINIMUM_TOKEN_SIZE)
+					distanceName[i] = 1; // do not count small tokens
+				else
+					distanceName[i] = getRelativeLevenshteinDistance(trNameTokens[i], c.getPartnerName());
+			}
+			
+			// try finding the contract name or number in the reason for payment
+			
+			String customerNumber = c.getCustomerNumber();
+			String contractNumber = c.getContractNumber();
+			for (int i = 0; i<trUseTokens.length; i++) {
+				if (trUseTokens[i].length() < MINIMUM_TOKEN_SIZE)
+					distanceUse1[i] = 1; // do not count small tokens
+				else
+					distanceUse1[i] = getRelativeLevenshteinDistance(trUseTokens[i], c.getName());
+				
+				if (trUseTokens[i].length() < MINIMUM_TOKEN_SIZE || customerNumber == null || "".equals(customerNumber))
+					distanceUse2[i] = 1; // do not count small tokens
+				else
+					distanceUse2[i] = getRelativeLevenshteinDistance(trUseTokens[i], customerNumber);
+				
+				if (trUseTokens[i].length() < MINIMUM_TOKEN_SIZE || contractNumber == null || "".equals(contractNumber))
+					distanceUse3[i] = 1; // do not count small tokens
+				else
+					distanceUse3[i] = getRelativeLevenshteinDistance(trUseTokens[i], contractNumber);
+			}
+			
+			float result = 1;
+			int zeros = 0;
+			for (int i = 0; i<trNameTokens.length; i++) {
+				result *= distanceName[i];
+				if (distanceName[i] == 0)
+					zeros++;
+			}
+			for (int i = 0; i<trUseTokens.length; i++) {
+				result *= distanceUse1[i];
+				if (distanceUse1[i] == 0)
+					zeros++;
+				result *= distanceUse2[i];
+				if (distanceUse2[i] == 0)
+					zeros++;
+				result *= distanceUse3[i];
+				if (distanceUse3[i] == 0)
+					zeros++;
+				}
+			return result-zeros;
+		} catch (RemoteException e) {
+			return 1;
+		}
 	}
 
 	@Override
