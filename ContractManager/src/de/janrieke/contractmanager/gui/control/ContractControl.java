@@ -641,9 +641,9 @@ public class ContractControl extends AbstractControl {
 			public String format(Object o) {
 				if (o instanceof Integer) {
 					if (((Integer)o).intValue() == 0)
-						return "☑";
+						return "\u2611";
 					else
-						return "☐";
+						return "\u2610";
 				}
 				else return "";
 			}
@@ -825,7 +825,7 @@ public class ContractControl extends AbstractControl {
 			public void format(TableItem item) {
 				try {
 					double money = ((Costs) item.getData()).getMoney(); // Double.parseDouble(item.getText(1));
-					String text = String.format("%1$.2f", money) + " €";
+					String text = String.format("%1$.2f", money) + " \u20AC";
 					item.setText(1, text);
 					item.setText(2, ((Costs) item.getData()).getPeriod()
 							.toAdjectiveString());
