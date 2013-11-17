@@ -50,7 +50,6 @@ import de.willuhn.datasource.BeanUtil;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.util.Font;
 import de.willuhn.jameica.gui.util.SWTUtil;
-import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ColorGenerator;
 
@@ -123,7 +122,7 @@ public class IncomeExpensesBarChart extends AbstractChart<ChartData>
 			grid.setForeground(gray);
 
 			IAxisTick tick = axis.getTick();
-			tick.setFormat(HBCI.DECIMALFORMAT);
+			tick.setFormat(Settings.DECIMALFORMAT);
 			tick.setForeground(GUI.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 		}
 		//

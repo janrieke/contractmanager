@@ -37,9 +37,6 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.swtchart.ext.Messages;
 
 import de.willuhn.jameica.gui.GUI;
-import de.willuhn.jameica.hbci.HBCI;
-import de.willuhn.jameica.system.Application;
-import de.willuhn.util.I18N;
 
 /**
  * Abstrakte Basis-Implementierung der Charts.
@@ -47,8 +44,6 @@ import de.willuhn.util.I18N;
  */
 public abstract class AbstractChart<T extends ChartData> implements Chart<T>
 {
-  final static I18N i18n = Application.getPluginLoader().getPlugin(HBCI.class).getResources().getI18N();
-
   private String title             = null;
   private Map<RGB,Color> colors    = new HashMap<RGB,Color>();
   private List<T> data             = new ArrayList<T>();
