@@ -6,12 +6,12 @@
         name="contractmanager" version="0.4" class="de.janrieke.contractmanager.ContractManagerPlugin">
 
   <description>ContractManager for Jameica</description>
-  <url>http://janrieke.de/products/jameica/updates/contractmanager/0.3/contractmanager.zip</url>
+  <url>http://janrieke.de/products/jameica/updates/contractmanager/0.4/contractmanager.zip</url>
   <homepage>http://janrieke.de/products/jameica/contractmanager</homepage>
   <license>GPL 3.0 - http://www.gnu.org/licenses/gpl-3.0.txt</license>
 
-  <requires jameica="2.3+">
-    <import plugin="hibiscus" version="2.3+" required="false" />
+  <requires jameica="2.5+">
+    <import plugin="hibiscus" version="2.5+" required="false" />
   </requires>
 
   <classfinder>
@@ -23,7 +23,7 @@
     <item name="ContractManager">
       <item name="New Contract..." shortcut="ALT+C" icon="document-new.png" action="de.janrieke.contractmanager.gui.action.ShowContractDetailView" />
       <item name="-" />
-      <item id="de.janrieke.contractmanager.menu.license"      name="Lizenzinformationen"      icon="text-x-generic.png"      action="de.janrieke.contractmanager.gui.action.ShowLicenseInfoView" />
+      <item id="de.janrieke.contractmanager.menu.license"      name="Licence Information"      icon="text-x-generic.png"      action="de.janrieke.contractmanager.gui.action.ShowLicenseInfoView" />
       <item id="de.janrieke.contractmanager.menu.about"        name="About..."                    icon="gtk-info.png"            action="de.janrieke.contractmanager.gui.action.ShowAboutDialog" />
     </item>
   </menu>
