@@ -1,0 +1,12 @@
+<form>
+	<p>
+		<span color="header" font="header">Ausgaben-Übersicht</span>
+	</p>
+
+	<p>
+		Diese Grafik zeigt alle Ausgaben, berechnet auf Monatsbasis. 
+	</p>
+	<li>
+		Sie können den angezeigten Monat oben über die Eingabefelder einstellen.
+	</li>
+</form>

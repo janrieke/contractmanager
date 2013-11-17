@@ -4,6 +4,6 @@
 	</p>
 
 	<p>
-	  ContractManager v0.1
+	  ContractManager v0.4
 	</p>
 </form>

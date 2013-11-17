@@ -1,0 +1,13 @@
+<form>
+	<p>
+		<span color="header" font="header">Einnahmen/Ausgaben-Vergleich</span>
+	</p>
+
+	<p>
+		In der linken Spalte finden Sie die monatlichen Einnahmen, rechts die Ausgaben.
+		Die Summe aller Einnahmen und Ausgaben ist oben mittig dargestellt. 
+	</p>
+	<li>
+		Sie können den angezeigten Monat oben über die Eingabefelder einstellen.
+	</li>
+</form>

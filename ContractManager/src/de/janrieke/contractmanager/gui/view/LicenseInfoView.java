@@ -50,7 +50,7 @@ public class LicenseInfoView extends AbstractView {
   public void bind() throws Exception
   {
 		I18N i18n = Application.getI18n();
-		GUI.getView().setTitle(i18n.tr("License Information"));
+		GUI.getView().setTitle(i18n.tr("Licence Information"));
     
 		LicenseControl control = new LicenseControl(this);
 
