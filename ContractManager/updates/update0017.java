@@ -57,7 +57,7 @@ public class update0017 implements Update
     I18N i18n = myProvider.getResources().getI18N();
 
     // Get the SQL dialect
-    String driver = ContractDBService.SETTINGS.getString("database.driver",null);
+    String driver = ContractDBService.SETTINGS.getString("database.driver",DBSupportH2Impl.class.getName());
     String sql = (String) statements.get(driver);
     if (sql == null)
       throw new ApplicationException(i18n.tr("Database {0} not supported",driver));
