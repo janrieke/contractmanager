@@ -4,9 +4,9 @@
 	</p>
 
 	<p>
-		Geben Sie hier die Adressdaten ein. Diese werden bei der Generierung von Kündungsschreiben genutzt, um automatisch das Anschriftsfeld zu füllen.
+		Geben Sie hier die Adressdaten ein. Diese werden bei der Generierung von Kündungsschreiben genutzt, um automatisch das Anschriftfeld zu füllen.
 	</p>
 	<li>
-		Nutzen Sie die Schaltfläche "Adresse löschen...", um nicht mehr genutzte Adressen zu löschen. Sie können nur Adressen löschen, die aktuell in keinem Vertrag verwendet werden. 
+		Nutzen Sie die Schaltfläche "Adresse löschen...", um nicht mehr genutzte Adressen zu löschen. Sie können nur Adressen löschen, die aktuell in keinem Vertrag verwendet werden.
 	</li>
 </form>

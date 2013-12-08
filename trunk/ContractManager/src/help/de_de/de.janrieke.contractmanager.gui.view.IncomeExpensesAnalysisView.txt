@@ -5,9 +5,9 @@
 
 	<p>
 		In der linken Spalte finden Sie die monatlichen Einnahmen, rechts die Ausgaben.
-		Die Summe aller Einnahmen und Ausgaben ist oben mittig dargestellt. 
+		Die Summe aller Einnahmen und Ausgaben ist oben mittig dargestellt.
 	</p>
 	<li>
-		Sie können den angezeigten Monat oben über die Eingabefelder einstellen.
+		Sie können den angezeigten Monat über die Eingabefelder oben einstellen.
 	</li>
 </form>

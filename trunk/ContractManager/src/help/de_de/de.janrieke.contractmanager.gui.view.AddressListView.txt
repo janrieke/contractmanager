@@ -4,13 +4,13 @@
 	</p>
 
 	<p>
-		Hier finden Sie eine Übersicht über alle Adressen von Vertragspartnern.
+		Hier finden Sie eine Übersicht über alle Adressen Ihrer Vertragspartner.
 	</p>
 	<li>
-		Doppelklicken Sie auf eine Adresse, um die Adressdaten anzuzeigen und zu bearbeiten. 
+		Doppelklicken Sie auf eine Adresse, um die Adressdaten anzuzeigen und zu bearbeiten.
 	</li>
 	<li>
-		Verwenden Sie die Schaltfläche am unteren Rand, um eine neue Adresse zu erstellen. 
+		Verwenden Sie die Schaltfläche am unteren Rand, um eine neue Adresse zu erstellen.
 	</li>
 	<li>
 		Nutzen Sie das Kontextmenü, um nicht mehr genutzte Adressen zu löschen. (Sie können nur Adressen löschen, die aktuell in keinem Vertrag verwendet werden.)

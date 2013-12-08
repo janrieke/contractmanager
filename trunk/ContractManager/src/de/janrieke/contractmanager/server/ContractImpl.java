@@ -229,6 +229,13 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			return getPartnerName();
 		else if (CONTRACT_NAME_PLUS_PARTNER_NAME.equals(arg0))
 			return getContractAndPartnerName();
+		else if ("ignore_cancellations".equals(arg0)) { // prevent "null" result
+			Object result = super.getAttribute(arg0);
+			if (result == null)
+				return 0;
+			else 
+				return result;
+		}
 		else
 			return super.getAttribute(arg0);
 	}

@@ -18,15 +18,19 @@
 package de.janrieke.contractmanager.gui.view;
 
 import de.janrieke.contractmanager.Settings;
+import de.janrieke.contractmanager.gui.action.ShowJameicaSettings;
 import de.janrieke.contractmanager.gui.button.RestoreButton;
 import de.janrieke.contractmanager.gui.control.SettingsControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.dialogs.YesNoDialog;
+import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.util.ButtonArea;
 import de.willuhn.jameica.gui.util.ColumnLayout;
 import de.willuhn.jameica.gui.util.SimpleContainer;
+import de.willuhn.jameica.plugin.Manifest;
+import de.willuhn.jameica.system.Application;
 import de.willuhn.util.ApplicationException;
 
 /**
@@ -69,6 +73,13 @@ public class SettingsView extends AbstractView {
 	    right.addHeadline(Settings.i18n().tr("iCal Export of Contract Cancellation Reminders"));
 //	    right.addLabelPair(Settings.i18n().tr("Export warnings on exit"), control.getICalAutoExport());
 	    right.addLabelPair(Settings.i18n().tr("Export contract names"), control.getNamedICalExport());
+	    
+	    Manifest mf = Application.getPluginLoader().getManifestByName("jameica.ical");
+	    if (mf == null) {
+	    	right.addText(Settings.i18n().tr("jameica.ical plugin not installed. Install the plugin to enable cancellation reminder export."), true);
+	    	right.addPart(new Button(Settings.i18n().tr("Open Jameica Update Settings"), new ShowJameicaSettings("Updates")));
+	    } else
+	    	right.addPart(new Button(Settings.i18n().tr("Open Jameica Calendar Settings"), new ShowJameicaSettings("Kalender")));
 
 	    
 		// add some buttons

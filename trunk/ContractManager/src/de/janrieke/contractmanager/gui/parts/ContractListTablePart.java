@@ -23,6 +23,7 @@ public class ContractListTablePart extends TablePart {
 
 	public ContractListTablePart(GenericIterator list, Action action) {
 		super(list, action);
+	    setRememberColWidths(true);
 		this.addChangeListener(new TableChangeListener() {
 			
 			@Override
