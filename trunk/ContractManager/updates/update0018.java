@@ -55,7 +55,7 @@ public class update0018 implements Update {
 
 		// Get the SQL dialect
 		String driver = ContractDBService.SETTINGS.getString("database.driver",
-				null);
+				DBSupportH2Impl.class.getName());
 		String sql = (String) statements.get(driver);
 		if (sql == null)
 			throw new ApplicationException(i18n.tr(
