@@ -36,6 +36,7 @@ import de.janrieke.contractmanager.gui.menu.ContractListMenu;
 import de.janrieke.contractmanager.gui.menu.CostsListMenu;
 import de.janrieke.contractmanager.gui.parts.ContractListTablePart;
 import de.janrieke.contractmanager.gui.parts.CostsListTablePart;
+import de.janrieke.contractmanager.gui.parts.SizeableTablePart;
 import de.janrieke.contractmanager.gui.view.ContractDetailView;
 import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
@@ -77,7 +78,7 @@ public class ContractControl extends AbstractControl {
 	// list of all contracts
 	private ContractListTablePart contractList;
 	// list of all contracts with cancellation warnings
-	private TablePart contractListWarnings;
+	private SizeableTablePart contractListWarnings;
 
 	// Input fields for the contract attributes,
 	private Input name;
@@ -595,7 +596,7 @@ public class ContractControl extends AbstractControl {
 	 * @return a table with contracts.
 	 * @throws RemoteException
 	 */
-	public Part getContractsTable() throws RemoteException {
+	public ContractListTablePart getContractsTable() throws RemoteException {
 		if (contractList != null)
 			return contractList;
 
@@ -745,7 +746,7 @@ public class ContractControl extends AbstractControl {
 				.fromArray(filteredContracts.toArray(filteredArray));
 
 		// 4) create the table
-		contractListWarnings = new TablePart(
+		contractListWarnings = new SizeableTablePart(
 				filteredIterator,
 				new de.janrieke.contractmanager.gui.action.ShowContractDetailView());
 
@@ -804,6 +805,8 @@ public class ContractControl extends AbstractControl {
 				}
 			}
 		});
+		contractListWarnings.orderBy(3);
+		
 		return contractListWarnings;
 	}
 

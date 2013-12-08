@@ -220,6 +220,8 @@ public class AddressControl extends AbstractControl {
 
 		// 6) we are adding a context menu
 		addressList.setContextMenu(new AddressListMenu(true));
+		
+		addressList.setRememberColWidths(true);
 
 		return addressList;
 	}

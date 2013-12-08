@@ -10,9 +10,12 @@
 		Gelb und rot hinterlegte Vertäge sind kurz vor einer Kündigungsfrist. (Sie können die Fristen unter "Einstellungen" anpassen.)
 	</li>
 	<li>
-		Doppelklicken Sie auf einen Vertrag, um die Vertragsdetails anzuzeigen. 
+		Ausgegraute Verträge laufen nicht im aktuellen Monat (Vertragsende in der Vergangenheit oder Vertragsbeginn in der Zukunft).
 	</li>
 	<li>
-		Verwenden Sie die Schaltfläche am unteren Rand, um neue Verträge zu erstellen. 
+		Doppelklicken Sie auf einen Vertrag, um die Vertragsdetails anzuzeigen.
+	</li>
+	<li>
+		Verwenden Sie die Schaltfläche am unteren Rand, um neue Verträge zu erstellen.
 	</li>
 </form>

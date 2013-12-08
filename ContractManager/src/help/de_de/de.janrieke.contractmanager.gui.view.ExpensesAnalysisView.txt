@@ -4,9 +4,9 @@
 	</p>
 
 	<p>
-		Diese Grafik zeigt alle Ausgaben, berechnet auf Monatsbasis. 
+		Diese Grafik zeigt alle Ausgaben, berechnet auf Monatsbasis.
 	</p>
 	<li>
-		Sie können den angezeigten Monat oben über die Eingabefelder einstellen.
+		Sie können den angezeigten Monat über die Eingabefelder oben einstellen.
 	</li>
 </form>

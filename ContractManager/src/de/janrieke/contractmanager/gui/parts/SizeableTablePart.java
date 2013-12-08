@@ -30,15 +30,22 @@ import de.willuhn.jameica.gui.util.SimpleContainer;
 
 public class SizeableTablePart extends TablePart {
 
-	private int heightHint;
+	private int heightHint = -1;
+	private int orderByIndex = -1;
 
 	@Override
 	public synchronized void paint(Composite parent) throws RemoteException {
-	    SimpleContainer container = new SimpleContainer(parent, true); //give the table a minimum height
-	    GridData gd = new GridData(GridData.FILL_VERTICAL | GridData.FILL_HORIZONTAL);
-	    gd.heightHint = heightHint;
-	    container.getComposite().setLayoutData(gd);
-	    super.paint(container.getComposite());
+		if (heightHint != -1) {
+			SimpleContainer container = new SimpleContainer(parent, true); //give the table a minimum height
+			GridData gd = new GridData(GridData.FILL_VERTICAL | GridData.FILL_HORIZONTAL);
+			gd.heightHint = heightHint;
+			container.getComposite().setLayoutData(gd);
+		    super.paint(container.getComposite());
+		} else {
+		    super.paint(parent);
+		}
+		if (orderByIndex != -1)
+			super.orderBy(orderByIndex);
 	}
 
 	public SizeableTablePart(GenericIterator list, Action action) {
@@ -53,5 +60,11 @@ public class SizeableTablePart extends TablePart {
 	public synchronized void setHeightHint(int heightHint) {
 		this.heightHint = heightHint; 
 	}
-
+	
+	@Override
+	public void orderBy(int index) {
+		// make method public
+		this.orderByIndex  = index;
+		super.orderBy(index);
+	}
 }
