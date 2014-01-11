@@ -166,4 +166,28 @@ public class Settings {
 		SettingsUtil.set("ical_name_export", Boolean.toString(name));
 	}
 
+
+	public static boolean getShowHibiscusCategorySelector() throws RemoteException {
+		return Boolean.parseBoolean(SettingsUtil.get("show_hibiscus_category_selector", "true"));
+	}
+
+	public static void setShowHibiscusCategorySelector(boolean show) throws RemoteException, ApplicationException {
+		SettingsUtil.set("show_hibiscus_category_selector", Boolean.toString(show));
+	}
+
+	public static boolean getShowHibiscusTransactionList() throws RemoteException {
+		return Boolean.parseBoolean(SettingsUtil.get("show_hibiscus_transaction_list", "true"));
+	}
+
+	public static void setShowHibiscusTransactionList(boolean show) throws RemoteException, ApplicationException {
+		SettingsUtil.set("show_hibiscus_transaction_list", Boolean.toString(show));
+	}
+
+	public static int getHibiscusTransactionListHeight() throws RemoteException {
+		return Integer.parseInt(SettingsUtil.get("hibiscus_transaction_list_height", "105"));
+	}
+
+	public static void setHibiscusTransactionListHeight(int height) throws RemoteException, ApplicationException {
+		SettingsUtil.set("hibiscus_transaction_list_height", Integer.toString(height));
+	}
 }

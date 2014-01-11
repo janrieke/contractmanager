@@ -56,6 +56,10 @@ public class SettingsControl extends AbstractControl {
 //	private CheckboxInput iCalAutoExport;
 	private CheckboxInput anonICalExport;
 
+	private CheckboxInput showHibiscusCategorySelector;
+	private CheckboxInput showHibiscusTransactionList;
+	private IntegerInput hibiscusTransactionListHeight;
+
 	/**
 	 * ct.
 	 * 
@@ -158,13 +162,27 @@ public class SettingsControl extends AbstractControl {
 		return warningTime;
 	}
 
-	public IntegerInput getNoticeTime() throws RemoteException {
-		if (noticeTime == null) {
-			noticeTime = new IntegerInput(Settings.getExtensionNoticeTime());
-			noticeTime.setComment(Settings.i18n().tr("Days"));
+	public CheckboxInput getShowHibiscusCategorySelector() throws RemoteException {
+		if (showHibiscusCategorySelector == null) {
+			showHibiscusCategorySelector = new CheckboxInput(Settings.getShowHibiscusCategorySelector());
 		}
-		return noticeTime;
+		return showHibiscusCategorySelector;
 	}
+
+	public CheckboxInput getShowHibiscusTransactionList() throws RemoteException {
+		if (showHibiscusTransactionList == null) {
+			showHibiscusTransactionList = new CheckboxInput(Settings.getShowHibiscusTransactionList());
+		}
+		return showHibiscusTransactionList;
+	}
+
+	public IntegerInput getHibiscusTransactionListHeight() throws RemoteException {
+		if (hibiscusTransactionListHeight == null) {
+			hibiscusTransactionListHeight = new IntegerInput(Settings.getHibiscusTransactionListHeight());
+		}
+		return hibiscusTransactionListHeight;
+	}
+	
 
 //	public CheckboxInput getICalAutoExport() throws RemoteException {
 //		if (iCalAutoExport == null) {
@@ -180,6 +198,15 @@ public class SettingsControl extends AbstractControl {
 		return anonICalExport;
 	}
 
+
+	public IntegerInput getNoticeTime() throws RemoteException {
+		if (noticeTime == null) {
+			noticeTime = new IntegerInput(Settings.getExtensionNoticeTime());
+			noticeTime.setComment(Settings.i18n().tr("Days"));
+		}
+		return noticeTime;
+	}
+	
 	/**
 	 * This method stores the contract using the current values.
 	 */
@@ -201,7 +228,11 @@ public class SettingsControl extends AbstractControl {
 					.getValue());
 //			Settings.setICalAutoExport((Boolean) getICalAutoExport().getValue());
 			Settings.setNamedICalExport((Boolean) getNamedICalExport().getValue());
-			
+
+			Settings.setShowHibiscusCategorySelector((Boolean) getShowHibiscusCategorySelector().getValue());
+			Settings.setShowHibiscusTransactionList((Boolean) getShowHibiscusTransactionList().getValue());
+			Settings.setHibiscusTransactionListHeight((Integer) getHibiscusTransactionListHeight().getValue());
+
 			GUI.getStatusBar().setSuccessText(
 					Settings.i18n().tr("Settings saved."));
 		} catch (ApplicationException e) {
