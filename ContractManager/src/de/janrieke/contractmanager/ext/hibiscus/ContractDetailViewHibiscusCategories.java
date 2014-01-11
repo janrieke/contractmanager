@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Listener;
 
 import de.janrieke.contractmanager.Settings;
+import de.janrieke.contractmanager.gui.action.ShowHibiscusSettings;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.janrieke.contractmanager.gui.parts.SizeableTablePart;
 import de.janrieke.contractmanager.gui.view.ContractDetailView;
@@ -36,10 +37,12 @@ import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Transaction;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.datasource.rmi.ObjectNotFoundException;
+import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.extension.Extendable;
 import de.willuhn.jameica.gui.extension.Extension;
 import de.willuhn.jameica.gui.formatter.CurrencyFormatter;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
+import de.willuhn.jameica.gui.parts.PanelButton;
 import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.HBCIProperties;
 import de.willuhn.jameica.hbci.gui.action.UmsatzDetail;
@@ -74,82 +77,89 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 		if (control == null || parent == null)
 			return;
 
+	    PanelButton settings = new PanelButton("document-properties.png", new ShowHibiscusSettings(), Settings.i18n().tr("Settings"));
+	    GUI.getView().addPanelButton(settings);
+
 		final Contract contract = (Contract) view.getCurrentObject();
 
 		try
 		{
 			// 1) add a category selection input
-			
-			// Zugeordnete Kategorie ermitteln
-			UmsatzTyp typ = null;
-			String id = contract.getHibiscusCategoryID();
-			if (id != null)
-			{
-				try
+			if (Settings.getShowHibiscusCategorySelector()) {
+				// Zugeordnete Kategorie ermitteln
+				UmsatzTyp typ = null;
+				String id = contract.getHibiscusCategoryID();
+				if (id != null)
 				{
-					typ = (UmsatzTyp)
-							de.willuhn.jameica.hbci.Settings.getDBService().createObject(UmsatzTyp.class,id);
-				}
-				catch (ObjectNotFoundException e)
-				{
-					// Die Kategorie wurde in Hibiscus zwischenzeitlich geloescht, ignorieren wir
-				}
-			}
-
-			// Auswahlfeld hinzufuegen
-			final UmsatzTypInput input = new UmsatzTypInput(typ,UmsatzTyp.TYP_EGAL);
-
-			input.addListener(new Listener() {
-				@Override
-				public void handleEvent(org.eclipse.swt.widgets.Event event) {
 					try
 					{
-						UmsatzTyp t = (UmsatzTyp) input.getValue();
-						//do not immediately write to DB, let the controller do 
-						// this when storing everything else
-						control.hibiscusCategoryID = (t != null ? t.getID() : null);
+						typ = (UmsatzTyp)
+								de.willuhn.jameica.hbci.Settings.getDBService().createObject(UmsatzTyp.class,id);
 					}
-					catch (RemoteException e)
+					catch (ObjectNotFoundException e)
 					{
-						Logger.error("unable to apply hibiscus category",e);
+						// Die Kategorie wurde in Hibiscus zwischenzeitlich geloescht, ignorieren wir
 					}
 				}
-			});
 
-			view.addExtensionInput("Hibiscus", Settings.i18n().tr("Category"), input);
-			
-			// 2) add a container that holds the list of assigned transactions
-			List<Umsatz> umsaetze = new Vector<Umsatz>();
-			DBIterator transactions = contract.getTransactions();
-			while (transactions.hasNext()) {
-				Transaction transaction = (Transaction) transactions.next();
-				Umsatz umsatz = null;
-				try
-				{
-					umsatz = (Umsatz)
-							de.willuhn.jameica.hbci.Settings.getDBService().createObject(Umsatz.class,transaction.getTransactionID().toString());
-				}
-				catch (ObjectNotFoundException e)
-				{
-					transaction.delete();
-				}
-				if (umsatz != null)
-					umsaetze.add(umsatz);
+				// Auswahlfeld hinzufuegen
+				final UmsatzTypInput input = new UmsatzTypInput(typ,UmsatzTyp.TYP_EGAL);
+
+				input.addListener(new Listener() {
+					@Override
+					public void handleEvent(org.eclipse.swt.widgets.Event event) {
+						try
+						{
+							UmsatzTyp t = (UmsatzTyp) input.getValue();
+							//do not immediately write to DB, let the controller do 
+							// this when storing everything else
+							control.hibiscusCategoryID = (t != null ? t.getID() : null);
+						}
+						catch (RemoteException e)
+						{
+							Logger.error("unable to apply hibiscus category",e);
+						}
+					}
+				});
+
+				view.addExtensionInput("Hibiscus", Settings.i18n().tr("Category"), input);
 			}
-			umsatzList = new SizeableTablePart(umsaetze, new UmsatzDetail());
-			umsatzList.setHeightHint(105);
-			umsatzList.setContextMenu(new UmsatzListContextMenu(contract, this));
-			umsatzList.addColumn("#","id-int");
-			umsatzList.addColumn(hibiscusI18n.tr("Flags"),                     "flags");
-			umsatzList.addColumn(hibiscusI18n.tr("Gegenkonto"),                "empfaenger");
-			umsatzList.addColumn(hibiscusI18n.tr("Verwendungszweck"),          "mergedzweck");
-			umsatzList.addColumn(hibiscusI18n.tr("Datum"),                     "datum_pseudo", new DateFormatter(HBCI.DATEFORMAT));
-			umsatzList.addColumn(hibiscusI18n.tr("Betrag"),                    "betrag",new CurrencyFormatter(HBCIProperties.CURRENCY_DEFAULT_DE,HBCI.DECIMALFORMAT));
-			umsatzList.addColumn(hibiscusI18n.tr("Kategorie"),                 "umsatztyp",null,false);
-			umsatzList.addColumn(hibiscusI18n.tr("Zwischensumme"),             "saldo",new CurrencyFormatter(HBCIProperties.CURRENCY_DEFAULT_DE,HBCI.DECIMALFORMAT));
-			umsatzList.addColumn(hibiscusI18n.tr("Notiz"),                     "kommentar",null,true);
-			umsatzList.setRememberColWidths(true);
-			view.addExtensionContainer(umsatzList, Settings.i18n().tr("Assigned Hibiscus Transactions"));
+
+			// 2) add a container that holds the list of assigned transactions
+			if (Settings.getShowHibiscusTransactionList()) {
+				List<Umsatz> umsaetze = new Vector<Umsatz>();
+				DBIterator transactions = contract.getTransactions();
+				while (transactions.hasNext()) {
+					Transaction transaction = (Transaction) transactions.next();
+					Umsatz umsatz = null;
+					try
+					{
+						umsatz = (Umsatz)
+								de.willuhn.jameica.hbci.Settings.getDBService().createObject(Umsatz.class,transaction.getTransactionID().toString());
+					}
+					catch (ObjectNotFoundException e)
+					{
+						transaction.delete();
+					}
+					if (umsatz != null)
+						umsaetze.add(umsatz);
+				}
+				umsatzList = new SizeableTablePart(umsaetze, new UmsatzDetail());
+				umsatzList.setHeightHint(Settings.getHibiscusTransactionListHeight());
+				umsatzList.setContextMenu(new UmsatzListContextMenu(contract, this));
+				umsatzList.addColumn("#","id-int");
+				umsatzList.addColumn(hibiscusI18n.tr("Flags"),                     "flags");
+				umsatzList.addColumn(hibiscusI18n.tr("Gegenkonto"),                "empfaenger");
+				umsatzList.addColumn(hibiscusI18n.tr("Verwendungszweck"),          "mergedzweck");
+				umsatzList.addColumn(hibiscusI18n.tr("Datum"),                     "datum_pseudo", new DateFormatter(HBCI.DATEFORMAT));
+				umsatzList.addColumn(hibiscusI18n.tr("Betrag"),                    "betrag",new CurrencyFormatter(HBCIProperties.CURRENCY_DEFAULT_DE,HBCI.DECIMALFORMAT));
+				umsatzList.addColumn(hibiscusI18n.tr("Kategorie"),                 "umsatztyp",null,false);
+				umsatzList.addColumn(hibiscusI18n.tr("Zwischensumme"),             "saldo",new CurrencyFormatter(HBCIProperties.CURRENCY_DEFAULT_DE,HBCI.DECIMALFORMAT));
+				umsatzList.addColumn(hibiscusI18n.tr("Notiz"),                     "kommentar",null,true);
+				umsatzList.setRememberColWidths(true);
+
+				view.addExtensionContainer(umsatzList, Settings.i18n().tr("Assigned Hibiscus Transactions"));
+			}
 		}
 		catch (Exception e)
 		{
