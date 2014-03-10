@@ -16,8 +16,10 @@ CREATE TABLE contract (
   uri varchar(4096),
   hibiscus_category varchar(255) NULL,
   ignore_cancellations int(1) NOT NULL,
+  do_not_remind_before date,
   UNIQUE (id),
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES address (id)
 );
 
 CREATE TABLE costs (
@@ -27,14 +29,16 @@ CREATE TABLE costs (
   money double,
   period int(1),
   UNIQUE (id),
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  CONSTRAINT fk_costs_contract FOREIGN KEY (contract_id) REFERENCES contract (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE transactions (
   transaction_id int(5),
   contract_id int(5),
   UNIQUE (transaction_id),
-  PRIMARY KEY (transaction_id)
+  PRIMARY KEY (transaction_id),
+  CONSTRAINT fk_transactions_contract FOREIGN KEY (contract_id) REFERENCES contract (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE address (
@@ -66,7 +70,4 @@ CREATE TABLE version (
   PRIMARY KEY (id)
 );
 
-ALTER TABLE contract     ADD CONSTRAINT fk_address           FOREIGN KEY (address_id)  REFERENCES address (id)  DEFERRABLE;
-ALTER TABLE transactions ADD CONSTRAINT fk_contract          FOREIGN KEY (contract_id) REFERENCES contract (id) DEFERRABLE;
-
-INSERT INTO version (name,version) values ('contract_db',19);
+INSERT INTO version (name,version) values ('contract_db',20);

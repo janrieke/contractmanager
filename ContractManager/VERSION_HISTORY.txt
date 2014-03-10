@@ -24,4 +24,4 @@ ROADMAP:
 
 0.5:
 	- Improved financial analysis
-	
+    - "Remind me next term" function	
