@@ -49,7 +49,7 @@ public class CancellationReminderBox extends AbstractView implements Box {
 
 	@Override
 	public String getName() {
-		return Settings.i18n().tr("Contract Cancellation Reminder");
+		return "ContractManager: " + Settings.i18n().tr("Contract Cancellation Reminder");
 	}
 
 	@Override

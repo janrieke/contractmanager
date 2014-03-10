@@ -31,18 +31,22 @@ import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
 /**
- * Increasing street number field size.
+ * Remind me later function
  */
-public class update0019 implements Update {
+public class update0020 implements Update {
 	private Map<String, String> statements = new HashMap<String, String>();
 
 	/**
 	 * Default constructor
 	 */
-	public update0019() {
+	public update0020() {
 		// Update for H2
 		statements.put(DBSupportH2Impl.class.getName(),
-				"ALTER TABLE address ALTER COLUMN number VARCHAR(16) NOT NULL;\n");
+				"ALTER TABLE contract ADD COLUMN do_not_remind_before date;\n" +
+				"ALTER TABLE transactions DROP CONSTRAINT fk_contract;\n" +
+				"ALTER TABLE transactions ADD CONSTRAINT fk_transactions_contract FOREIGN KEY (contract_id) REFERENCES contract (id) ON DELETE CASCADE ON UPDATE CASCADE;\n" +
+				"DELETE FROM costs WHERE contract_id NOT IN (SELECT id from contract);\n" + //in case some unassigned costs got lost in the DB 
+				"ALTER TABLE costs ADD CONSTRAINT fk_costs_contract FOREIGN KEY (contract_id) REFERENCES contract (id) ON DELETE CASCADE ON UPDATE CASCADE;\n");
 	}
 
 	/**
@@ -78,7 +82,7 @@ public class update0019 implements Update {
 	 * @see de.willuhn.sql.version.Update#getName()
 	 */
 	public String getName() {
-		return "Database update v18 to v19 (increasing street number field size)";
+		return "Database update v19 to v20 (remind me later function, DB cleanup)";
 	}
 
 }
