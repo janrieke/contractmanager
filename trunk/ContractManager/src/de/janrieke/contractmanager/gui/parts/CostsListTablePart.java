@@ -1,7 +1,7 @@
 package de.janrieke.contractmanager.gui.parts;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -19,8 +19,8 @@ public class CostsListTablePart extends SizeableTablePart {
 
 	@Override
 	protected String getControlValue(Control control) {
-		if (control instanceof Combo) {
-			return ((Combo) control).getText();
+		if (control instanceof CCombo) {
+			return ((CCombo) control).getText();
 		} else
 			return super.getControlValue(control);
 	}
@@ -28,10 +28,8 @@ public class CostsListTablePart extends SizeableTablePart {
 	@Override
 	protected Control getEditorControl(int row, TableItem item, String oldValue) {
 			if (item.getData() instanceof Costs && row == 2) {
-			    Combo newCombo = new Combo(item.getParent(), SWT.DROP_DOWN | SWT.READ_ONLY);
+				CCombo newCombo = new CCombo(item.getParent(), SWT.FLAT | SWT.READ_ONLY);
 			    newCombo.setItems(Contract.IntervalType.getAdjectives());
-	//		    Contract.IntervalType value = Contract.IntervalType.values()[Integer.parseInt(oldValue)];
-	//		    newCombo.setText(value.toAdjectiveString());
 			    newCombo.setText(oldValue);
 			    newCombo.setFocus();
 			    return newCombo;
