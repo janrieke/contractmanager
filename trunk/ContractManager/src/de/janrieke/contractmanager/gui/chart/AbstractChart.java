@@ -34,7 +34,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
-import org.swtchart.ext.Messages;
+import org.swtchartx.ext.Messages;
 
 import de.willuhn.jameica.gui.GUI;
 
@@ -47,7 +47,7 @@ public abstract class AbstractChart<T extends ChartData> implements Chart<T>
   private String title             = null;
   private Map<RGB,Color> colors    = new HashMap<RGB,Color>();
   private List<T> data             = new ArrayList<T>();
-  org.swtchart.Chart chart         = null;
+  org.swtchartx.Chart chart         = null;
 
   /**
    * @see de.willuhn.jameica.hbci.gui.chart.Chart#setTitle(java.lang.String)
