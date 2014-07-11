@@ -382,13 +382,13 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	public IntervalType getCancellationPeriodType() throws RemoteException {
 		Object type = getAttribute("cancelation_period_type");
 		return type == null ? IntervalType.DAYS
-				: IntervalType.values()[(Integer) type];
+				: IntervalType.valueOf((Integer) type);
 	}
 
 	@Override
 	public void setCancelationPeriodType(IntervalType type)
 			throws RemoteException {
-		setAttribute("cancelation_period_type", type.ordinal());
+		setAttribute("cancelation_period_type", type.getValue());
 	}
 
 	@Override
@@ -417,13 +417,13 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	public IntervalType getFirstMinRuntimeType() throws RemoteException {
 		Object type = getAttribute("first_min_runtime_type");
 		return type == null ? IntervalType.DAYS
-				: IntervalType.values()[(Integer) type];
+				: IntervalType.valueOf((Integer) type);
 	}
 
 	@Override
 	public void setFirstMinRuntimeType(IntervalType type)
 			throws RemoteException {
-		setAttribute("first_min_runtime_type", type.ordinal());
+		setAttribute("first_min_runtime_type", type.getValue());
 	}
 
 	@Override
@@ -441,12 +441,12 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	public IntervalType getFollowingMinRuntimeType() throws RemoteException {
 		Object type = getAttribute("next_min_runtime_type");
 		return type == null ? IntervalType.DAYS
-				: IntervalType.values()[(Integer) type];
+				: IntervalType.valueOf((Integer) type);
 	}
 
 	@Override
 	public void setFollowingMinRuntimeType(IntervalType type) throws RemoteException {
-		setAttribute("next_min_runtime_type", type.ordinal());
+		setAttribute("next_min_runtime_type", type.getValue());
 	}
 
 	@Override
@@ -668,6 +668,12 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			case YEARS:
 				costsPerYear += costEntry.getMoney();
 				break;
+			case HALF_YEARS:
+				costsPerMonth += costEntry.getMoney()*6;
+				break;
+			case QUARTER_YEAR:
+				costsPerMonth += costEntry.getMoney()*3;
+				break;
 
 			default:
 				break;
@@ -717,6 +723,12 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 				break;
 			case MONTHS:
 				costsPerMonth += costEntry.getMoney();
+				break;
+			case QUARTER_YEAR:
+				costsPerMonth += costEntry.getMoney()/3;
+				break;
+			case HALF_YEARS:
+				costsPerMonth += costEntry.getMoney()/6;
 				break;
 			case YEARS:
 				costsPerMonth += costEntry.getMoney()/12;

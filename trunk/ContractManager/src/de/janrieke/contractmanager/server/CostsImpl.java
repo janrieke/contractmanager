@@ -145,12 +145,12 @@ public class CostsImpl extends AbstractDBObject implements Costs {
 	public IntervalType getPeriod() throws RemoteException {
 		Object period = getAttribute("period");
 		return period == null ? IntervalType.DAYS
-				: IntervalType.values()[(Integer) period];
+				: IntervalType.valueOf((Integer) period);
 	}
 
 	@Override
 	public void setPeriod(IntervalType period)
 			throws RemoteException {
-		setAttribute("period", period.ordinal());
+		setAttribute("period", period.getValue());
 	}
 }
