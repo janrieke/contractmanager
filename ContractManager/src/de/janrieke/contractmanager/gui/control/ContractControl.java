@@ -831,7 +831,7 @@ public class ContractControl extends AbstractControl {
 					String text = String.format("%1$.2f", money) + " \u20AC";
 					item.setText(1, text);
 					item.setText(2, ((Costs) item.getData()).getPeriod()
-							.toAdjectiveString());
+							.getAdjective());
 				} catch (RemoteException e) {
 				}
 			}
@@ -865,7 +865,7 @@ public class ContractControl extends AbstractControl {
 						}
 					} else if ("period".equals(attribute))
 						((Costs) object).setPeriod(Contract.IntervalType
-								.adjectiveValueOf(newValue));
+								.valueOfAdjective(newValue));
 					else
 						assert false;
 				} catch (RemoteException e) {
