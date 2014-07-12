@@ -70,6 +70,10 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    left.addLabelPair(Settings.i18n().tr("Name of contract"), control.getName());
 	    left.addLabelPair(Settings.i18n().tr("Contract number"), control.getContractNumber());
 	    left.addLabelPair(Settings.i18n().tr("Customer number"), control.getCustomerNumber());
+	    if(Settings.getShowSEPACreditorInput())
+	    	left.addLabelPair(Settings.i18n().tr("SEPA Creditor Reference"), control.getSEPACreditorReference());
+	    if(Settings.getShowSEPACustomerInput())
+	    	left.addLabelPair(Settings.i18n().tr("SEPA Customer Reference"), control.getSEPACustomerReference());
 
 	    left.addHeadline(Settings.i18n().tr("Financial Details"));
 	    left.addPart(control.getCostsList());

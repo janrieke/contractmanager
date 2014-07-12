@@ -17,6 +17,8 @@ CREATE TABLE contract (
   hibiscus_category varchar(255) NULL,
   ignore_cancellations int(1) NOT NULL,
   do_not_remind_before date,
+  sepa_creditor varchar(35),
+  sepa_customer varchar(35),
   UNIQUE (id),
   PRIMARY KEY (id),
   CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES address (id)
@@ -55,6 +57,17 @@ CREATE TABLE address (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE storage (
+  id IDENTITY,
+  contract_id int(5),
+  description varchar(255),
+  path varchar(65535),
+  file BLOB,
+  UNIQUE (id),
+  PRIMARY KEY (id),
+  CONSTRAINT fk_storage_contract FOREIGN KEY (contract_id) REFERENCES contract (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 CREATE TABLE settings (
   key varchar(255) NOT NULL,
   value varchar(255),
@@ -70,4 +83,4 @@ CREATE TABLE version (
   PRIMARY KEY (id)
 );
 
-INSERT INTO version (name,version) values ('contract_db',20);
+INSERT INTO version (name,version) values ('contract_db',21);

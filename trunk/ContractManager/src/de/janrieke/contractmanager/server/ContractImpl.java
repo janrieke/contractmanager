@@ -804,4 +804,24 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		else
 			return false;
 	}
+
+	@Override
+	public String getSepaCreditorRef() throws RemoteException {
+		return (String) getAttribute("sepa_creditor");
+	}
+
+	@Override
+	public void setSepaCreditorRef(String ref) throws RemoteException {
+		setAttribute("sepa_creditor", ref);
+	}
+
+	@Override
+	public String getSepaCustomerRef() throws RemoteException {
+		return (String) getAttribute("sepa_customer");
+	}
+
+	@Override
+	public void setSepaCustomerRef(String ref) throws RemoteException {
+		setAttribute("sepa_customer", ref);
+	}
 }
