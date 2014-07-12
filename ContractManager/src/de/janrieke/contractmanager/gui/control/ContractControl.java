@@ -85,6 +85,8 @@ public class ContractControl extends AbstractControl {
 	private Input contractNo;
 	private Input customerNo;
 	private Input comment;
+	private Input sepaCreditorRef;
+	private Input sepaCustomerRef;
 	private DateDialogInputAutoCompletion startDate;
 	private DateDialogInputAutoCompletion endDate;
 	private Input nextExtension;
@@ -201,6 +203,18 @@ public class ContractControl extends AbstractControl {
 		if (customerNo == null)
 			customerNo = new TextInput(getContract().getCustomerNumber(), 255);
 		return customerNo;
+	}
+
+	public Input getSEPACreditorReference() throws RemoteException {
+		if (sepaCreditorRef == null)
+			sepaCreditorRef = new TextInput(getContract().getSepaCreditorRef(), 35);
+		return sepaCreditorRef;
+	}
+
+	public Input getSEPACustomerReference() throws RemoteException {
+		if (sepaCustomerRef == null)
+			sepaCustomerRef = new TextInput(getContract().getSepaCustomerRef(), 35);
+		return sepaCustomerRef;
 	}
 
 	/**
@@ -888,6 +902,8 @@ public class ContractControl extends AbstractControl {
 			c.setName((String) getName().getValue());
 			c.setContractNumber((String) getContractNumber().getValue());
 			c.setCustomerNumber((String) getCustomerNumber().getValue());
+			c.setSepaCreditorRef((String) getSEPACreditorReference().getValue());
+			c.setSepaCustomerRef((String) getSEPACustomerReference().getValue());
 			c.setComment((String) getComment().getValue());
 			c.setStartDate((Date) getStartDate().getValue());
 			c.setEndDate((Date) getEndDate().getValue());

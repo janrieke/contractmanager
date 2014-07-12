@@ -56,6 +56,8 @@ public class SettingsControl extends AbstractControl {
 //	private CheckboxInput iCalAutoExport;
 	private CheckboxInput anonICalExport;
 
+	private CheckboxInput showSEPACreditorInput;
+	private CheckboxInput showSEPACustomerInput;
 	private CheckboxInput showHibiscusCategorySelector;
 	private CheckboxInput showHibiscusTransactionList;
 	private IntegerInput hibiscusTransactionListHeight;
@@ -183,6 +185,20 @@ public class SettingsControl extends AbstractControl {
 		return hibiscusTransactionListHeight;
 	}
 	
+	public CheckboxInput getShowSEPACreditorInput() throws RemoteException {
+		if (showSEPACreditorInput == null) {
+			showSEPACreditorInput = new CheckboxInput(Settings.getShowSEPACreditorInput());
+		}
+		return showSEPACreditorInput;
+	}
+
+	public CheckboxInput getShowSEPACustomerInput() throws RemoteException {
+		if (showSEPACustomerInput == null) {
+			showSEPACustomerInput = new CheckboxInput(Settings.getShowSEPACustomerInput());
+		}
+		return showSEPACustomerInput;
+	}
+
 
 //	public CheckboxInput getICalAutoExport() throws RemoteException {
 //		if (iCalAutoExport == null) {
@@ -229,6 +245,25 @@ public class SettingsControl extends AbstractControl {
 //			Settings.setICalAutoExport((Boolean) getICalAutoExport().getValue());
 			Settings.setNamedICalExport((Boolean) getNamedICalExport().getValue());
 
+			GUI.getStatusBar().setSuccessText(
+					Settings.i18n().tr("Settings saved."));
+		} catch (ApplicationException e) {
+			GUI.getView().setErrorText(e.getMessage());
+
+		} catch (RemoteException e) {
+			Logger.error("Error while storing settings", e);
+			GUI.getStatusBar().setErrorText(
+					Settings.i18n().tr("Error while storing settings"));
+		}
+	}
+
+	/**
+	 * This method stores the contract using the current values.
+	 */
+	public void handleContractDetailsSettingsStore() {
+		try {
+			Settings.setShowSEPACreditorInput((Boolean) getShowSEPACreditorInput().getValue());
+			Settings.setShowSEPADebitorInput((Boolean) getShowSEPACustomerInput().getValue());
 			Settings.setShowHibiscusCategorySelector((Boolean) getShowHibiscusCategorySelector().getValue());
 			Settings.setShowHibiscusTransactionList((Boolean) getShowHibiscusTransactionList().getValue());
 			Settings.setHibiscusTransactionListHeight((Integer) getHibiscusTransactionListHeight().getValue());

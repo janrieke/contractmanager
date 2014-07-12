@@ -190,4 +190,20 @@ public class Settings {
 	public static void setHibiscusTransactionListHeight(int height) throws RemoteException, ApplicationException {
 		SettingsUtil.set("hibiscus_transaction_list_height", Integer.toString(height));
 	}
+
+	public static boolean getShowSEPACreditorInput() throws RemoteException {
+		return Boolean.parseBoolean(SettingsUtil.get("show_sepa_creditor_input", "false"));
+	}
+
+	public static void setShowSEPACreditorInput(boolean show) throws RemoteException, ApplicationException {
+		SettingsUtil.set("show_sepa_creditor_input", Boolean.toString(show));
+	}
+
+	public static boolean getShowSEPACustomerInput() throws RemoteException {
+		return Boolean.parseBoolean(SettingsUtil.get("show_sepa_debitor_input", "false"));
+	}
+
+	public static void setShowSEPADebitorInput(boolean show) throws RemoteException, ApplicationException {
+		SettingsUtil.set("show_sepa_debitor_input", Boolean.toString(show));
+	}
 }

@@ -30,15 +30,15 @@ import de.willuhn.util.ApplicationException;
 /**
  * Dialog zum Konfigurieren der Boxen.
  */
-public class HibiscusSettingsDialog extends AbstractDialog<Object> {
+public class ContractDetailViewSettingsDialog extends AbstractDialog<Object> {
 
 	/**
 	 * @param position
 	 */
-	public HibiscusSettingsDialog(int position) {
+	public ContractDetailViewSettingsDialog(int position) {
 		super(position);
-		this.setSize(460, 400);
-		setTitle(i18n.tr("Auswahl der anzuzeigenden Elemente"));
+		//this.setSize(460, 400);
+		setTitle(Settings.i18n().tr("Customize Contract Details View"));
 	}
 
 	/**
@@ -47,8 +47,14 @@ public class HibiscusSettingsDialog extends AbstractDialog<Object> {
 	protected void paint(Composite parent) throws Exception {
 		final SettingsControl control = new SettingsControl(null);
 
-		Container c = new SimpleContainer(parent, true);
-		c.addHeadline(Settings.i18n().tr("Customize Hibiscus Extension Views"));
+		Container c = new SimpleContainer(parent, false);
+		c.addHeadline(Settings.i18n().tr("Additional Input Fields"));
+		
+		c.addLabelPair(Settings.i18n().tr("Show SEPA Creditor Reference"), control.getShowSEPACreditorInput());
+		c.addLabelPair(Settings.i18n().tr("Show SEPA Customer Reference"), control.getShowSEPACustomerInput());
+
+		c = new SimpleContainer(parent, false);
+		c.addHeadline(Settings.i18n().tr("Hibiscus Extension"));
 		
 		c.addLabelPair(Settings.i18n().tr("Show Category Selector"), control.getShowHibiscusCategorySelector());
 		c.addLabelPair(Settings.i18n().tr("Show Transaction List"), control.getShowHibiscusTransactionList());
@@ -58,7 +64,7 @@ public class HibiscusSettingsDialog extends AbstractDialog<Object> {
 		buttons.addButton(i18n.tr("Übernehmen"), new Action() {
 			public void handleAction(Object context)
 					throws ApplicationException {
-				control.handleStore();
+				control.handleContractDetailsSettingsStore();
 				close();
 				AbstractView current = GUI.getCurrentView();
 				GUI.startView(current,current.getCurrentObject()); // reload view

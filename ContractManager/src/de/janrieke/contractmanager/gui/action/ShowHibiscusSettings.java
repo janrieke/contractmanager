@@ -31,7 +31,7 @@ public class ShowHibiscusSettings implements Action {
 	 */
 	public void handleAction(Object context) throws ApplicationException {
 		try {
-			new de.janrieke.contractmanager.gui.view.HibiscusSettingsDialog(
+			new de.janrieke.contractmanager.gui.view.ContractDetailViewSettingsDialog(
 					AbstractDialog.POSITION_CENTER).open();
 		} catch (OperationCanceledException e) {
 		} catch (Exception e) {

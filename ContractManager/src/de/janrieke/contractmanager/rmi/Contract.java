@@ -153,6 +153,12 @@ public interface Contract extends DBObject {
 	public String getCustomerNumber() throws RemoteException;
 	public void setCustomerNumber(String customerNo) throws RemoteException;
 	
+	public String getSepaCreditorRef() throws RemoteException;
+	public void setSepaCreditorRef(String ref) throws RemoteException;
+
+	public String getSepaCustomerRef() throws RemoteException;
+	public void setSepaCustomerRef(String ref) throws RemoteException;
+
 	public Address getAddress() throws RemoteException;
 	public void setAddress(Address address) throws RemoteException;
 	
