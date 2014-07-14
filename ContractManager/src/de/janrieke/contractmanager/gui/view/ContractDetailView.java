@@ -17,6 +17,8 @@
  */
 package de.janrieke.contractmanager.gui.view;
 
+import java.util.List;
+
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.DeleteContract;
 import de.janrieke.contractmanager.gui.action.GenerateCancelation;
@@ -70,11 +72,6 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    left.addLabelPair(Settings.i18n().tr("Name of contract"), control.getName());
 	    left.addLabelPair(Settings.i18n().tr("Contract number"), control.getContractNumber());
 	    left.addLabelPair(Settings.i18n().tr("Customer number"), control.getCustomerNumber());
-	    if(Settings.getShowSEPACreditorInput())
-	    	left.addLabelPair(Settings.i18n().tr("SEPA Creditor Reference"), control.getSEPACreditorReference());
-	    if(Settings.getShowSEPACustomerInput())
-	    	left.addLabelPair(Settings.i18n().tr("SEPA Customer Reference"), control.getSEPACustomerReference());
-
 	    left.addHeadline(Settings.i18n().tr("Financial Details"));
 	    left.addPart(control.getCostsList());
 	    left.addLabelPair(Settings.i18n().tr("Money per term"), control.getCostsPerTerm());
@@ -151,9 +148,13 @@ public class ContractDetailView extends AbstractView implements Extendable {
 		return control;
 	}
 
-	public void addExtensionInput(String headline, String label, Input input) {
-	    right.addHeadline(Settings.i18n().tr("Hibiscus"));
-	    right.addLabelPair(label, input);
+	public void addExtensionInput(String headline, List<String> labels, List<Input> inputs) {
+		if (labels.size() != inputs.size())
+			throw new IllegalArgumentException("Number of labels must be equal to number of inputs.");
+	    right.addHeadline(headline);
+	    for (int i = 0; i<labels.size(); i++) {
+		    right.addLabelPair(labels.get(i), inputs.get(i));
+	    }
 	}
 
 	public void addExtensionContainer(Part part, String headline) {

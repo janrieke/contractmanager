@@ -22,6 +22,7 @@
 package de.janrieke.contractmanager.ext.hibiscus;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -42,6 +43,7 @@ import de.willuhn.jameica.gui.extension.Extendable;
 import de.willuhn.jameica.gui.extension.Extension;
 import de.willuhn.jameica.gui.formatter.CurrencyFormatter;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
+import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.parts.PanelButton;
 import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.HBCIProperties;
@@ -81,10 +83,23 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 	    GUI.getView().addPanelButton(settings);
 
 		final Contract contract = (Contract) view.getCurrentObject();
+		
+		ArrayList<String> labels = new ArrayList<String>(3);
+		ArrayList<Input> inputs  = new ArrayList<Input>(3);
 
 		try
 		{
-			// 1) add a category selection input
+			// 1) add SEPA fields
+			if(Settings.getShowSEPACreditorInput()) {
+		    	labels.add(Settings.i18n().tr("SEPA Creditor Reference"));
+		    	inputs.add(control.getSEPACreditorReference());
+			}
+		    if(Settings.getShowSEPACustomerInput()) {
+		    	labels.add(Settings.i18n().tr("SEPA Customer Reference"));
+		    	inputs.add(control.getSEPACustomerReference());
+		    }
+
+			// 2) add a category selection input
 			if (Settings.getShowHibiscusCategorySelector()) {
 				// Zugeordnete Kategorie ermitteln
 				UmsatzTyp typ = null;
@@ -121,11 +136,13 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 						}
 					}
 				});
+				labels.add(Settings.i18n().tr("Category"));
+				inputs.add(input);
 
-				view.addExtensionInput("Hibiscus", Settings.i18n().tr("Category"), input);
+				view.addExtensionInput(Settings.i18n().tr("Hibiscus"), labels, inputs);
 			}
 
-			// 2) add a container that holds the list of assigned transactions
+			// 3) add a container that holds the list of assigned transactions
 			if (Settings.getShowHibiscusTransactionList()) {
 				List<Umsatz> umsaetze = new Vector<Umsatz>();
 				DBIterator transactions = contract.getTransactions();

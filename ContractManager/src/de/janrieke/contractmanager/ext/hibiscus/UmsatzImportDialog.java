@@ -173,17 +173,17 @@ public class UmsatzImportDialog extends AbstractDialog<Contract> {
 			String trName = "";
 			if (transaction.getGegenkontoName() != null)
 				trName = transaction.getGegenkontoName();
-			String trUse = "";
+			StringBuilder trUse = new StringBuilder();
 			if (transaction.getZweck() != null)
-				trUse += transaction.getZweck();
+				trUse.append(transaction.getZweck());
 			if (transaction.getZweck2() != null)
-				trUse += transaction.getZweck2();
+				trUse.append(transaction.getZweck2());
 			for (String more : transaction.getWeitereVerwendungszwecke()) {
-				trUse += more;
+				trUse.append(more);
 			}
 			
 			String[] trNameTokens = trName.split("\\s+");
-			String[] trUseTokens = trUse.split("\\s+");
+			String[] trUseTokens = trUse.toString().split("\\s+");
 			
 			float[] distanceName = new float[trNameTokens.length];
 			float[] distanceUse1 = new float[trUseTokens.length];
@@ -202,6 +202,8 @@ public class UmsatzImportDialog extends AbstractDialog<Contract> {
 			
 			String customerNumber = c.getCustomerNumber();
 			String contractNumber = c.getContractNumber();
+			String sepaCreditorRef = c.getSepaCreditorRef();
+			String sepaCustomerRef = c.getSepaCustomerRef();
 			for (int i = 0; i<trUseTokens.length; i++) {
 				if (trUseTokens[i].length() < MINIMUM_TOKEN_SIZE)
 					distanceUse1[i] = 1; // do not count small tokens

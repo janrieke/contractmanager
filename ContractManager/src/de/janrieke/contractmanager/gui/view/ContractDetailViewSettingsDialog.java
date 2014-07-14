@@ -48,14 +48,16 @@ public class ContractDetailViewSettingsDialog extends AbstractDialog<Object> {
 		final SettingsControl control = new SettingsControl(null);
 
 		Container c = new SimpleContainer(parent, false);
-		c.addHeadline(Settings.i18n().tr("Additional Input Fields"));
+//		c.addHeadline(Settings.i18n().tr("Additional Input Fields"));
+//		
+//		c.addLabelPair(Settings.i18n().tr("Show SEPA Creditor Reference"), control.getShowSEPACreditorInput());
+//		c.addLabelPair(Settings.i18n().tr("Show SEPA Customer Reference"), control.getShowSEPACustomerInput());
+
+//		c = new SimpleContainer(parent, false);
+		c.addHeadline(Settings.i18n().tr("Hibiscus Extension"));
 		
 		c.addLabelPair(Settings.i18n().tr("Show SEPA Creditor Reference"), control.getShowSEPACreditorInput());
 		c.addLabelPair(Settings.i18n().tr("Show SEPA Customer Reference"), control.getShowSEPACustomerInput());
-
-		c = new SimpleContainer(parent, false);
-		c.addHeadline(Settings.i18n().tr("Hibiscus Extension"));
-		
 		c.addLabelPair(Settings.i18n().tr("Show Category Selector"), control.getShowHibiscusCategorySelector());
 		c.addLabelPair(Settings.i18n().tr("Show Transaction List"), control.getShowHibiscusTransactionList());
 		c.addLabelPair(Settings.i18n().tr("Transaction List Height"), control.getHibiscusTransactionListHeight());

@@ -902,8 +902,6 @@ public class ContractControl extends AbstractControl {
 			c.setName((String) getName().getValue());
 			c.setContractNumber((String) getContractNumber().getValue());
 			c.setCustomerNumber((String) getCustomerNumber().getValue());
-			c.setSepaCreditorRef((String) getSEPACreditorReference().getValue());
-			c.setSepaCustomerRef((String) getSEPACustomerReference().getValue());
 			c.setComment((String) getComment().getValue());
 			c.setStartDate((Date) getStartDate().getValue());
 			c.setEndDate((Date) getEndDate().getValue());
@@ -938,6 +936,12 @@ public class ContractControl extends AbstractControl {
 			a.setCity((String) getPartnerCity().getValue());
 			a.setState((String) getPartnerState().getValue());
 			a.setCountry((String) getPartnerCountry().getValue());
+
+			//only store these if Hibicus extension was registered
+			if (sepaCreditorRef == null)
+				c.setSepaCreditorRef((String) getSEPACreditorReference().getValue());
+			if (sepaCustomerRef == null)
+				c.setSepaCustomerRef((String) getSEPACustomerReference().getValue());
 
 			// Now, let's store the contract and its address.
 			// The store() method throws ApplicationExceptions if
