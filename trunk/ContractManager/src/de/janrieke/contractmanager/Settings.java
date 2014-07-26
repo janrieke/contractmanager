@@ -24,6 +24,10 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Display;
+
 import de.janrieke.contractmanager.rmi.ContractDBService;
 import de.janrieke.contractmanager.server.SettingsUtil;
 import de.willuhn.datasource.rmi.DBService;
@@ -205,5 +209,9 @@ public class Settings {
 
 	public static void setShowSEPADebitorInput(boolean show) throws RemoteException, ApplicationException {
 		SettingsUtil.set("show_sepa_debitor_input", Boolean.toString(show));
+	}
+
+	public static Color getNotActiveForeground() {
+		return Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
 	}
 }
