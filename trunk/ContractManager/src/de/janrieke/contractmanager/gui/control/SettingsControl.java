@@ -61,6 +61,7 @@ public class SettingsControl extends AbstractControl {
 	private CheckboxInput showHibiscusCategorySelector;
 	private CheckboxInput showHibiscusTransactionList;
 	private IntegerInput hibiscusTransactionListHeight;
+	private CheckboxInput autoImport;
 
 	/**
 	 * ct.
@@ -222,6 +223,13 @@ public class SettingsControl extends AbstractControl {
 		}
 		return noticeTime;
 	}
+
+	public Input getHibiscusAutoImportNewTransactions() throws RemoteException {
+		if (autoImport == null) {
+			autoImport = new CheckboxInput(Settings.getHibiscusAutoImportNewTransactions());
+		}
+		return autoImport;
+	}
 	
 	/**
 	 * This method stores the contract using the current values.
@@ -244,6 +252,7 @@ public class SettingsControl extends AbstractControl {
 					.getValue());
 //			Settings.setICalAutoExport((Boolean) getICalAutoExport().getValue());
 			Settings.setNamedICalExport((Boolean) getNamedICalExport().getValue());
+			Settings.setHibiscusAutoImportNewTransactions((Boolean) getHibiscusAutoImportNewTransactions().getValue());
 
 			GUI.getStatusBar().setSuccessText(
 					Settings.i18n().tr("Settings saved."));
@@ -299,6 +308,7 @@ public class SettingsControl extends AbstractControl {
 			Settings.setExtensionWarningTime(7);
 //			Settings.setICalAutoExport(true);
 			Settings.setNamedICalExport(true);
+			Settings.setHibiscusAutoImportNewTransactions(false);
 			
 			GUI.getStatusBar().setSuccessText(
 					Settings.i18n().tr("Settings reset to default."));

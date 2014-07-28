@@ -81,6 +81,12 @@ public class SettingsView extends AbstractView {
 	    } else
 	    	right.addPart(new Button(Settings.i18n().tr("Open Jameica Calendar Settings"), new ShowJameicaSettings("Kalender")));
 
+	    //Hibiscus integration
+	    mf = Application.getPluginLoader().getManifestByName("hibiscus");
+	    if (mf != null) {
+		    right.addHeadline(Settings.i18n().tr("Hibiscus Settings"));
+		    right.addLabelPair(Settings.i18n().tr("Auto-import new transactions"), control.getHibiscusAutoImportNewTransactions());
+	    }
 	    
 		// add some buttons
 	    ButtonArea buttons = new ButtonArea(getParent(), 4);

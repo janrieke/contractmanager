@@ -214,4 +214,12 @@ public class Settings {
 	public static Color getNotActiveForeground() {
 		return Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
 	}
+
+	public static boolean getHibiscusAutoImportNewTransactions() throws RemoteException {
+		return Boolean.parseBoolean(SettingsUtil.get("hibiscus_auto_import", "false"));
+	}
+
+	public static void setHibiscusAutoImportNewTransactions(boolean value) throws RemoteException, ApplicationException {
+		SettingsUtil.set("hibiscus_auto_import", Boolean.toString(value));
+	}
 }
