@@ -32,6 +32,7 @@ public class SizeableTablePart extends TablePart {
 
 	private int heightHint = -1;
 	private int orderByIndex = -1;
+	private String orderByColName = null;
 
 	@Override
 	public synchronized void paint(Composite parent) throws RemoteException {
@@ -46,6 +47,8 @@ public class SizeableTablePart extends TablePart {
 		}
 		if (orderByIndex != -1)
 			super.orderBy(orderByIndex);
+		if (orderByColName != null)
+			super.orderBy(orderByColName);
 	}
 
 	public SizeableTablePart(GenericIterator list, Action action) {
@@ -67,4 +70,13 @@ public class SizeableTablePart extends TablePart {
 		this.orderByIndex  = index;
 		super.orderBy(index);
 	}
+
+	@Override
+	public void orderBy(String colName) {
+		// make method public
+		this.orderByColName   = colName;
+		super.orderBy(colName);
+	}
+	
+	
 }

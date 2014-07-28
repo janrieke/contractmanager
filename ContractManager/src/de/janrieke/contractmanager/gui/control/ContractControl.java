@@ -173,7 +173,7 @@ public class ContractControl extends AbstractControl {
 	 * @throws RemoteException
 	 * @return iterator containing all addresses
 	 */
-	public static GenericIterator getContracts() throws RemoteException {
+	public static DBIterator getContracts() throws RemoteException {
 		DBService service = Settings.getDBService();
 		DBIterator contracts = service.createList(Contract.class);
 		return contracts;
@@ -938,9 +938,9 @@ public class ContractControl extends AbstractControl {
 			a.setCountry((String) getPartnerCountry().getValue());
 
 			//only store these if Hibicus extension was registered
-			if (sepaCreditorRef == null)
+			if (sepaCreditorRef != null)
 				c.setSepaCreditorRef((String) getSEPACreditorReference().getValue());
-			if (sepaCustomerRef == null)
+			if (sepaCustomerRef != null)
 				c.setSepaCustomerRef((String) getSEPACustomerReference().getValue());
 
 			// Now, let's store the contract and its address.

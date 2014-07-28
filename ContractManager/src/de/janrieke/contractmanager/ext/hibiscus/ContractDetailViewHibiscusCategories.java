@@ -174,6 +174,7 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 				umsatzList.addColumn(hibiscusI18n.tr("Zwischensumme"),             "saldo",new CurrencyFormatter(HBCIProperties.CURRENCY_DEFAULT_DE,HBCI.DECIMALFORMAT));
 				umsatzList.addColumn(hibiscusI18n.tr("Notiz"),                     "kommentar",null,true);
 				umsatzList.setRememberColWidths(true);
+				umsatzList.orderBy("!id-int");
 
 				view.addExtensionContainer(umsatzList, Settings.i18n().tr("Assigned Hibiscus Transactions"));
 			}

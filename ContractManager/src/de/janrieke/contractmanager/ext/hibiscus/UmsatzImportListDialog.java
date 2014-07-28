@@ -52,6 +52,7 @@ import de.willuhn.jameica.gui.util.Container;
 import de.willuhn.jameica.gui.util.DelayedListener;
 import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.jameica.hbci.rmi.Umsatz;
+import de.willuhn.jameica.hbci.server.VerwendungszweckUtil;
 import de.willuhn.jameica.system.OperationCanceledException;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
@@ -78,9 +79,10 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 	 *            the preselected contract.
 	 * @throws RemoteException
 	 */
-	public UmsatzImportListDialog(Umsatz u) throws RemoteException {
+	public UmsatzImportListDialog(Umsatz u, Contract preSelectedContract) throws RemoteException {
 		super(AbstractDialog.POSITION_CENTER, true);
 		this.umsatz = u;
+		this.chosen = preSelectedContract;
 
 		this.setTitle(Settings.i18n().tr("Select contract to assign to."));
 		this.setSize(370, 500);
@@ -324,17 +326,14 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 			String trName = "";
 			if (transaction.getGegenkontoName() != null)
 				trName = transaction.getGegenkontoName();
-			StringBuilder trUse = new StringBuilder();
-			if (transaction.getZweck() != null)
-				trUse.append(transaction.getZweck());
-			if (transaction.getZweck2() != null)
-				trUse.append(transaction.getZweck2());
-			for (String more : transaction.getWeitereVerwendungszwecke()) {
-				trUse.append(more);
-			}
+
+			//No separators between lines until we have a working SEPA rewriter - 
+			// lines end after 27 chars, but fields may be 35 chars long.
+			String trUse = VerwendungszweckUtil.toString(transaction, "");
+
 
 			String[] trNameTokens = trName.split("\\s+");
-			String[] trUseTokens = trUse.toString().split("\\s+");
+			String[] trUseTokens = trUse.split("\\s+");
 
 			float[] distanceName = new float[trNameTokens.length];
 			float[] distanceUse = new float[trUseTokens.length];
