@@ -25,6 +25,7 @@ import java.util.List;
 
 import de.janrieke.contractmanager.ContractManagerPlugin;
 import de.janrieke.contractmanager.Settings;
+import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Transaction;
 import de.willuhn.datasource.rmi.DBIterator;
@@ -39,6 +40,7 @@ import de.willuhn.jameica.gui.parts.ContextMenuItem;
 import de.willuhn.jameica.hbci.messaging.ObjectChangedMessage;
 import de.willuhn.jameica.hbci.rmi.Umsatz;
 import de.willuhn.jameica.hbci.rmi.UmsatzTyp;
+import de.willuhn.jameica.hbci.server.VerwendungszweckUtil;
 import de.willuhn.jameica.messaging.StatusBarMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.system.BackgroundTask;
@@ -96,40 +98,65 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 	}
 
 	/**
-	 * Erzeugt eine einzelne Buchung.
-	 * Sie wird jedoch noch nicht gespeichert.
-	 * @param u die zu erzeugende Buchung.
-	 * @param auto true, wenn wir mehr als eine Buchung haben und im Automatik-Modus laufen.
-	 * In dem Fall wird die Erstellung der Buchung mit einer ApplicationException
-	 * abgebrochen, wenn keine Umsatz-Kategorie vorhanden ist oder dieser keine
-	 * Buchungsvorlage zugeordnet ist.
-	 * "Keine Buchungsvorlage zugeordnet" geworfen.
-	 * @return die erzeugte Buchung.
+	 * Assigns a single transaction to a contract.
+	 * @param u the transaction that should be assigned.
+	 * @param auto If there is more than one transaction, we run in auto mode, where 
+	 * we use the category and the SEPA references to identify a contract.
+	 * If this does not work, we cancel with an exception.
+	 * @return the assigned contract.
 	 * @throws Exception
 	 */
 	private Transaction createAssignedTransaction(Umsatz u, boolean auto) throws Exception
 	{
-		// Checken, ob der Umsatz eine Kategorie hat
-		UmsatzTyp typ = u.getUmsatzTyp();
-
-		if (typ == null && auto)
-			throw new ApplicationException(i18n.tr("No category assigned"));
-
 		Contract contract = null;
+		//TODO: also perform auto import if SEPA references match
+
+		//1. Try to find contract by Hibiscus category
+		UmsatzTyp typ = u.getUmsatzTyp();
 		if (typ != null)
 		{
-			// Contract suchen
-			DBIterator i = Settings.getDBService().createList(Contract.class);
+			DBIterator i = ContractControl.getContracts();
 			i.addFilter("hibiscus_category = ?", new Object[]{typ.getID()});
-			if (i.hasNext())
+			if (i.size() == 1)
 				contract = (Contract) i.next();
 		}
+		
+		
+		//2. Try to find SEPA references in transaction
+		
+		//No separators between lines until we have a working SEPA rewriter - 
+		// lines end after 27 chars, but fields may be 35 chars long.
+		if (contract == null) {
+			String trUse = VerwendungszweckUtil.toString(u, "");
+			DBIterator i = ContractControl.getContracts();
+			while (contract == null && i.hasNext()) {
+				Contract c = (Contract) i.next();
+				if (c.getSepaCreditorRef() != null && !"".equals(c.getSepaCreditorRef())) {
+					if (c.getSepaCustomerRef() != null && !"".equals(c.getSepaCustomerRef())) {
+						//Both SEPA references set -> both must be contained in the use string 
+						if (trUse.toString().contains(c.getSepaCreditorRef()) && trUse.toString().contains(c.getSepaCustomerRef()))
+							contract = c;
+					} else {
+						//Only SEPA creditor reference set -> only require this to be contained 
+						if (trUse.toString().contains(c.getSepaCreditorRef()))
+							contract = c;
+					}
+				} else {
+					if (c.getSepaCustomerRef() != null && !"".equals(c.getSepaCustomerRef())) {
+						//Only SEPA customer reference set -> only require this to be contained 
+						if (trUse.toString().contains(c.getSepaCustomerRef()))
+							contract = c;
+					} // else { // both SEPA references not set -> nothing to do }
+				}
+			}
+		}
+		
 
 		if (contract == null && auto)
-			throw new ApplicationException(i18n.tr("No assigned contract in database"));
+			throw new ApplicationException(i18n.tr("Auto-import not possible: No category assigned or no matching SEPA references found."));
 		
-		if (contract == null) {
-			contract = new UmsatzImportListDialog(u).open();
+		if (!auto) {
+			contract = new UmsatzImportListDialog(u, contract).open();
 		}
 
 		if (contract != null) {
@@ -143,7 +170,7 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 	}
 
 	/**
-	 * Hilfsklasse, um den Menupunkt zu deaktivieren, wenn die Buchung bereits zugeordnet ist.
+	 * Helper class to deactivate the menu item if the transaction is already assigned.
 	 */
 	private class MyContextMenuItem extends CheckedContextMenuItem
 	{
