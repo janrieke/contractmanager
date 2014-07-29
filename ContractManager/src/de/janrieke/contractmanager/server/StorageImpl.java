@@ -102,7 +102,8 @@ public class StorageImpl extends AbstractDBObject implements Storage {
 
 	@Override
 	public Blob getFile() throws RemoteException {
-		return (Blob) getAttribute("file");
+		Object res = getAttribute("file");
+		return (Blob) res; 
 	}
 
 	@Override

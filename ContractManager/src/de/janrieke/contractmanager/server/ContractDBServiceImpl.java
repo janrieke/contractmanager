@@ -159,7 +159,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.datasource.db.DBServiceImpl#getConnection()
 	 */
-	protected Connection getConnection() throws RemoteException {
+	public Connection getConnection() throws RemoteException {
 		try {
 			return super.getConnection();
 		} catch (RemoteException re) {

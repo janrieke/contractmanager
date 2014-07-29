@@ -24,11 +24,16 @@ package de.janrieke.contractmanager.gui.view;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.sql.Blob;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.eclipse.swt.SWT;
@@ -40,12 +45,17 @@ import org.eclipse.swt.widgets.Listener;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
+import de.janrieke.contractmanager.rmi.ContractDBService;
 import de.janrieke.contractmanager.rmi.Storage;
+import de.willuhn.datasource.GenericObject;
+import de.willuhn.datasource.rmi.DBIterator;
+import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.dialogs.AbstractDialog;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.parts.ButtonArea;
+import de.willuhn.jameica.gui.parts.TableChangeListener;
 import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.jameica.gui.util.Container;
 import de.willuhn.jameica.gui.util.SimpleContainer;
@@ -125,7 +135,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 			return buttonAddFile;
 
 		buttonAddFile = new Button(Settings.i18n().tr("Add File..."),
-				new OpenFile()) {
+				new AddFile()) {
 					@Override
 					public void paint(Composite parent) throws RemoteException {
 						super.paint(parent);
@@ -165,7 +175,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 			return buttonRemove;
 
 		buttonRemove = new Button(Settings.i18n().tr("Remove"),
-				new OpenFile()) {
+				new Remove()) {
 			@Override
 			public void paint(Composite parent) throws RemoteException {
 				super.paint(parent);
@@ -211,11 +221,30 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 					new OpenFile());
 			this.table.setSummary(false);
 			this.table.addColumn(Settings.i18n().tr("Description"),
-					"description");
+					"description", null, true);
 			this.table.addColumn(Settings.i18n().tr("Local file URI"), "path");
 			table.addSelectionListener(new Listener() {
 				@Override
 				public void handleEvent(Event event) {
+					if (event.type == SWT.Selection && event.data instanceof Storage) {
+						getRemoveButton().setEnabled(true);
+						getOpenButton().setEnabled(true);
+					}
+				}
+			});
+			table.addChangeListener(new TableChangeListener() {
+				
+				@Override
+				public void itemChanged(Object object, String attribute, String newValue)
+						throws ApplicationException {
+					if (object instanceof Storage && "description".equals(attribute)) {
+						try {
+							((Storage)object).setDescription(newValue);
+							((Storage)object).store();
+						} catch (RemoteException e) {
+							Logger.error("error while setting field", e);
+						}
+					}
 				}
 			});
 		} catch (RemoteException e) {
@@ -270,7 +299,6 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 								Desktop.getDesktop().open(localfile);
 							}
 						}
-						
 					}
 				} catch (IOException e) {
 					Logger.error("error while saving to temporary file", e);
@@ -280,9 +308,76 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 			}
 		}
 	}
+	
+	/**
+	 * Action for adding a new file as blob
+	 */
+	private class AddFile implements Action {
+		public void handleAction(Object context) throws ApplicationException {
+			FileDialog fd = new FileDialog(GUI.getShell(), SWT.OPEN);
+			fd.setText(Settings.i18n().tr("Select File to Add"));
+
+			final String filename = fd.open();
+			if (filename != null && !"".equals(filename)) {
+				try {
+					File localfile = new File(filename);
+					if (localfile.exists() && localfile.isFile() && localfile.canRead()) {
+						DBService service = Settings.getDBService();
+						if (service instanceof ContractDBService) {
+							Connection conn = ((ContractDBService) service).getConnection();
+						    boolean autocommit = conn.getAutoCommit();
+						    conn.setAutoCommit(false);
+
+						    String sql = "INSERT INTO storage (contract_id, description, path, file) VALUES (?, ?, ?, ?)";
+						    PreparedStatement stmt = conn.prepareStatement(sql);
+						    stmt.setString(1, contract.getID());
+						    stmt.setString(2, Settings.i18n().tr("Enter description here"));
+
+						    int lastDot = filename.lastIndexOf(".");
+							if (lastDot != -1)
+								stmt.setString(3, filename.substring(lastDot));
+							else 
+								stmt.setString(3, "");
+
+							FileInputStream fis = new FileInputStream(localfile);
+	
+						    stmt.setBinaryStream(4, fis, (int) localfile.length());
+						    stmt.execute();
+						    ResultSet res = stmt.getGeneratedKeys();
+						    int newid = 0;
+						    if (res != null && res.next())
+						    	newid = res.getInt(1);
+	
+						    conn.commit();
+						    conn.setAutoCommit(autocommit);
+						    fis.close();
+
+						    //add the new entry to the table
+						    if (newid != 0) {
+						    	DBIterator storageIterator = service.createList(Storage.class);
+						    	storageIterator.addFilter("id = " + newid);
+						    	GenericObject newEntry = storageIterator.next();
+						    	if (newEntry != null)
+						    		table.addItem(newEntry);
+						    }
+						}
+					}
+				} catch (RemoteException e) {
+					throw new ApplicationException(Settings.i18n().tr(
+							"Error while creating new storage entry"), e);
+				} catch (FileNotFoundException e) {
+					Logger.error("error while loading file", e);
+				} catch (SQLException e) {
+					Logger.error("error while executing SQL query", e);
+				} catch (IOException e) {
+					Logger.error("error while loading file", e);
+				}
+			}
+		}
+	}
 
 	/**
-	 * Action for opening the selected entry
+	 * Action for adding a new link
 	 */
 	private class AddLocalFileLink implements Action {
 		public void handleAction(Object context) throws ApplicationException {
@@ -298,6 +393,22 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 				s.setPath(filename);
 				s.store();
 				table.addItem(s);
+			} catch (RemoteException e) {
+				throw new ApplicationException(Settings.i18n().tr(
+						"Error while creating new storage entry"), e);
+			}
+		}
+	}
+
+	/**
+	 * Action for removing an entry
+	 */
+	private class Remove implements Action {
+		public void handleAction(Object context) throws ApplicationException {
+			try {
+				Storage sel = (Storage) getTable().getSelection();
+				table.removeItem(sel);
+				sel.delete();
 			} catch (RemoteException e) {
 				throw new ApplicationException(Settings.i18n().tr(
 						"Error while creating new storage entry"), e);
