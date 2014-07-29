@@ -22,6 +22,7 @@ import java.util.List;
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.DeleteContract;
 import de.janrieke.contractmanager.gui.action.GenerateCancelation;
+import de.janrieke.contractmanager.gui.action.ShowDocumentStorage;
 import de.janrieke.contractmanager.gui.button.RestoreButton;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.willuhn.jameica.gui.AbstractView;
@@ -72,10 +73,13 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    left.addLabelPair(Settings.i18n().tr("Name of contract"), control.getName());
 	    left.addLabelPair(Settings.i18n().tr("Contract number"), control.getContractNumber());
 	    left.addLabelPair(Settings.i18n().tr("Customer number"), control.getCustomerNumber());
+    	left.addPart(new Button(Settings.i18n().tr("Open document storage..."), new ShowDocumentStorage(), this.getCurrentObject()));
+    	
 	    left.addHeadline(Settings.i18n().tr("Financial Details"));
 	    left.addPart(control.getCostsList());
 	    left.addLabelPair(Settings.i18n().tr("Money per term"), control.getCostsPerTerm());
 	    left.addLabelPair(Settings.i18n().tr("Money per month"), control.getCostsPerMonth());
+	    
 	    left.addHeadline(Settings.i18n().tr("Runtime"));
 	    left.addLabelPair(Settings.i18n().tr("Start date"),	control.getStartDate());
 	    left.addLabelPair(Settings.i18n().tr("End date"), control.getEndDate());
@@ -83,7 +87,6 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    left.addLabelPair(Settings.i18n().tr("Cancellation period"), control.getCancellationPeriod());
 	    left.addLabelPair(Settings.i18n().tr("Minimum term"), control.getFirstRuntime());
 	    left.addLabelPair(Settings.i18n().tr("Following terms"), control.getNextRuntime());
-	    //TODO: Show complete term instead of only beginning
 	    left.addLabelPair(Settings.i18n().tr("Next cancelable term"), control.getNextTerm());
 	    left.addLabelPair(Settings.i18n().tr("Next cancellation deadline"), control.getNextCancellationDeadline());
 	    left.addLabelPair(Settings.i18n().tr("Remind about cancellations?"), control.getRemind());
@@ -103,8 +106,6 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    
 		// add some buttons
 		ButtonArea buttons = new ButtonArea(getParent(), 4);
-
-		//buttons.addButton(new Back(false));
 		buttons.addButton(Settings.i18n().tr("Generate Cancellation..."), new GenerateCancelation(), control.getCurrentObject(), false, "document-print.png");
 		deleteButton = new Button(Settings.i18n().tr("Delete Contract..."),
 				new DeleteContract(), control.getCurrentObject(), false, "window-close.png");
@@ -119,12 +120,6 @@ public class ContractDetailView extends AbstractView implements Extendable {
 				control.handleStore();
 			}
 		}, null, true, "document-save.png"); // "true" defines this button as the default button
-
-		// show transactions of this contract
-		//new Headline(getParent(), Settings.i18n().tr(
-		//		"Transactions of this contract"));
-		//		control.getTaskList().paint(getParent());
-
 	}
 
 	/**

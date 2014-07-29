@@ -824,4 +824,23 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	public void setSepaCustomerRef(String ref) throws RemoteException {
 		setAttribute("sepa_customer", ref);
 	}
+
+	@Override
+	public DBIterator getAttachedFiles() throws RemoteException {
+		try {
+			// 1) Get the Database Service.
+			DBService service = Settings.getDBService();
+
+			// 2) We create the transaction list using createList(Class)
+			DBIterator transactions = service
+					.createList(de.janrieke.contractmanager.rmi.Storage.class);
+
+			// 3) we add a filter to only query for tasks with our project id
+			transactions.addFilter("contract_id = " + this.getID());
+
+			return transactions;
+		} catch (Exception e) {
+			throw new RemoteException("unable to load file list", e);
+		}
+	}
 }
