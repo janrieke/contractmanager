@@ -198,6 +198,8 @@ public interface Contract extends DBObject {
 	//derived features
 	public DBIterator getTransactions() throws RemoteException;
 	public DBIterator getCosts() throws RemoteException;
+	
+	public DBIterator getAttachedFiles() throws RemoteException;
 
 	public static final String NEXT_TERM_BEGIN = "next_term_begin";
 	public Date getNextTermBegin() throws RemoteException;
