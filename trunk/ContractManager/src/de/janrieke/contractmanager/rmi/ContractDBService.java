@@ -29,6 +29,7 @@
 package de.janrieke.contractmanager.rmi;
 
 import java.rmi.RemoteException;
+import java.sql.Connection;
 
 import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.jameica.system.Settings;
@@ -74,4 +75,10 @@ public interface ContractDBService extends DBService
    */
   public String getSQLTimestamp(String content) throws RemoteException;
 
+  /**
+   * Returns the current connection.
+   * @return connection
+   * @throws RemoteException
+   */
+  public Connection getConnection() throws RemoteException;
 }
