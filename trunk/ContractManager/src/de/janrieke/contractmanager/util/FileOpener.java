@@ -94,7 +94,8 @@ class WindowsFileOpener extends FileOpener {
 		boolean result = false;
 		try {
 			Process proc = Runtime.getRuntime().exec(
-					"cmd /c start \"" + file.getAbsolutePath() + "\"");
+			//		"cmd /c start \"" + file.getAbsolutePath() + "\"");
+					"rundll32 SHELL32.DLL,ShellExec_RunDLL "+ "\"" + file.getAbsolutePath() + "\""); 
 			try {
 			    Thread.sleep(WAIT_TIME);
 			} catch (InterruptedException e) {
