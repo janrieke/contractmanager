@@ -352,21 +352,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 		private boolean openFile(File file) {
 			boolean success = false;
 			if (file.exists() && file.isFile() && file.canRead()) {
-				// 1. Try using the SWT mechanism: find the associated program
-				// by file extension
-				int lastDot = file.getAbsolutePath().lastIndexOf(".");
-				if (lastDot != -1) {
-					String suffix = file.getAbsolutePath().substring(lastDot);
-					final Program p = Program.findProgram(suffix);
-					if (p != null) {
-						success = p.execute(file.getAbsolutePath());
-					}
-				}
-				if (success)
-					return true;
-				Logger.warn("Error while opening file using SWT");
-
-				// 2. Use the AWT Desktop
+				// 1. Use the AWT Desktop
 				if (Desktop.isDesktopSupported()
 						&& Desktop.getDesktop()
 								.isSupported(Desktop.Action.OPEN)) {
@@ -382,6 +368,21 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 					return true;
 				Logger.warn("Error while opening file using AWT");
 
+				// 2. Try using the SWT mechanism: find the associated program
+				// by file extension
+				int lastDot = file.getAbsolutePath().lastIndexOf(".");
+				if (lastDot != -1) {
+					String suffix = file.getAbsolutePath().substring(lastDot);
+					final Program p = Program.findProgram(suffix);
+					if (p != null) {
+						success = p.execute(file.getAbsolutePath());
+					} else
+						Program.launch(file.getAbsolutePath());
+				}
+				if (success)
+					return true;
+				Logger.warn("Error while opening file using SWT");
+				
 				// 3. Use OS command line
 				success = FileOpener.getFileOpener().open(file);
 				if (success)
