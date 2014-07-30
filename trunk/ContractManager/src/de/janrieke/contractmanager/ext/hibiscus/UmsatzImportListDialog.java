@@ -191,7 +191,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 
 					boolean t = c.isActiveInMonth(new Date());
 					if (!t)
-						col = Settings.getNotActiveForeground();
+						col = Settings.getNotActiveForegroundColor();
 					else
 						col = de.willuhn.jameica.gui.util.Color.FOREGROUND
 								.getSWTColor();

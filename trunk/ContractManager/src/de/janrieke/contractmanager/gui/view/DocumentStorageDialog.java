@@ -30,7 +30,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.rmi.RemoteException;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,6 +41,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.TableItem;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
@@ -53,12 +54,14 @@ import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.dialogs.AbstractDialog;
+import de.willuhn.jameica.gui.formatter.TableFormatter;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.parts.ButtonArea;
 import de.willuhn.jameica.gui.parts.TableChangeListener;
 import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.jameica.gui.util.Container;
 import de.willuhn.jameica.gui.util.SimpleContainer;
+import de.willuhn.jameica.system.OperationCanceledException;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
@@ -223,6 +226,25 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 			this.table.addColumn(Settings.i18n().tr("Description"),
 					"description", null, true);
 			this.table.addColumn(Settings.i18n().tr("Local file URI"), "path");
+			table.setFormatter(new TableFormatter() {
+				@Override
+				public void format(TableItem item) {
+					Object o = item.getData();
+					if (o instanceof Storage) {
+						try {
+							if (((Storage)o).getFile() != null) {
+								item.setText(1, Settings.i18n().tr("File in database"));
+								item.setForeground(1, Settings.getNotActiveForegroundColor());
+							}
+							else
+								item.setText(1, ((Storage)o).getPath());
+						} catch (RemoteException e) {
+							item.setText(1, "Error while reading database");
+							item.setForeground(1, Settings.getErrorColor());
+						}
+					}
+				}
+			});
 			table.addSelectionListener(new Listener() {
 				@Override
 				public void handleEvent(Event event) {
@@ -260,10 +282,10 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 		public void handleAction(Object context) throws ApplicationException {
 			Storage storage = (Storage) getTable().getSelection();
 			if (storage != null) {
-				Blob blob;
+				InputStream inputStream;
 				try {
-					blob = storage.getFile();
-					if (blob != null) {
+					inputStream = storage.getFile();
+					if (inputStream != null) {
 						// file has been stored in DB as blob
 						String suffix = storage.getPath(); // path contains the
 															// file suffix when
@@ -276,10 +298,9 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 						//save the DB contents to file
 						FileOutputStream output = new FileOutputStream(tmp);
 						try {
-							InputStream src = storage.getFile().getBinaryStream();
 							byte[] buffer = new byte[1024];
 							int len;
-							while ((len = src.read(buffer)) != -1) {
+							while ((len = inputStream.read(buffer)) != -1) {
 							    output.write(buffer, 0, len);
 							}
 						} catch (IOException ex) {
@@ -302,8 +323,6 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 					}
 				} catch (IOException e) {
 					Logger.error("error while saving to temporary file", e);
-				} catch (SQLException e) {
-					Logger.error("error while retrieving file from database", e);
 				}
 			}
 		}
@@ -357,8 +376,9 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 						    	DBIterator storageIterator = service.createList(Storage.class);
 						    	storageIterator.addFilter("id = " + newid);
 						    	GenericObject newEntry = storageIterator.next();
-						    	if (newEntry != null)
+						    	if (newEntry != null) {
 						    		table.addItem(newEntry);
+						    	}
 						    }
 						}
 					}
@@ -406,12 +426,43 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 	private class Remove implements Action {
 		public void handleAction(Object context) throws ApplicationException {
 			try {
-				Storage sel = (Storage) getTable().getSelection();
-				table.removeItem(sel);
-				sel.delete();
+				if (Desktop.isDesktopSupported() && table.getSelection() != null && table.getSelection() instanceof Storage) {
+					Storage st = (Storage) table.getSelection();
+			        MessageBox messageBox = new MessageBox(GUI.getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+					
+					//YesNoDialog d = new YesNoDialog(YesNoDialog.POSITION_CENTER);
+			        messageBox.setText(Settings.i18n().tr("Remove file?"));
+					//messageBox.setPanelText(Settings.i18n().tr("Do you really want to remove the file?"));
+
+					if (st.getFile() != null)
+						messageBox.setMessage(Settings.i18n().tr("Do you really want to remove the file?") + "\n" +
+								Settings.i18n().tr("This will delete the file from the database permanently."));
+					else
+						messageBox.setMessage(Settings.i18n().tr("Do you really want to remove the file?") + "\n" +
+								Settings.i18n().tr("This will remove the file link, but will not delete the actual file."));
+
+			        boolean choice = messageBox.open() == SWT.YES;
+
+					if (choice) {
+						Storage sel = (Storage) getTable().getSelection();
+						table.removeItem(sel);
+						sel.delete();
+					}
+					
+					if (table.getSelection() == null) {
+						getRemoveButton().setEnabled(false);
+						getOpenButton().setEnabled(false);
+					} else
+						table.select(table.getSelection()); //refresh selection marker
+				}
+			} catch (OperationCanceledException e) {
+				//user pressed ESC, do nothing
 			} catch (RemoteException e) {
 				throw new ApplicationException(Settings.i18n().tr(
-						"Error while creating new storage entry"), e);
+						"Error while deleting storage entry"), e);
+			} catch (Exception e) {
+				throw new ApplicationException(Settings.i18n().tr(
+						"Error while deleting storage entry"), e);
 			}
 		}
 	}

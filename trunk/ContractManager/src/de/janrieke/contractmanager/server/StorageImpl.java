@@ -17,12 +17,19 @@
  */
 package de.janrieke.contractmanager.server;
 
+import java.io.InputStream;
 import java.rmi.RemoteException;
-import java.sql.Blob;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
+import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
+import de.janrieke.contractmanager.rmi.ContractDBService;
 import de.janrieke.contractmanager.rmi.Storage;
 import de.willuhn.datasource.db.AbstractDBObject;
+import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.datasource.rmi.ObjectNotFoundException;
 
 /**
@@ -101,13 +108,26 @@ public class StorageImpl extends AbstractDBObject implements Storage {
 	}
 
 	@Override
-	public Blob getFile() throws RemoteException {
-		Object res = getAttribute("file");
-		return (Blob) res; 
-	}
+	public InputStream getFile() throws RemoteException {
+		DBService service = Settings.getDBService();
+		InputStream result = null;
+		if (service instanceof ContractDBService) {
+			Connection conn = ((ContractDBService) service).getConnection();
 
-	@Override
-	public void setFile(Blob file) throws RemoteException {
-		setAttribute("file", file);
+			String sql = "SELECT file FROM storage where id="+this.getID();
+			try {
+				PreparedStatement stmt = conn.prepareStatement(sql);
+			    ResultSet resultSet = stmt.executeQuery();
+			    if (resultSet.next()) {
+			    	result = resultSet.getBinaryStream(1);
+			    } else
+					throw new RemoteException("Unable to find storage entry");
+			} catch (SQLException e) {
+				throw new RemoteException("Database retrieval failed", e);
+			}
+		}
+		else
+			throw new RemoteException("Unknown database service");
+		return result; 
 	}
 }

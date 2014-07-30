@@ -17,8 +17,8 @@
  */
 package de.janrieke.contractmanager.rmi;
 
+import java.io.InputStream;
 import java.rmi.RemoteException;
-import java.sql.Blob;
 
 import de.willuhn.datasource.rmi.DBObject;
 
@@ -41,6 +41,14 @@ public interface Storage extends DBObject {
 	public void setDescription(String desc) throws RemoteException;
 	public String getPath() throws RemoteException;
 	public void setPath(String path) throws RemoteException;
-	public Blob getFile() throws RemoteException;
-	public void setFile(Blob file) throws RemoteException;
+	
+	/**
+	 * Returns a stream for reading the binary contents stored in the "file" field. 
+	 * Note: All data must be read before calling any other database operation.
+	 * Any other DB operation will implicitly close the stream.
+	 * @return a stream with the file contents
+	 * @throws RemoteException
+	 */
+	public InputStream getFile() throws RemoteException;
+	//saving is only implemented via prepared statements 
 }
