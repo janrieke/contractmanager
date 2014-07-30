@@ -1,6 +1,6 @@
 /*
  *   This file is part of ContractManager for Jameica.
- *   Copyright (C) 2010-2011  Jan Rieke
+ *   Copyright (C) 2010-2014  Jan Rieke
  *
  *   ContractManager is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
