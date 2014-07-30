@@ -211,9 +211,15 @@ public class Settings {
 		SettingsUtil.set("show_sepa_debitor_input", Boolean.toString(show));
 	}
 
-	public static Color getNotActiveForeground() {
+	public static Color getNotActiveForegroundColor() {
 		return Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
 	}
+	
+	public static Color getErrorColor() {
+		//derive from Jameica settings
+		return de.willuhn.jameica.gui.util.Color.ERROR.getSWTColor();
+	}
+	
 
 	public static boolean getHibiscusAutoImportNewTransactions() throws RemoteException {
 		return Boolean.parseBoolean(SettingsUtil.get("hibiscus_auto_import", "false"));

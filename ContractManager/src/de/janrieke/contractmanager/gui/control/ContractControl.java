@@ -678,7 +678,7 @@ public class ContractControl extends AbstractControl {
 					Calendar calendar = Calendar.getInstance();
 					try {
 						if (!contract.isActiveInMonth(new Date())) {
-							item.setForeground(Settings.getNotActiveForeground());
+							item.setForeground(Settings.getNotActiveForegroundColor());
 						}
 
 						if (contract.getDoNotRemind())
