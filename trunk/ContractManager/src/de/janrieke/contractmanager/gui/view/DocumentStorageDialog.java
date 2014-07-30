@@ -37,6 +37,7 @@ import java.sql.SQLException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
@@ -48,6 +49,7 @@ import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.ContractDBService;
 import de.janrieke.contractmanager.rmi.Storage;
+import de.janrieke.contractmanager.util.FileOpener;
 import de.willuhn.datasource.GenericObject;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.datasource.rmi.DBService;
@@ -77,8 +79,8 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 	private Button buttonAddLocalFileLink = null;
 	private Button buttonRemove = null;
 	private Button buttonOpen = null;
-	
-	//TODO: calculate this from the maximum text width
+
+	// TODO: calculate this from the maximum text width
 	private static int BUTTON_HORIZONTAL_SIZE = 160;
 	private static int BUTTON_VERTICAL_SIZE = SWT.DEFAULT;
 
@@ -106,12 +108,12 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 
 		Container left = new SimpleContainer(group.getComposite(), true, 1);
 
-	
 		left.addText(Settings.i18n().tr("List of files:"), true);
 		left.addPart(this.getTable());
 
 		Container right = new SimpleContainer(group.getComposite(), false, 1);
-		right.getComposite().setLayoutData(new GridData(BUTTON_HORIZONTAL_SIZE+10, SWT.DEFAULT));
+		right.getComposite().setLayoutData(
+				new GridData(BUTTON_HORIZONTAL_SIZE + 10, SWT.DEFAULT));
 		right.addPart(getAddFileButton());
 		right.addPart(getAddLocalLinkFileButton());
 		right.addPart(getRemoveButton());
@@ -139,15 +141,16 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 
 		buttonAddFile = new Button(Settings.i18n().tr("Add File..."),
 				new AddFile()) {
-					@Override
-					public void paint(Composite parent) throws RemoteException {
-						super.paint(parent);
-						button.setLayoutData(new GridData(BUTTON_HORIZONTAL_SIZE, BUTTON_VERTICAL_SIZE));
-					}
+			@Override
+			public void paint(Composite parent) throws RemoteException {
+				super.paint(parent);
+				button.setLayoutData(new GridData(BUTTON_HORIZONTAL_SIZE,
+						BUTTON_VERTICAL_SIZE));
+			}
 		};
 		return buttonAddFile;
 	}
-	
+
 	/**
 	 * Returns the open button to open the selected storage entry.
 	 * 
@@ -157,17 +160,18 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 		if (buttonAddLocalFileLink != null)
 			return buttonAddLocalFileLink;
 
-		buttonAddLocalFileLink = new Button(Settings.i18n().tr("Add Local File Link..."),
-				new AddLocalFileLink()) {
+		buttonAddLocalFileLink = new Button(Settings.i18n().tr(
+				"Add Local File Link..."), new AddLocalFileLink()) {
 			@Override
 			public void paint(Composite parent) throws RemoteException {
 				super.paint(parent);
-				button.setLayoutData(new GridData(BUTTON_HORIZONTAL_SIZE, BUTTON_VERTICAL_SIZE));
+				button.setLayoutData(new GridData(BUTTON_HORIZONTAL_SIZE,
+						BUTTON_VERTICAL_SIZE));
 			}
 		};
 		return buttonAddLocalFileLink;
 	}
-	
+
 	/**
 	 * Returns the open button to open the selected storage entry.
 	 * 
@@ -177,18 +181,18 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 		if (buttonRemove != null)
 			return buttonRemove;
 
-		buttonRemove = new Button(Settings.i18n().tr("Remove"),
-				new Remove()) {
+		buttonRemove = new Button(Settings.i18n().tr("Remove"), new Remove()) {
 			@Override
 			public void paint(Composite parent) throws RemoteException {
 				super.paint(parent);
-				button.setLayoutData(new GridData(BUTTON_HORIZONTAL_SIZE, BUTTON_VERTICAL_SIZE));
+				button.setLayoutData(new GridData(BUTTON_HORIZONTAL_SIZE,
+						BUTTON_VERTICAL_SIZE));
 			}
 		};
 		buttonRemove.setEnabled(false); // initial deaktiviert
 		return buttonRemove;
 	}
-	
+
 	/**
 	 * Returns the open button to open the selected storage entry.
 	 * 
@@ -198,12 +202,12 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 		if (buttonOpen != null)
 			return buttonOpen;
 
-		buttonOpen = new Button(Settings.i18n().tr("Open"),
-				new OpenFile()) {
+		buttonOpen = new Button(Settings.i18n().tr("Open"), new OpenFile()) {
 			@Override
 			public void paint(Composite parent) throws RemoteException {
 				super.paint(parent);
-				button.setLayoutData(new GridData(BUTTON_HORIZONTAL_SIZE, BUTTON_VERTICAL_SIZE));
+				button.setLayoutData(new GridData(BUTTON_HORIZONTAL_SIZE,
+						BUTTON_VERTICAL_SIZE));
 			}
 		};
 		buttonOpen.setEnabled(false); // initial deaktiviert
@@ -232,12 +236,13 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 					Object o = item.getData();
 					if (o instanceof Storage) {
 						try {
-							if (((Storage)o).getFile() != null) {
-								item.setText(1, Settings.i18n().tr("File in database"));
-								item.setForeground(1, Settings.getNotActiveForegroundColor());
-							}
-							else
-								item.setText(1, ((Storage)o).getPath());
+							if (((Storage) o).getFile() != null) {
+								item.setText(1,
+										Settings.i18n().tr("File in database"));
+								item.setForeground(1,
+										Settings.getNotActiveForegroundColor());
+							} else
+								item.setText(1, ((Storage) o).getPath());
 						} catch (RemoteException e) {
 							item.setText(1, "Error while reading database");
 							item.setForeground(1, Settings.getErrorColor());
@@ -248,21 +253,23 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 			table.addSelectionListener(new Listener() {
 				@Override
 				public void handleEvent(Event event) {
-					if (event.type == SWT.Selection && event.data instanceof Storage) {
+					if (event.type == SWT.Selection
+							&& event.data instanceof Storage) {
 						getRemoveButton().setEnabled(true);
 						getOpenButton().setEnabled(true);
 					}
 				}
 			});
 			table.addChangeListener(new TableChangeListener() {
-				
+
 				@Override
-				public void itemChanged(Object object, String attribute, String newValue)
-						throws ApplicationException {
-					if (object instanceof Storage && "description".equals(attribute)) {
+				public void itemChanged(Object object, String attribute,
+						String newValue) throws ApplicationException {
+					if (object instanceof Storage
+							&& "description".equals(attribute)) {
 						try {
-							((Storage)object).setDescription(newValue);
-							((Storage)object).store();
+							((Storage) object).setDescription(newValue);
+							((Storage) object).store();
 						} catch (RemoteException e) {
 							Logger.error("error while setting field", e);
 						}
@@ -295,39 +302,102 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 						// Delete temp file when program exits
 						tmp.deleteOnExit();
 
-						//save the DB contents to file
+						// save the DB contents to file
 						FileOutputStream output = new FileOutputStream(tmp);
 						try {
 							byte[] buffer = new byte[1024];
 							int len;
 							while ((len = inputStream.read(buffer)) != -1) {
-							    output.write(buffer, 0, len);
+								output.write(buffer, 0, len);
 							}
 						} catch (IOException ex) {
-							Logger.error("error while saving temporary file contents", ex);
+							Logger.error(
+									"Error while saving temporary file contents",
+									ex);
 						} finally {
-						   output.close();
+							output.close();
 						}
-						
+
 						// open the temp file
-						Desktop.getDesktop().open(tmp);
+						if (!openFile(tmp)) {
+							// if opening has failed, allow the user to access
+							// the file manually
+							MessageBox messageBox = new MessageBox(
+									GUI.getShell(), SWT.ICON_INFORMATION
+											| SWT.OK);
+							messageBox.setText(Settings.i18n().tr(
+									"Opening Failed"));
+							messageBox.setMessage(Settings.i18n().tr("Opening the stored file failed. You can access it manually at the following location:")
+											+ "\n"
+											+ tmp.getAbsolutePath()
+											+ "\n"
+											+ Settings.i18n().tr("The file will be deleted when exiting Jameica."));
+							messageBox.open();
+						}
+						;
 					} else {
 						// just open the plain file link from "path" field
 						String path = storage.getPath();
 						if (path != null && !"".equals(path)) {
 							File localfile = new File(path);
-							if (localfile.exists() && localfile.isFile() && localfile.canRead()) {
-								Desktop.getDesktop().open(localfile);
-							}
+							openFile(localfile);
 						}
 					}
 				} catch (IOException e) {
-					Logger.error("error while saving to temporary file", e);
+					Logger.error("Error while saving to temporary file", e);
 				}
 			}
 		}
+
+		private boolean openFile(File file) {
+			boolean success = false;
+			if (file.exists() && file.isFile() && file.canRead()) {
+				// 1. Try using the SWT mechanism: find the associated program
+				// by file extension
+				int lastDot = file.getAbsolutePath().lastIndexOf(".");
+				if (lastDot != -1) {
+					String suffix = file.getAbsolutePath().substring(lastDot);
+					final Program p = Program.findProgram(suffix);
+					if (p != null) {
+						success = p.execute(file.getAbsolutePath());
+					}
+				}
+				if (success)
+					return true;
+				Logger.warn("Error while opening file using SWT");
+
+				// 2. Use the AWT Desktop
+				if (Desktop.isDesktopSupported()
+						&& Desktop.getDesktop()
+								.isSupported(Desktop.Action.OPEN)) {
+					try {
+						Desktop.getDesktop().open(file);
+						success = true;
+					} catch (IOException e) {
+						Logger.warn("IOException while opening file using AWT: "
+								+ e.getMessage());
+					}
+				}
+				if (success)
+					return true;
+				Logger.warn("Error while opening file using AWT");
+
+				// 3. Use OS command line
+				success = FileOpener.getFileOpener().open(file);
+				if (success)
+					return true;
+				Logger.warn("Error while opening file using command line");
+
+				// Finally: report fatal error
+				Logger.error("Error while opening file, all methods failed. Check whether file is accessible and is associated with a program.");
+			} else {
+				Logger.error("Error while opening file: file does not exist or is not readable");
+				return false;
+			}
+			return success;
+		}
 	}
-	
+
 	/**
 	 * Action for adding a new file as blob
 	 */
@@ -340,46 +410,52 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 			if (filename != null && !"".equals(filename)) {
 				try {
 					File localfile = new File(filename);
-					if (localfile.exists() && localfile.isFile() && localfile.canRead()) {
+					if (localfile.exists() && localfile.isFile()
+							&& localfile.canRead()) {
 						DBService service = Settings.getDBService();
 						if (service instanceof ContractDBService) {
-							Connection conn = ((ContractDBService) service).getConnection();
-						    boolean autocommit = conn.getAutoCommit();
-						    conn.setAutoCommit(false);
+							Connection conn = ((ContractDBService) service)
+									.getConnection();
+							boolean autocommit = conn.getAutoCommit();
+							conn.setAutoCommit(false);
 
-						    String sql = "INSERT INTO storage (contract_id, description, path, file) VALUES (?, ?, ?, ?)";
-						    PreparedStatement stmt = conn.prepareStatement(sql);
-						    stmt.setString(1, contract.getID());
-						    stmt.setString(2, Settings.i18n().tr("Enter description here"));
+							String sql = "INSERT INTO storage (contract_id, description, path, file) VALUES (?, ?, ?, ?)";
+							PreparedStatement stmt = conn.prepareStatement(sql);
+							stmt.setString(1, contract.getID());
+							stmt.setString(2,
+									Settings.i18n()
+											.tr("Enter description here"));
 
-						    int lastDot = filename.lastIndexOf(".");
+							int lastDot = filename.lastIndexOf(".");
 							if (lastDot != -1)
 								stmt.setString(3, filename.substring(lastDot));
-							else 
+							else
 								stmt.setString(3, "");
 
 							FileInputStream fis = new FileInputStream(localfile);
-	
-						    stmt.setBinaryStream(4, fis, (int) localfile.length());
-						    stmt.execute();
-						    ResultSet res = stmt.getGeneratedKeys();
-						    int newid = 0;
-						    if (res != null && res.next())
-						    	newid = res.getInt(1);
-	
-						    conn.commit();
-						    conn.setAutoCommit(autocommit);
-						    fis.close();
 
-						    //add the new entry to the table
-						    if (newid != 0) {
-						    	DBIterator storageIterator = service.createList(Storage.class);
-						    	storageIterator.addFilter("id = " + newid);
-						    	GenericObject newEntry = storageIterator.next();
-						    	if (newEntry != null) {
-						    		table.addItem(newEntry);
-						    	}
-						    }
+							stmt.setBinaryStream(4, fis,
+									(int) localfile.length());
+							stmt.execute();
+							ResultSet res = stmt.getGeneratedKeys();
+							int newid = 0;
+							if (res != null && res.next())
+								newid = res.getInt(1);
+
+							conn.commit();
+							conn.setAutoCommit(autocommit);
+							fis.close();
+
+							// add the new entry to the table
+							if (newid != 0) {
+								DBIterator storageIterator = service
+										.createList(Storage.class);
+								storageIterator.addFilter("id = " + newid);
+								GenericObject newEntry = storageIterator.next();
+								if (newEntry != null) {
+									table.addItem(newEntry);
+								}
+							}
 						}
 					}
 				} catch (RemoteException e) {
@@ -426,37 +502,53 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 	private class Remove implements Action {
 		public void handleAction(Object context) throws ApplicationException {
 			try {
-				if (Desktop.isDesktopSupported() && table.getSelection() != null && table.getSelection() instanceof Storage) {
+				if (table.getSelection() != null
+						&& table.getSelection() instanceof Storage) {
 					Storage st = (Storage) table.getSelection();
-			        MessageBox messageBox = new MessageBox(GUI.getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
-					
-					//YesNoDialog d = new YesNoDialog(YesNoDialog.POSITION_CENTER);
-			        messageBox.setText(Settings.i18n().tr("Remove file?"));
-					//messageBox.setPanelText(Settings.i18n().tr("Do you really want to remove the file?"));
+					MessageBox messageBox = new MessageBox(GUI.getShell(),
+							SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+
+					// YesNoDialog d = new
+					// YesNoDialog(YesNoDialog.POSITION_CENTER);
+					messageBox.setText(Settings.i18n().tr("Remove file?"));
+					// messageBox.setPanelText(Settings.i18n().tr("Do you really want to remove the file?"));
 
 					if (st.getFile() != null)
-						messageBox.setMessage(Settings.i18n().tr("Do you really want to remove the file?") + "\n" +
-								Settings.i18n().tr("This will delete the file from the database permanently."));
+						messageBox
+								.setMessage(Settings
+										.i18n()
+										.tr("Do you really want to remove the file?")
+										+ "\n"
+										+ Settings
+												.i18n()
+												.tr("This will delete the file from the database permanently."));
 					else
-						messageBox.setMessage(Settings.i18n().tr("Do you really want to remove the file?") + "\n" +
-								Settings.i18n().tr("This will remove the file link, but will not delete the actual file."));
+						messageBox
+								.setMessage(Settings
+										.i18n()
+										.tr("Do you really want to remove the file?")
+										+ "\n"
+										+ Settings
+												.i18n()
+												.tr("This will remove the file link, but will not delete the actual file."));
 
-			        boolean choice = messageBox.open() == SWT.YES;
+					boolean choice = messageBox.open() == SWT.YES;
 
 					if (choice) {
 						Storage sel = (Storage) getTable().getSelection();
 						table.removeItem(sel);
 						sel.delete();
 					}
-					
+
 					if (table.getSelection() == null) {
 						getRemoveButton().setEnabled(false);
 						getOpenButton().setEnabled(false);
 					} else
-						table.select(table.getSelection()); //refresh selection marker
+						table.select(table.getSelection()); // refresh selection
+															// marker
 				}
 			} catch (OperationCanceledException e) {
-				//user pressed ESC, do nothing
+				// user pressed ESC, do nothing
 			} catch (RemoteException e) {
 				throw new ApplicationException(Settings.i18n().tr(
 						"Error while deleting storage entry"), e);
@@ -466,7 +558,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 			}
 		}
 	}
-	
+
 	@Override
 	protected Contract getData() throws Exception {
 		return null;
