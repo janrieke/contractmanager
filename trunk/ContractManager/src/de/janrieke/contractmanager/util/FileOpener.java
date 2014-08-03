@@ -10,7 +10,7 @@ public class FileOpener {
 	FileOpener() {
 	}
 
-	protected static int WAIT_TIME = 500;
+	protected final static int WAIT_TIME = 500;
 
 	// Created the appropriate instance
 	public static FileOpener getFileOpener() {

@@ -443,9 +443,10 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 							if (res != null && res.next())
 								newid = res.getInt(1);
 
+							fis.close();
+							stmt.close();
 							conn.commit();
 							conn.setAutoCommit(autocommit);
-							fis.close();
 
 							// add the new entry to the table
 							if (newid != 0) {
