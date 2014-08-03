@@ -36,6 +36,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
@@ -81,8 +82,8 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 	private Button buttonOpen = null;
 
 	// TODO: calculate this from the maximum text width
-	private static int BUTTON_HORIZONTAL_SIZE = 160;
-	private static int BUTTON_VERTICAL_SIZE = SWT.DEFAULT;
+	private int BUTTON_HORIZONTAL_SIZE = 160;
+	private final static int BUTTON_VERTICAL_SIZE = SWT.DEFAULT;
 
 	/**
 	 * ct.
@@ -110,7 +111,16 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 
 		left.addText(Settings.i18n().tr("List of files:"), true);
 		left.addPart(this.getTable());
-
+		
+		//compute max width of the buttons
+		GC gc = new GC(parent.getShell());
+		int maxwidth = 0;
+		maxwidth = Math.max(maxwidth, gc.stringExtent(Settings.i18n().tr("Add File...")).x);
+		maxwidth = Math.max(maxwidth, gc.stringExtent(Settings.i18n().tr("Add Local File Link...")).x);
+		maxwidth = Math.max(maxwidth, gc.stringExtent(Settings.i18n().tr("Remove")).x);
+		maxwidth = Math.max(maxwidth, gc.stringExtent(Settings.i18n().tr("Open")).x);
+		BUTTON_HORIZONTAL_SIZE = maxwidth + 8;
+		
 		Container right = new SimpleContainer(group.getComposite(), false, 1);
 		right.getComposite().setLayoutData(
 				new GridData(BUTTON_HORIZONTAL_SIZE + 10, SWT.DEFAULT));
