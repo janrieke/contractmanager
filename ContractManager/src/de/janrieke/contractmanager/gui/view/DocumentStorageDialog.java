@@ -119,7 +119,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 		maxwidth = Math.max(maxwidth, gc.stringExtent(Settings.i18n().tr("Add Local File Link...")).x);
 		maxwidth = Math.max(maxwidth, gc.stringExtent(Settings.i18n().tr("Remove")).x);
 		maxwidth = Math.max(maxwidth, gc.stringExtent(Settings.i18n().tr("Open")).x);
-		BUTTON_HORIZONTAL_SIZE = maxwidth + 8;
+		BUTTON_HORIZONTAL_SIZE = maxwidth + 12;
 		
 		Container right = new SimpleContainer(group.getComposite(), false, 1);
 		right.getComposite().setLayoutData(
