@@ -65,14 +65,14 @@ public class SizeableTablePart extends TablePart {
 	}
 	
 	@Override
-	public void orderBy(int index) {
+	public synchronized void orderBy(int index) {
 		// make method public
 		this.orderByIndex  = index;
 		super.orderBy(index);
 	}
 
 	@Override
-	public void orderBy(String colName) {
+	public synchronized void orderBy(String colName) {
 		// make method public
 		this.orderByColName   = colName;
 		super.orderBy(colName);

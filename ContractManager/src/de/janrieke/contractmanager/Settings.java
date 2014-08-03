@@ -143,7 +143,7 @@ public class Settings {
 	}
 
 	public static void setExtensionWarningTime(int time) throws RemoteException, ApplicationException {
-		SettingsUtil.set("extension_warning_time", ((Integer)time).toString());
+		SettingsUtil.set("extension_warning_time", Integer.toString(time));
 	}
 
 	public static int getExtensionNoticeTime() throws RemoteException {
@@ -151,7 +151,7 @@ public class Settings {
 	}
 
 	public static void setExtensionNoticeTime(int time) throws RemoteException, ApplicationException {
-		SettingsUtil.set("extension_notice_time", ((Integer)time).toString());
+		SettingsUtil.set("extension_notice_time", Integer.toString(time));
 	}
 
 //	public static boolean getICalAutoExport() throws RemoteException {

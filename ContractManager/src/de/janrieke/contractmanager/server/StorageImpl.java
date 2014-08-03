@@ -114,9 +114,10 @@ public class StorageImpl extends AbstractDBObject implements Storage {
 		if (service instanceof ContractDBService) {
 			Connection conn = ((ContractDBService) service).getConnection();
 
+			PreparedStatement stmt = null;
 			String sql = "SELECT file FROM storage where id="+this.getID();
 			try {
-				PreparedStatement stmt = conn.prepareStatement(sql);
+				stmt = conn.prepareStatement(sql);
 			    ResultSet resultSet = stmt.executeQuery();
 			    if (resultSet.next()) {
 			    	result = resultSet.getBinaryStream(1);
@@ -124,6 +125,13 @@ public class StorageImpl extends AbstractDBObject implements Storage {
 					throw new RemoteException("Unable to find storage entry");
 			} catch (SQLException e) {
 				throw new RemoteException("Database retrieval failed", e);
+			} finally { 			    
+				if (stmt != null)
+					try {
+						stmt.close();
+					} catch (SQLException e) {
+						throw new RemoteException("Statemment close failed", e);
+					}
 			}
 		}
 		else

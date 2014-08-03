@@ -231,7 +231,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 	 * @throws RemoteException
 	 */
 	private List<Contract> initializeContractList() throws RemoteException {
-		class SortedContract implements Comparable<SortedContract> {
+		final class SortedContract implements Comparable<SortedContract> {
 			private float value;
 			private Contract c;
 			public Contract getContract() {return c;}
@@ -244,6 +244,19 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 			@Override
 			public int compareTo(SortedContract o) {
 				return Float.compare(this.value, o.value); 
+			}
+
+			@Override
+			public int hashCode() {
+				return c.hashCode()+1;
+			}
+
+			@Override
+			public boolean equals(Object obj) {
+				if (obj != null && obj instanceof SortedContract && ((SortedContract)obj).c == this.c)
+					return true;
+				else 
+					return false;
 			}
 		}
 
