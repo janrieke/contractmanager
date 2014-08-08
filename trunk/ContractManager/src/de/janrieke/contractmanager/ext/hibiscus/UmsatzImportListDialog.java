@@ -24,6 +24,7 @@ package de.janrieke.contractmanager.ext.hibiscus;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,7 +57,6 @@ import de.willuhn.jameica.hbci.server.VerwendungszweckUtil;
 import de.willuhn.jameica.system.OperationCanceledException;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * Dialog for selecting a contract for a transaction. Uses a table and includes

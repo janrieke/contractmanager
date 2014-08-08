@@ -5,11 +5,11 @@ VERSION HISTORY:
 	- Cancellation Reminder
 	- Generation of letters of cancellation
 	- Export reminders to iCal
-	
+
 0.2:
 	- Reload iCal file instead of overwriting (do not re-remind of already checked cancellation)
 	- Better address management
-	
+
 0.3:
 	- Include payments from Hibiscus
 
@@ -18,10 +18,24 @@ VERSION HISTORY:
 
 0.4:
 	- Analysis diagrams
-	
-	
-ROADMAP:
+
+0.4.2:
+	- Bugfixes
 
 0.5:
-	- Improved financial analysis
-    - "Remind me next term" function	
+	- Document storage
+	- SEPA-Mandatsreferenz und -Gläubiger-ID 	 
+	- Improved import dialog (intelligent pre-selection of contract) 	 
+	- Auto-import of new Hibiscus transactions
+	- Added quarterly/semiannually as payment interval
+
+
+ROADMAP:
+
+0.6:
+	- "Remind me next term" function	
+	- Grouping of contracs
+
+1.0:
+	- Contract detection based on Hibiscus transactions
+	- Analyses based on "real" Hibiscus transaction
