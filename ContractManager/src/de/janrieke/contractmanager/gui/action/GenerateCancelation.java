@@ -29,7 +29,7 @@ import java.util.Map;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.odftoolkit.odfdom.doc.OdfDocument;
-import org.odftoolkit.odfdom.doc.text.OdfTextUserFieldDecl;
+import org.odftoolkit.odfdom.dom.element.text.TextUserFieldDeclElement;
 import org.w3c.dom.NodeList;
 
 import de.janrieke.contractmanager.ContractManagerPlugin;
@@ -141,10 +141,10 @@ public class GenerateCancelation implements Action {
 			OdfDocument doc = OdfDocument.loadDocument(fis);
 
 			// set the values of the variables
-			NodeList nodes = doc.getOfficeBody().getElementsByTagName(
-					OdfTextUserFieldDecl.ELEMENT_NAME.getQName());
+			NodeList nodes = doc.getContentDom().getElementsByTagName(
+					TextUserFieldDeclElement.ELEMENT_NAME.getQName());
 			for (int i = 0; i < nodes.getLength(); i++) {
-				OdfTextUserFieldDecl element = (OdfTextUserFieldDecl) nodes
+				TextUserFieldDeclElement element = (TextUserFieldDeclElement) nodes
 						.item(i);
 				if (values.containsKey(element.getTextNameAttribute())) {
 					element.setOfficeStringValueAttribute(values.get(element
