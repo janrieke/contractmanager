@@ -62,9 +62,6 @@
       <pathelement location="../jameica/lib/de_willuhn_ds/de_willuhn_ds.jar" />
       <pathelement location="../jameica/lib/de_willuhn_util/de_willuhn_util.jar" />
       <pathelement location="../hibiscus/bin/" />
-      <pathelement location="lib/backport-util-concurrent-3.1.jar" />
-      <pathelement location="lib/commons-lang-2.4.jar" />
-      <pathelement location="lib/commons-logging-1.1.1.jar" />
       <pathelement location="lib/odfdom.jar" />
       <pathelement location="lib/org.swtchartx_0.9.0.v20140219.jar" />
       <pathelement location="lib/org.swtchartx.ext_0.9.0.v20140219.jar" />
