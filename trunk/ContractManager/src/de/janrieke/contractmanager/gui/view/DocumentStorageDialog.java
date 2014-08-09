@@ -437,9 +437,9 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 									Settings.i18n()
 											.tr("Enter description here"));
 
-							int lastDot = filename.lastIndexOf(".");
+							int lastDot = localfile.getName().lastIndexOf(".");
 							if (lastDot != -1)
-								stmt.setString(3, filename.substring(lastDot));
+								stmt.setString(3, localfile.getName().substring(lastDot));
 							else
 								stmt.setString(3, "");
 
