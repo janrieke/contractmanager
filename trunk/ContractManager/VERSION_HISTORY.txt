@@ -28,6 +28,7 @@ VERSION HISTORY:
 	- Improved import dialog (intelligent pre-selection of contract) 	 
 	- Auto-import of new Hibiscus transactions
 	- Added quarterly/semiannually as payment interval
+	- update libs (ODFDOM 0.8.9-incubating)
 
 
 ROADMAP:

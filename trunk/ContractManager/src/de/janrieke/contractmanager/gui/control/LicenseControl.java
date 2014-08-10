@@ -93,7 +93,7 @@ public class LicenseControl extends AbstractControl {
 					+ manifest.getVersion());
 			buffer.append("<br/>" + Settings.i18n().tr("Description") + ": "
 					+ manifest.getDescription());
-			buffer.append("<br/>" + Settings.i18n().tr("URL") + ": " + manifest.getURL());
+			buffer.append("<br/>" + Settings.i18n().tr("URL") + ": " + manifest.getHomepage());
 			buffer.append("<br/>" + Settings.i18n().tr("Licence") + ": "
 					+ manifest.getLicense());
 			buffer.append("<br/><br/><br/></p>");
