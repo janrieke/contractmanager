@@ -7,7 +7,7 @@
 
   <description>ContractManager for Jameica (v0.5)</description>
   <url>http://janrieke.de/products/jameica/updates/contractmanager/developer/contractmanager.zip</url>
-  <homepage>http://janrieke.de/products/jameica/contractmanager</homepage>
+  <homepage>http://janrieke.de/products/contractmanager</homepage>
   <license>GPL 3.0 - http://www.gnu.org/licenses/gpl-3.0.txt</license>
 
   <requires jameica="2.6+">

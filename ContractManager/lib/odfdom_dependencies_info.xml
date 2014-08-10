@@ -1,0 +1,6 @@
+<info>
+  <name>ODFDOM dependencies</name>
+  <description>commons-validator 1.4.0; org.apache.clerezza (rdf.rdfa) 0.1-incubating; org.apache.jena (jena-arq) 2.9.4; xerces (xercesImpl) 2.9.1</description>
+  <url>https://incubator.apache.org/odftoolkit/mvn-site/0.8.9-incubating/odfdom-java/dependencies.html</url>
+  <license>diverse</license>
+</info>

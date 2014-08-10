@@ -26,6 +26,7 @@ import de.willuhn.jameica.gui.input.LabelInput;
 import de.willuhn.jameica.gui.parts.FormTextPart;
 import de.willuhn.jameica.gui.util.LabelGroup;
 import de.willuhn.jameica.plugin.AbstractPlugin;
+import de.willuhn.jameica.plugin.Manifest;
 import de.willuhn.jameica.system.Application;
 
 /**
@@ -48,12 +49,14 @@ public class AboutDialog extends AbstractDialog<Object> {
 	 */
 	@Override
 	protected void paint(Composite parent) throws Exception {
+		Manifest manifest = Application.getPluginLoader().getManifest(
+					ContractManagerPlugin.class);
 
 		FormTextPart text = new FormTextPart();
-		text.setText("<form>" + "<p><b>Contract Manager</b></p>"
+		text.setText("<form>" + "<p><b>" + manifest.getDescription() + "</b></p>"
 				+ "<br/>Licence: GPL 3.0 (http://www.gnu.org/licenses/gpl-3.0.txt)"
 				+ "<br/><p>Copyright by Jan Rieke [it@janrieke.de]</p>"
-				+ "<p>http://www.janrieke.de/projects/contractmanager</p>"
+				+ "<p>" +manifest.getHomepage() + "</p>"
 				+ "<br/><p>Contains code from Jameica, Jameica Example Plugin, Hibiscus, and Syntax; copyright by Olaf Willuhn [info@jameica.org], GPL</p>"
 				+ "<p>http://www.jameica.org</p>" + "</form>");
 
@@ -65,7 +68,7 @@ public class AboutDialog extends AbstractDialog<Object> {
 				ContractManagerPlugin.class);
 
 		group.addLabelPair(Settings.i18n().tr("Version"), new LabelInput(""
-				+ p.getManifest().getVersion()));
+				+ manifest.getVersion()));
 		group.addLabelPair(Settings.i18n().tr("Working directory"),
 				new LabelInput("" + p.getResources().getWorkPath()));
 
