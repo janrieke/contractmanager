@@ -9,5 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jameica"/>
 	<classpathentry kind="lib" path="lib/org.swtchartx_0.9.0.v20140219.jar"/>
 	<classpathentry kind="lib" path="lib/org.swtchartx.ext_0.9.0.v20140219.jar"/>
+	<classpathentry kind="lib" path="/jameica/lib/jakarta_commons/commons-lang-2.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
