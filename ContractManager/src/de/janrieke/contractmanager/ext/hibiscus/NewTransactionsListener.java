@@ -24,10 +24,12 @@ package de.janrieke.contractmanager.ext.hibiscus;
 
 import de.janrieke.contractmanager.Settings;
 import de.willuhn.datasource.GenericObject;
+import de.willuhn.jameica.hbci.HBCI;
 import de.willuhn.jameica.hbci.messaging.ImportMessage;
 import de.willuhn.jameica.hbci.rmi.Umsatz;
 import de.willuhn.jameica.messaging.Message;
 import de.willuhn.jameica.messaging.MessageConsumer;
+import de.willuhn.jameica.system.Application;
 
 /**
  * Automatically import incoming Hibiscus transactions.
@@ -37,7 +39,7 @@ public class NewTransactionsListener implements MessageConsumer {
 	 * @see de.willuhn.jameica.messaging.MessageConsumer#autoRegister()
 	 */
 	public boolean autoRegister() {
-		return true;
+		return (Application.getPluginLoader().isInstalled(HBCI.class.getName()));
 	}
 
 	/**
