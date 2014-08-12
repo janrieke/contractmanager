@@ -163,7 +163,7 @@ public class Settings {
 //	}
 	
 	public static boolean getNamedICalExport() throws RemoteException {
-		return Boolean.parseBoolean(SettingsUtil.get("ical_name_export", "false"));
+		return Boolean.parseBoolean(SettingsUtil.get("ical_name_export", "true"));
 	}
 
 	public static void setNamedICalExport(boolean name) throws RemoteException, ApplicationException {
