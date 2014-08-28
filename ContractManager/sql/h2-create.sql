@@ -1,3 +1,17 @@
+CREATE TABLE address (
+  id IDENTITY,
+  name varchar(255) NOT NULL,
+  street varchar(255),
+  number varchar(16),
+  extra varchar(255),
+  zipcode varchar(5),
+  city varchar(255),
+  state varchar(255),
+  country varchar(255),
+  UNIQUE (id),
+  PRIMARY KEY (id)
+);
+
 CREATE TABLE contract (
   id IDENTITY,
   name varchar(255) NOT NULL,
@@ -41,20 +55,6 @@ CREATE TABLE transactions (
   UNIQUE (transaction_id),
   PRIMARY KEY (transaction_id),
   CONSTRAINT fk_transactions_contract FOREIGN KEY (contract_id) REFERENCES contract (id) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE address (
-  id IDENTITY,
-  name varchar(255) NOT NULL,
-  street varchar(255),
-  number varchar(16),
-  extra varchar(255),
-  zipcode varchar(5),
-  city varchar(255),
-  state varchar(255),
-  country varchar(255),
-  UNIQUE (id),
-  PRIMARY KEY (id)
 );
 
 CREATE TABLE storage (
