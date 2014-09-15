@@ -843,4 +843,49 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			throw new RemoteException("unable to load file list", e);
 		}
 	}
+
+	@Override
+	public Date getDoNotRemindBefore() throws RemoteException {
+		return (Date) getAttribute("do_not_remind_before");
+	}
+
+	@Override
+	public void setDoNotRemindBefore(Date date) throws RemoteException {
+		setAttribute("do_not_remind_before", date);
+	}
+
+	@Override
+	public void doNotRemindAboutNextCancellation() throws RemoteException {
+		Date nextDeadline = getNextCancellationDeadline();
+		if (nextDeadline != null) {
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(nextDeadline);
+			cal.add(Calendar.DAY_OF_YEAR, 1);
+			setDoNotRemindBefore(cal.getTime());
+		}
+	}
+
+	@Override
+	public boolean isNextDeadlineWithinNoticeTime() throws RemoteException {
+		return isNextDeadlineWithin(Settings.getExtensionNoticeTime());
+	}
+
+	@Override
+	public boolean isNextDeadlineWithinWarningTime() throws RemoteException {
+		return isNextDeadlineWithin(Settings.getExtensionWarningTime());
+	}
+	
+	private boolean isNextDeadlineWithin(int days) throws RemoteException {
+		Date deadline = getNextCancellationDeadline();
+		if (deadline == null)
+			return false;
+		
+		final Calendar today = Calendar.getInstance();
+		Calendar calendar = Calendar.getInstance();
+
+		calendar.setTime(deadline);
+		calendar.add(Calendar.DAY_OF_YEAR,
+				-days);
+		return calendar.before(today);
+	}
 }

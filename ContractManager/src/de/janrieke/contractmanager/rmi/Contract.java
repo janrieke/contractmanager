@@ -195,6 +195,12 @@ public interface Contract extends DBObject {
 	public String getURI() throws RemoteException;
 	public void setURI(String uri) throws RemoteException;
 
+	public String getHibiscusCategoryID() throws RemoteException;
+	public void setHibiscusCategoryID(String category) throws RemoteException;	
+
+	public Date getDoNotRemindBefore() throws RemoteException;
+	public void setDoNotRemindBefore(Date date) throws RemoteException;
+		
 	//derived features
 	public DBIterator getTransactions() throws RemoteException;
 	public DBIterator getCosts() throws RemoteException;
@@ -216,8 +222,6 @@ public interface Contract extends DBObject {
 	public static final String NEXT_CANCELLATION_DEADLINE = "next_cancellation_deadline";
 	public Date getNextCancellationDeadline() throws RemoteException;
 	
-	public Date getNextCancellationDeadline(Date after) throws RemoteException;
-	
 	public static final String MONEY_PER_TERM = "costs_per_term";
 	public double getMoneyPerTerm() throws RemoteException;
 
@@ -230,8 +234,13 @@ public interface Contract extends DBObject {
 	public static final String CONTRACT_NAME_PLUS_PARTNER_NAME = "contract_name_plus_partner_name";
 	public String getContractAndPartnerName() throws RemoteException;
 
-	public String getHibiscusCategoryID() throws RemoteException;
-	public void setHibiscusCategoryID(String category) throws RemoteException;
+	//helper methods
+	public Date getNextCancellationDeadline(Date after) throws RemoteException;
 	
 	public boolean isActiveInMonth(Date month) throws RemoteException;
+	
+	public void doNotRemindAboutNextCancellation() throws RemoteException;
+	
+	public boolean isNextDeadlineWithinNoticeTime() throws RemoteException;
+	public boolean isNextDeadlineWithinWarningTime() throws RemoteException;
 }

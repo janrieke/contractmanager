@@ -46,6 +46,10 @@ public class ContractListMenu extends ContextMenu {
 				"Generate Cancellation..."), new GenerateCancelation(),
 				"document-print.png"));
 
+		addItem(new CheckedContextMenuItem(Settings.i18n().tr(
+				"Generate Cancellation..."), new GenerateCancelation(),
+				"document-print.png"));
+
 		if (showNew) {
 			// separator
 			addItem(ContextMenuItem.SEPARATOR);
