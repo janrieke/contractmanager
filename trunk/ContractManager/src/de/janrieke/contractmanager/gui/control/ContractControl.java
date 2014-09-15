@@ -305,15 +305,18 @@ public class ContractControl extends AbstractControl {
 		if (nextExtension != null)
 			return nextExtension;
 
+		nextExtension = new LabelInput(getNextTermValueString());
+		return nextExtension;
+	}
+
+	private String getNextTermValueString() throws RemoteException {
 		Date ntb = getContract().getNextCancelableTermBegin();
 		Date nte = getContract().getNextCancelableTermEnd();
 		if (ntb != null && nte != null) {
-			nextExtension = new MultiInput(new LabelInput(
-					Settings.dateformat(ntb) + " " + Settings.i18n().tr("to")
-							+ " " + Settings.dateformat(nte)));
+			return Settings.dateformat(ntb) + " " + Settings.i18n().tr("to")
+							+ " " + Settings.dateformat(nte);
 		} else
-			nextExtension = new LabelInput("");
-		return nextExtension;
+			return Settings.i18n().tr("Not cancellable before contract ends");
 	}
 
 	public LabelInput getNextCancellationDeadline() throws RemoteException {
@@ -673,9 +676,6 @@ public class ContractControl extends AbstractControl {
 			public void format(TableItem item) {
 				if (item.getData() instanceof Contract) {
 					Contract contract = (Contract) item.getData();
-
-					Calendar today = Calendar.getInstance();
-					Calendar calendar = Calendar.getInstance();
 					try {
 						if (!contract.isActiveInMonth(new Date())) {
 							item.setForeground(Settings.getNotActiveForegroundColor());
@@ -683,23 +683,11 @@ public class ContractControl extends AbstractControl {
 
 						if (contract.getDoNotRemind())
 							return;
-						Date deadline = contract.getNextCancellationDeadline();
-						if (deadline == null)
-							return;
-						calendar.setTime(deadline);
-						calendar.add(Calendar.DAY_OF_YEAR,
-								-Settings.getExtensionWarningTime());
-						if (calendar.before(today))
+						if (contract.isNextDeadlineWithinWarningTime())
 							item.setBackground(Color.ERROR.getSWTColor());
-						else {
-							calendar.setTime(contract
-									.getNextCancellationDeadline());
-							calendar.add(Calendar.DAY_OF_YEAR,
-									-Settings.getExtensionNoticeTime());
-							if (calendar.before(today))
+						else if (contract.isNextDeadlineWithinNoticeTime())
 								item.setBackground(Color.MANDATORY_BG
 										.getSWTColor());
-						}
 					} catch (RemoteException e) {
 					}
 				}
@@ -1033,15 +1021,7 @@ public class ContractControl extends AbstractControl {
 		nextCancellationDeadline.setValue(ne == null ? "" : Settings
 				.dateformat(ne));
 
-		Date ntb = getContract().getNextCancelableTermBegin();
-		Date nte = getContract().getNextCancelableTermEnd();
-		if (ntb != null && nte != null) {
-			nextExtension
-					.setValue(Settings.dateformat(ntb) + " "
-							+ Settings.i18n().tr("to") + " "
-							+ Settings.dateformat(nte));
-		} else
-			nextExtension.setValue("");
+		nextExtension.setValue(getNextTermValueString());
 	}
 
 	public void removeCostEntry(Costs c) {
