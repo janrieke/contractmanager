@@ -21,7 +21,6 @@ import java.rmi.RemoteException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +31,7 @@ import org.eclipse.swt.widgets.TableItem;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion;
+import de.janrieke.contractmanager.gui.input.PositiveIntegerInput;
 import de.janrieke.contractmanager.gui.menu.ContractListMenu;
 import de.janrieke.contractmanager.gui.menu.CostsListMenu;
 import de.janrieke.contractmanager.gui.parts.ContractListTablePart;
@@ -315,8 +315,13 @@ public class ContractControl extends AbstractControl {
 		if (ntb != null && nte != null) {
 			return Settings.dateformat(ntb) + " " + Settings.i18n().tr("to")
 							+ " " + Settings.dateformat(nte);
-		} else
-			return Settings.i18n().tr("Not cancellable before contract ends");
+		} else {
+			if (getContract().hasValidRuntimeInformation()) {
+				return Settings.i18n().tr("Not cancellable before contract ends");
+			} else {
+				return Settings.i18n().tr("No information on cancellation given");
+			}
+		}
 	}
 
 	public LabelInput getNextCancellationDeadline() throws RemoteException {
@@ -396,7 +401,7 @@ public class ContractControl extends AbstractControl {
 
 	public IntegerInput getFirstRuntimeCount() throws RemoteException {
 		if (firstRuntimeCount == null) {
-			firstRuntimeCount = new IntegerInput(getContract()
+			firstRuntimeCount = new PositiveIntegerInput(getContract()
 					.getFirstMinRuntimeCount());
 		}
 		return firstRuntimeCount;
@@ -427,7 +432,7 @@ public class ContractControl extends AbstractControl {
 
 	public IntegerInput getNextRuntimeCount() throws RemoteException {
 		if (nextRuntimeCount == null) {
-			nextRuntimeCount = new IntegerInput(getContract()
+			nextRuntimeCount = new PositiveIntegerInput(getContract()
 					.getFollowingMinRuntimeCount());
 			
 			// when focusing this input, transfer the values from the first runtime 
@@ -725,19 +730,11 @@ public class ContractControl extends AbstractControl {
 		// Iterate through the list and filter
 		while (contracts.hasNext()) {
 			Contract contract = (Contract) contracts.next();
-
-			Calendar today = Calendar.getInstance();
-			Calendar calendar = Calendar.getInstance();
 			try {
 				if (contract.getDoNotRemind())
 					continue;
-				Date deadline = contract.getNextCancellationDeadline();
-				if (deadline == null)
-					continue;
-				calendar.setTime(deadline);
-				calendar.add(Calendar.DAY_OF_YEAR,
-						-Settings.getExtensionNoticeTime());
-				if (calendar.before(today)) {
+
+				if (contract.isNextDeadlineWithinNoticeTime()) {
 					filteredContracts.add(contract);
 				}
 			} catch (RemoteException e) {
@@ -782,26 +779,11 @@ public class ContractControl extends AbstractControl {
 			public void format(TableItem item) {
 				if (item.getData() instanceof Contract) {
 					Contract contract = (Contract) item.getData();
-					Calendar today = Calendar.getInstance();
-					Calendar calendar = Calendar.getInstance();
 					try {
-						Date deadline = contract.getNextCancellationDeadline();
-						assert (deadline != null); // otherwise it never should
-													// have been added
-						calendar.setTime(deadline);
-						calendar.add(Calendar.DAY_OF_YEAR,
-								-Settings.getExtensionNoticeTime());
-						if (calendar.before(today)) {
-							calendar.setTime(contract
-									.getNextCancellationDeadline());
-							calendar.add(Calendar.DAY_OF_YEAR,
-									-Settings.getExtensionWarningTime());
-							if (calendar.before(today))
-								item.setBackground(Color.ERROR.getSWTColor());
-							else
-								item.setBackground(Color.MANDATORY_BG
-										.getSWTColor());
-						}
+						if (contract.isNextDeadlineWithinWarningTime())
+							item.setBackground(Color.ERROR.getSWTColor());
+						else if (contract.isNextDeadlineWithinNoticeTime())
+							item.setBackground(Color.MANDATORY_BG.getSWTColor());
 					} catch (RemoteException e) {
 					}
 				}
@@ -891,23 +873,67 @@ public class ContractControl extends AbstractControl {
 			c.setContractNumber((String) getContractNumber().getValue());
 			c.setCustomerNumber((String) getCustomerNumber().getValue());
 			c.setComment((String) getComment().getValue());
-			c.setStartDate((Date) getStartDate().getValue());
-			c.setEndDate((Date) getEndDate().getValue());
+			
+			//If dates or runtime values have changed, reset the "do not remind before" field
+			// because deadlines may have changed and the user may want to be notified again.
+			boolean resetDoNotRemindBefore = false;
+			
+			Object newValue = getStartDate().getValue();
+			Object oldValue = c.getStartDate();
+			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
+				resetDoNotRemindBefore = true;
+				c.setStartDate((Date)newValue);
+			}
 
-			c.setCancelationPeriodCount((Integer) getCancellationPeriodCount()
-					.getValue());
-			c.setCancelationPeriodType((IntervalType) getCancellationPeriodType()
-					.getValue());
-			c.setFirstMinRuntimeCount((Integer) getFirstRuntimeCount()
-					.getValue());
-			c.setFirstMinRuntimeType((IntervalType) getFirstRuntimeType()
-					.getValue());
-			c.setFollowingMinRuntimeCount((Integer) getNextRuntimeCount()
-					.getValue());
-			c.setFollowingMinRuntimeType((IntervalType) getNextRuntimeType()
-					.getValue());
+			newValue = getEndDate().getValue();
+			oldValue = c.getEndDate();
+			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
+				resetDoNotRemindBefore = true;
+				c.setEndDate((Date)newValue);
+			}
 
+			newValue = getCancellationPeriodCount().getValue();
+			oldValue = c.getCancellationPeriodCount();
+			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
+				resetDoNotRemindBefore = true;
+				c.setCancelationPeriodCount((Integer) newValue);
+			}
+			newValue = getCancellationPeriodType().getValue();
+			oldValue = c.getCancellationPeriodType();
+			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
+				resetDoNotRemindBefore = true;
+				c.setCancelationPeriodType((IntervalType) newValue);
+			}
+			newValue = getFirstRuntimeCount().getValue();
+			oldValue = c.getFirstMinRuntimeCount();
+			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
+				resetDoNotRemindBefore = true;
+				c.setFirstMinRuntimeCount((Integer) newValue);
+			}
+			newValue = getFirstRuntimeType().getValue();
+			oldValue = c.getFirstMinRuntimeType();
+			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
+				resetDoNotRemindBefore = true;
+				c.setFirstMinRuntimeType((IntervalType) newValue);
+			}
+			newValue = getNextRuntimeCount().getValue();
+			oldValue = c.getFollowingMinRuntimeCount();
+			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
+				resetDoNotRemindBefore = true;
+				c.setFollowingMinRuntimeCount((Integer) newValue);
+			}
+			newValue = getNextRuntimeType().getValue();
+			oldValue = c.getFollowingMinRuntimeType();
+			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
+				resetDoNotRemindBefore = true;
+				c.setFollowingMinRuntimeType((IntervalType) newValue);
+			}
+			
 			c.setDoNotRemind(!(Boolean) getRemind().getValue());
+
+			//At least one relevant field changed, reset the "do not remind before" field
+			if (resetDoNotRemindBefore)
+				c.setDoNotRemindBefore(null);	
 
 			c.setHibiscusCategoryID(hibiscusCategoryID);
 
