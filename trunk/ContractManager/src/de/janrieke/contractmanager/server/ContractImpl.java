@@ -495,6 +495,61 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	public void setHibiscusCategoryID(String category) throws RemoteException {
 		setAttribute("hibiscus_category", category);
 	}
+
+	/* Instances of this class shall only be returned if all fields are
+	 * set and valid. 
+	 */
+	class ValidRuntimes {
+		IntervalType firstMinRuntimeType;
+		Integer firstMinRuntimeCount;
+		IntervalType followingMinRuntimeType;
+		Integer followingMinRuntimeCount;
+	}
+	
+	@Override
+	public boolean hasValidRuntimeInformation() throws RemoteException {
+		return getValidRuntimes() != null;
+	}
+	
+	/**
+	 * Convenience method to find out whether all necessary info is available
+	 * to calculate terms and cancellation information.
+	 * @return a ValidRuntimes object if all info is available, or null otherwise
+	 */
+	private ValidRuntimes getValidRuntimes() throws RemoteException {
+		if (getStartDate() == null)
+			return null;
+		
+		ValidRuntimes result = new ValidRuntimes();
+		
+		Date startDate = DateUtil.startOfDay(getStartDate());
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(startDate);
+
+		result.firstMinRuntimeType = getFirstMinRuntimeType();
+		result.firstMinRuntimeCount = getFirstMinRuntimeCount();
+		result.followingMinRuntimeType = getFollowingMinRuntimeType();
+		result.followingMinRuntimeCount = getFollowingMinRuntimeCount();
+
+		// if one of the runtime definition is invalid, use the other one
+		if (result.firstMinRuntimeType == null || result.firstMinRuntimeCount == null
+				|| result.firstMinRuntimeCount <= 0) {
+			result.firstMinRuntimeCount = result.followingMinRuntimeCount;
+			result.firstMinRuntimeType = result.followingMinRuntimeType;
+		}
+		if (result.followingMinRuntimeType == null || result.followingMinRuntimeCount == null
+				|| result.followingMinRuntimeCount <= 0) {
+			result.followingMinRuntimeCount = result.firstMinRuntimeCount;
+			result.followingMinRuntimeType = result.firstMinRuntimeType;
+		}
+		// do nothing if both are invalid
+		if (result.followingMinRuntimeType == null || result.followingMinRuntimeCount == null
+				|| result.followingMinRuntimeCount <= 0)
+			return null;
+
+		return result;
+	}
 	
 	/**
 	 * Calculates the next contractual term's end after the given date.
@@ -505,9 +560,11 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 */
 	private Date calculateNextTermBegin(Date after)
 			throws RemoteException {
-		Date startDate = DateUtil.startOfDay(getStartDate());
-		if (startDate == null)
+		ValidRuntimes rt = getValidRuntimes();
+		if (rt == null)
 			return null;
+		
+		Date startDate = DateUtil.startOfDay(getStartDate());
 		if (after == null)
 			return null;
 		Calendar afterCal = Calendar.getInstance();
@@ -516,40 +573,14 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(startDate);
 
-		IntervalType firstMinRuntimeType = getFirstMinRuntimeType();
-		Integer firstMinRuntimeCount = getFirstMinRuntimeCount();
-		IntervalType followingMinRuntimeType = getFollowingMinRuntimeType();
-		Integer followingMinRuntimeCount = getFollowingMinRuntimeCount();
-
-		// if one of the runtime definition is invalid, use the other one
-		if (firstMinRuntimeType == null || firstMinRuntimeCount == null
-				|| firstMinRuntimeCount < 0) {
-			firstMinRuntimeCount = followingMinRuntimeCount;
-			firstMinRuntimeType = followingMinRuntimeType;
-		}
-		if (followingMinRuntimeType == null || followingMinRuntimeCount == null
-				|| followingMinRuntimeCount < 0) {
-			followingMinRuntimeCount = firstMinRuntimeCount;
-			followingMinRuntimeType = firstMinRuntimeType;
-		}
-		// do nothing if both are invalid
-		if (followingMinRuntimeType == null || followingMinRuntimeCount == null
-				|| followingMinRuntimeCount < 0)
-			return null;
-
-		if (followingMinRuntimeCount == 0)
-			return null; // "0" encodes a daily runtime extension
-
 		boolean first = true;
 
 		while (!calendar.after(afterCal)) {
 			if (first) {
-				addToCalendar(calendar, firstMinRuntimeType, firstMinRuntimeCount);
+				addToCalendar(calendar, rt.firstMinRuntimeType, rt.firstMinRuntimeCount);
 				first = false;
 			} else {
-				if (followingMinRuntimeCount == 0)
-					return null; // "0" encodes a daily runtime extension
-				addToCalendar(calendar, followingMinRuntimeType, followingMinRuntimeCount);
+				addToCalendar(calendar, rt.followingMinRuntimeType, rt.followingMinRuntimeCount);
 			}
 		}
 
@@ -564,7 +595,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 * Calculates the next cancellation deadline after the given date.
 	 * 
 	 * @param after
-	 * @return The cancellation deadline.
+	 * @return The cancellation deadline or null if no deadline exists after the given date.
 	 * @throws RemoteException
 	 */
 	private Date calculateNextCancellationDeadline(Date after)
@@ -876,10 +907,16 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 	
 	private boolean isNextDeadlineWithin(int days) throws RemoteException {
-		Date deadline = getNextCancellationDeadline();
+		Date doNotRemindBefore = getDoNotRemindBefore();
+		Date deadline;
+		if (doNotRemindBefore != null)
+			deadline = getNextCancellationDeadline(doNotRemindBefore);
+		else
+			deadline = getNextCancellationDeadline();
+
 		if (deadline == null)
 			return false;
-		
+
 		final Calendar today = Calendar.getInstance();
 		Calendar calendar = Calendar.getInstance();
 

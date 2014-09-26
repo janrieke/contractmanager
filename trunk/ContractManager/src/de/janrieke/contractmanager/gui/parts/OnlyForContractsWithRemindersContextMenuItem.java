@@ -27,12 +27,12 @@ import de.willuhn.jameica.gui.parts.ContextMenuItem;
  * ContextMenu-Element, dass nur für Verträge aktiv ist, für die gerade eine
  * Erinnerung angezeigt wird.
  */
-public class OnlyReminderContextMenuItem extends ContextMenuItem {
+public class OnlyForContractsWithRemindersContextMenuItem extends ContextMenuItem {
 
 	/**
 	 * ct.
 	 */
-	public OnlyReminderContextMenuItem() {
+	public OnlyForContractsWithRemindersContextMenuItem() {
 		super();
 	}
 
@@ -44,7 +44,7 @@ public class OnlyReminderContextMenuItem extends ContextMenuItem {
 	 * @param a
 	 *            Action, die beim Klick ausgeloest werden soll.
 	 */
-	public OnlyReminderContextMenuItem(String text, Action a) {
+	public OnlyForContractsWithRemindersContextMenuItem(String text, Action a) {
 		super(text, a);
 	}
 
@@ -58,7 +58,7 @@ public class OnlyReminderContextMenuItem extends ContextMenuItem {
 	 * @param icon
 	 *            optionales Icon.
 	 */
-	public OnlyReminderContextMenuItem(String text, Action a, String icon) {
+	public OnlyForContractsWithRemindersContextMenuItem(String text, Action a, String icon) {
 		super(text, a, icon);
 	}
 
@@ -68,24 +68,10 @@ public class OnlyReminderContextMenuItem extends ContextMenuItem {
 	public boolean isEnabledFor(Object o) {
 		try {
 			return (o != null && o instanceof Contract &&
-					(((Contract) o).isNextDeadlineWithinNoticeTime() ||
-					((Contract) o).isNextDeadlineWithinWarningTime()));
+					(((Contract) o).getNextCancellationDeadline() != null));
 		} catch (RemoteException e) {
 			return false;
 		}
 	}
 
 }
-
-/**********************************************************************
- * $Log: CheckedContextMenuItem.java,v $ Revision 1.3 2008/12/19 01:12:06
- * willuhn
- * 
- * @N Icons in Contextmenus
- * 
- *    Revision 1.2 2004/10/18 23:37:42 willuhn *** empty log message ***
- * 
- *    Revision 1.1 2004/07/20 21:47:44 willuhn
- * @N ContextMenu
- * 
- **********************************************************************/
