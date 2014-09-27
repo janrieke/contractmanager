@@ -22,6 +22,7 @@ import java.rmi.RemoteException;
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.willuhn.jameica.gui.Action;
+import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
@@ -30,7 +31,10 @@ import de.willuhn.util.ApplicationException;
  */
 public class DismissNextReminder implements Action {
 
-	public DismissNextReminder() {
+	private TablePart tablePart;
+
+	public DismissNextReminder(TablePart tablePart) {
+		this.tablePart = tablePart;
 	}
 
 	/**
@@ -48,6 +52,7 @@ public class DismissNextReminder implements Action {
 		try {
 			c.doNotRemindAboutNextCancellation();
 			c.store();
+			tablePart.updateItem(c, c);
 		} catch (RemoteException e) {
 			Logger.error("error while dismissing reminder", e);
 			throw new ApplicationException(Settings.i18n().tr(
