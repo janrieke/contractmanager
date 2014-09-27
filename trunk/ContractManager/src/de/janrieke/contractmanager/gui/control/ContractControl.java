@@ -673,7 +673,7 @@ public class ContractControl extends AbstractControl {
 		}, true, Column.ALIGN_LEFT);
 
 		// 7) we are adding a context menu
-		contractList.setContextMenu(new ContractListMenu(true));
+		contractList.setContextMenu(new ContractListMenu(contractList, true));
 
 		contractList.setFormatter(new TableFormatter() {
 
@@ -693,6 +693,8 @@ public class ContractControl extends AbstractControl {
 						else if (contract.isNextDeadlineWithinNoticeTime())
 								item.setBackground(Color.MANDATORY_BG
 										.getSWTColor());
+						else //set default background in case that we are updating 
+							item.setBackground(null);
 					} catch (RemoteException e) {
 					}
 				}
@@ -771,7 +773,7 @@ public class ContractControl extends AbstractControl {
 						Settings.CURRENCY, Settings.DECIMALFORMAT));
 
 		// 7) we are adding a context menu
-		contractListWarnings.setContextMenu(new ContractListMenu(false));
+		contractListWarnings.setContextMenu(new ContractListMenu(contractListWarnings, false));
 
 		contractListWarnings.setFormatter(new TableFormatter() {
 
@@ -784,6 +786,13 @@ public class ContractControl extends AbstractControl {
 							item.setBackground(Color.ERROR.getSWTColor());
 						else if (contract.isNextDeadlineWithinNoticeTime())
 							item.setBackground(Color.MANDATORY_BG.getSWTColor());
+						else {
+							//this may happen if user dismissed the next reminder
+							//remove the entry in this case
+							int index = item.getParent().indexOf(item);
+							item.getParent().remove(index);
+						}
+							
 					} catch (RemoteException e) {
 					}
 				}

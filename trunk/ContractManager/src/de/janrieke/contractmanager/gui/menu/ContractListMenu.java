@@ -27,6 +27,7 @@ import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
 import de.willuhn.jameica.gui.parts.ContextMenu;
 import de.willuhn.jameica.gui.parts.ContextMenuItem;
+import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.util.ApplicationException;
 
 /**
@@ -38,7 +39,7 @@ public class ContractListMenu extends ContextMenu {
 	 * 
 	 * @param showNew
 	 */
-	public ContractListMenu(boolean showNew) {
+	public ContractListMenu(TablePart tablePart, boolean showNew) {
 		// CheckedContextMenuItems will be disabled, if the user clicks into an
 		// empty space of the table
 		addItem(new CheckedContextMenuItem(Settings.i18n().tr("Open..."),
@@ -49,7 +50,7 @@ public class ContractListMenu extends ContextMenu {
 				"document-print.png"));
 
 		addItem(new OnlyForContractsWithRemindersContextMenuItem(Settings.i18n().tr(
-				"Dismiss Reminder For Next Deadline"), new DismissNextReminder()));
+				"Dismiss Reminder For Next Deadline"), new DismissNextReminder(tablePart)));
 
 		if (showNew) {
 			// separator
