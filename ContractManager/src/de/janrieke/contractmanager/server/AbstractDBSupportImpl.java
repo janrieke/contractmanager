@@ -16,18 +16,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**********************************************************************
- * Kopie aus Hibiscus
- * 
- * $Source: /cvsroot/hibiscus/hibiscus/src/de/willuhn/jameica/hbci/server/AbstractDBSupportImpl.java,v $
- * $Revision: 1.6 $
- * $Date: 2010-11-02 12:02:19 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
- *
+ * Copy from Hibiscus
  * Copyright (c) by willuhn software & services
  * All rights reserved
- *
  **********************************************************************/
 
 package de.janrieke.contractmanager.server;
