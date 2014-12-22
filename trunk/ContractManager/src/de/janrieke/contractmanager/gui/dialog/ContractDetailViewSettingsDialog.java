@@ -11,7 +11,7 @@
  *
  **********************************************************************/
 
-package de.janrieke.contractmanager.gui.view;
+package de.janrieke.contractmanager.gui.dialog;
 
 import org.eclipse.swt.widgets.Composite;
 

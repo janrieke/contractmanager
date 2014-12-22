@@ -1,6 +1,6 @@
 package de.janrieke.contractmanager.gui.action;
 
-import de.janrieke.contractmanager.gui.view.AssignTransactionDialog;
+import de.janrieke.contractmanager.gui.dialog.AssignTransactionDialog;
 import de.janrieke.contractmanager.rmi.Transaction;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
