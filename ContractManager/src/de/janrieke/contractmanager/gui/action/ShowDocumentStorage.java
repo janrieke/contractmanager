@@ -30,7 +30,7 @@ public class ShowDocumentStorage implements Action {
 	 */
 	public void handleAction(Object context) throws ApplicationException {
 		try {
-			new de.janrieke.contractmanager.gui.view.DocumentStorageDialog((Contract) context).open();
+			new de.janrieke.contractmanager.gui.dialog.DocumentStorageDialog((Contract) context).open();
 		} catch (Exception e) {
 			Logger.error("error while opening file storage dialog", e);
 			throw new ApplicationException(Settings.i18n().tr(

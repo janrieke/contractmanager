@@ -20,7 +20,7 @@
  * Partially copied from Hibiscus/Syntax, (c) by willuhn.webdesign
  */
 
-package de.janrieke.contractmanager.gui.view;
+package de.janrieke.contractmanager.gui.dialog;
 
 import java.awt.Desktop;
 import java.io.File;

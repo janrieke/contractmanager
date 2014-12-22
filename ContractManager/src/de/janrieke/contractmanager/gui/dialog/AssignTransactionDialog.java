@@ -15,7 +15,7 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.janrieke.contractmanager.gui.view;
+package de.janrieke.contractmanager.gui.dialog;
 
 import org.eclipse.swt.widgets.Composite;
 

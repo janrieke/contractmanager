@@ -40,7 +40,7 @@ import de.willuhn.util.ApplicationException;
  */
 public class AboutDialog extends AbstractDialog<Object> {
 
-	int WINDOW_WIDTH = 600;
+	int WINDOW_WIDTH = 550;
 	int WINDOW_HEIGHT = 350;
 	/**
 	 * ct.
