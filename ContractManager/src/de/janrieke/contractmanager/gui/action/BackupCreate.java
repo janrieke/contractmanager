@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.FileDialog;
 
 import de.janrieke.contractmanager.ContractManagerPlugin;
 import de.janrieke.contractmanager.Settings;
+import de.janrieke.contractmanager.io.CsvWriter;
 import de.janrieke.contractmanager.server.AddressImpl;
 import de.janrieke.contractmanager.server.ContractImpl;
 import de.janrieke.contractmanager.server.CostsImpl;
@@ -64,23 +65,24 @@ public class BackupCreate implements Action {
 	 */
 	public static DateFormat DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-	private static I18N i18n = Application.getPluginLoader()
-			.getPlugin(ContractManagerPlugin.class).getResources().getI18N();
+	private static I18N i18n = Application.getPluginLoader().getPlugin(ContractManagerPlugin.class)
+			.getResources().getI18N();
 
 	/**
 	 * @see de.willuhn.jameica.gui.Action#handleAction(java.lang.Object)
 	 */
 	public void handleAction(Object context) throws ApplicationException {
 		FileDialog fd = new FileDialog(GUI.getShell(), SWT.SAVE);
-		fd.setFilterPath(System.getProperty("user.home"));
 		fd.setOverwrite(true);
-		fd.setFileName("contractmanager-backup-" + DATEFORMAT.format(new Date())
-				+ ".xml");
-		fd.setFilterExtensions(new String[] { "*.xml" });
+		fd.setFileName("contractmanager-backup-" + DATEFORMAT.format(new Date()) + ".xml");
+		fd.setFilterExtensions(new String[] { "*.xml", "*.zip" });
+		fd.setFilterNames(new String[] { "XML-Datei (*.xml)",
+				"Komma-getrennte Werte (komprimiert) (*.zip)" });
 		fd.setText("Bitte wählen Sie die Datei, in der das Backup gespeichert wird");
 		String f = fd.open();
 		if (f == null || f.length() == 0)
 			return;
+		final int filterIndex = fd.getFilterIndex();
 
 		final File file = new File(f);
 		Application.getController().start(new BackgroundTask() {
@@ -89,15 +91,19 @@ public class BackupCreate implements Action {
 			/**
 			 * @see de.willuhn.jameica.system.BackgroundTask#run(de.willuhn.util.ProgressMonitor)
 			 */
-			public void run(ProgressMonitor monitor)
-					throws ApplicationException {
+			public void run(ProgressMonitor monitor) throws ApplicationException {
 				Writer writer = null;
 				try {
-					Logger.info("creating xml backup to "
-							+ file.getAbsolutePath());
+					Logger.info("creating backup to " + file.getAbsolutePath());
 
-					writer = new XmlWriter(new BufferedOutputStream(
-							new FileOutputStream(file)));
+					switch (filterIndex) {
+					case 1:
+						writer = new CsvWriter(new BufferedOutputStream(new FileOutputStream(file)));
+						break;
+					case 0:
+					default:
+						writer = new XmlWriter(new BufferedOutputStream(new FileOutputStream(file)));
+					}
 
 					monitor.setStatusText(i18n.tr("Saving Addresses..."));
 					backup(AddressImpl.class, writer, monitor);
@@ -171,24 +177,17 @@ public class BackupCreate implements Action {
 			ProgressMonitor monitor) throws Exception {
 		DBIterator list = Settings.getDBService().createList(type);
 
-		DBObject obj = Settings.getDBService().createObject(type, null);
-		String primaryAttribute = obj.getPrimaryAttribute();
-		if (primaryAttribute != null && "".equals(primaryAttribute))
-			list.setOrder("order by "+ primaryAttribute);
 		while (list.hasNext()) {
 			GenericObject o = null;
 			try {
 				o = list.next();
 				writer.write(o);
 			} catch (Exception e) {
-				Logger.error(
-						"error while writing object " + BeanUtil.toString(o)
-								+ " - skipping", e);
+				Logger.error("error while writing object " + BeanUtil.toString(o) + " - skipping",
+						e);
 				monitor.log("  "
-						+ i18n.tr(
-								"{0} fehlerhaft ({1}), überspringe",
-								new String[] { BeanUtil.toString(o),
-										e.getMessage() }));
+						+ i18n.tr("{0} fehlerhaft ({1}), überspringe",
+								new String[] { BeanUtil.toString(o), e.getMessage() }));
 			}
 		}
 	}
