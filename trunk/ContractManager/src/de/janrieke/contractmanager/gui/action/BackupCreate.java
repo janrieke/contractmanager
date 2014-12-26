@@ -76,9 +76,9 @@ public class BackupCreate implements Action {
 		fd.setOverwrite(true);
 		fd.setFileName("contractmanager-backup-" + DATEFORMAT.format(new Date()) + ".xml");
 		fd.setFilterExtensions(new String[] { "*.xml", "*.zip" });
-		fd.setFilterNames(new String[] { "XML-Datei (*.xml)",
-				"Komma-getrennte Werte (komprimiert) (*.zip)" });
-		fd.setText("Bitte wählen Sie die Datei, in der das Backup gespeichert wird");
+		fd.setFilterNames(new String[] { i18n.tr("XML file (*.xml)"),
+				i18n.tr("Comma-separated values (compressed) (*.zip)") });
+		fd.setText(i18n.tr("Select file for export"));
 		String f = fd.open();
 		if (f == null || f.length() == 0)
 			return;
@@ -130,7 +130,7 @@ public class BackupCreate implements Action {
 					monitor.addPercentComplete(40);
 
 					monitor.setStatus(ProgressMonitor.STATUS_DONE);
-					monitor.setStatusText("Backup complete.");
+					monitor.setStatusText(i18n.tr("Export complete."));
 					monitor.setPercentComplete(100);
 				} catch (Exception e) {
 					throw new ApplicationException(e.getMessage());
@@ -186,7 +186,7 @@ public class BackupCreate implements Action {
 				Logger.error("error while writing object " + BeanUtil.toString(o) + " - skipping",
 						e);
 				monitor.log("  "
-						+ i18n.tr("{0} fehlerhaft ({1}), überspringe",
+						+ i18n.tr("Error during export of {0} ({1}), skipping",
 								new String[] { BeanUtil.toString(o), e.getMessage() }));
 			}
 		}

@@ -23,8 +23,8 @@
     <item name="ContractManager">
       <item name="New Contract..." shortcut="ALT+C" icon="document-new.png" action="de.janrieke.contractmanager.gui.action.ShowContractDetailView" />
       <item id="contractmanager.menu.ext"                       name="Advanced">
-        <item id="contractmanager.menu.ext.backup.create"       name="Export Data"     icon="document-save.png"        action="de.janrieke.contractmanager.gui.action.BackupCreate" />
-        <item id="contractmanager.menu.ext.backup.restore"      name="Import Data"     icon="document-open.png"        action="de.janrieke.contractmanager.gui.action.BackupRestore" />
+        <item id="contractmanager.menu.ext.backup.create"       name="Export Data..."     icon="document-save.png"        action="de.janrieke.contractmanager.gui.action.BackupCreate" />
+        <item id="contractmanager.menu.ext.backup.restore"      name="Import Data..."     icon="document-open.png"        action="de.janrieke.contractmanager.gui.action.BackupRestore" />
       </item>
       <item name="-" />
       <item id="de.janrieke.contractmanager.menu.license"      name="Licence Information"      icon="text-x-generic.png"      action="de.janrieke.contractmanager.gui.action.ShowLicenseInfoView" />

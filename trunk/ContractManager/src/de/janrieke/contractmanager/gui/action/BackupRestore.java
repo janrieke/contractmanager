@@ -68,9 +68,9 @@ public class BackupRestore implements Action {
 		// eh nicht sinnvoll importieren.
 		try {
 			if (Settings.getDBService().createList(Contract.class).size() > 0) {
-				String text = i18n.tr("Die ContractManager-Installation enthält bereits Daten.\n"
-						+ "Ein Import kann zu unvorhersehbaren Ergebnissen oder Fehlern führen.\n"
-						+ "Wollen Sie wirklich fortfahren?");
+				String text = i18n.tr("The ContractManager installation already contains data.\n" +
+						"Importing data may lead to errors or unforseeable behavior.\n" +
+						"Do you really want to continue?");
 				if (!Application.getCallback().askUser(text))
 					return;
 			}
@@ -80,13 +80,13 @@ public class BackupRestore implements Action {
 			return;
 		} catch (Exception e) {
 			Logger.error("unable to notify user", e);
-			throw new ApplicationException(i18n.tr("Datenbank-Import fehlgeschlagen"));
+			throw new ApplicationException(i18n.tr("Database import failed"));
 		}
 
 		FileDialog fd = new FileDialog(GUI.getShell(), SWT.OPEN);
 		fd.setFileName("hibiscus-backup-" + BackupCreate.DATEFORMAT.format(new Date()) + ".xml");
 		fd.setFilterExtensions(new String[] { "*.xml" });
-		fd.setText("Bitte wählen Sie die Backup-Datei aus");
+		fd.setText(i18n.tr("Please select file for import"));
 		String f = fd.open();
 		if (f == null || f.length() == 0)
 			return;
@@ -102,8 +102,8 @@ public class BackupRestore implements Action {
 			 * @see de.willuhn.jameica.system.BackgroundTask#run(de.willuhn.util.ProgressMonitor)
 			 */
 			public void run(ProgressMonitor monitor) throws ApplicationException {
-				monitor.setStatusText(i18n.tr("Importiere Backup"));
-				Logger.info("importing backup " + file.getAbsolutePath());
+				monitor.setStatusText(i18n.tr("Importing data"));
+				Logger.info("importing data from " + file.getAbsolutePath());
 				final ClassLoader loader = Application.getPluginLoader()
 						.getManifest(ContractManagerPlugin.class).getClassLoader();
 
@@ -137,7 +137,7 @@ public class BackupRestore implements Action {
 									"unable to import " + o.getClass().getName() + ":" + o.getID()
 											+ ", skipping", e);
 							monitor.log("  "
-									+ i18n.tr("{0} fehlerhaft ({1}), überspringe", new String[] {
+									+ i18n.tr("Error during export of {0} ({1}), skipping", new String[] {
 											BeanUtil.toString(o), e.getMessage() }));
 						}
 						if (count++ % 100 == 0)
@@ -145,7 +145,7 @@ public class BackupRestore implements Action {
 					}
 
 					monitor.setStatus(ProgressMonitor.STATUS_DONE);
-					monitor.setStatusText("Backup importiert");
+					monitor.setStatusText(i18n.tr("Import complete"));
 					monitor.setPercentComplete(100);
 				} catch (Exception e) {
 					Logger.error("error while importing data", e);
