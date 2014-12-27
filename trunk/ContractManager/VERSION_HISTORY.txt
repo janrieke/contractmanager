@@ -19,6 +19,9 @@ VERSION HISTORY:
 0.4:
 	- Analysis diagrams
 
+0.4.1:
+	- Bugfixes
+
 0.4.2:
 	- Bugfixes
 
@@ -30,11 +33,15 @@ VERSION HISTORY:
 	- Added quarterly/semiannually as payment interval
 	- update libs (ODFDOM 0.8.9-incubating)
 
+0.5.1:
+	- "Remind me next term" function	
+	- Dialog with database login data
+	- Import/Export
+
 
 ROADMAP:
 
 0.6:
-	- "Remind me next term" function	
 	- Grouping of contracs
 
 1.0:
