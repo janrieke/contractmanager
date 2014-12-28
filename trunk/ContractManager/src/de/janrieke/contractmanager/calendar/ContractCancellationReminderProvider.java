@@ -38,12 +38,13 @@ public class ContractCancellationReminderProvider implements
 			iterator = ContractControl.getContracts();
 		while (iterator.hasNext()) {
 			Contract contract = (Contract) iterator.next();
-			if (contract.getDoNotRemind())
-				continue;
 			Date nextCancellationDeadline = contract.getNextCancellationDeadline();
 			while (nextCancellationDeadline != null && nextCancellationDeadline.before(to)) {
-				if (nextCancellationDeadline.after(from))
-					result.add(new ContractCancellationAppointment(contract, nextCancellationDeadline));
+				if (nextCancellationDeadline.after(from)) {
+					Date doNotRemindBefore = contract.getDoNotRemindBefore();
+					boolean hasAlarm = !contract.getDoNotRemind() && !(doNotRemindBefore != null && nextCancellationDeadline.before(doNotRemindBefore));
+					result.add(new ContractCancellationAppointment(contract, nextCancellationDeadline, hasAlarm));
+				}
 				Calendar next = Calendar.getInstance();
 				next.setTime(nextCancellationDeadline);
 				next.add(Calendar.DAY_OF_YEAR, 1);
@@ -63,18 +64,21 @@ public class ContractCancellationReminderProvider implements
 	private class ContractCancellationAppointment extends AbstractAppointment {
 		private Contract contract;
 		private Date date;
+		private boolean hasAlarm;
 
 		/**
 		 * ct.
 		 * @param date 
+		 * @param hasAlarm 
 		 * 
 		 * @param schedule
 		 *            der Termin.
 		 */
-		private ContractCancellationAppointment(Contract contract, Date date) {
+		private ContractCancellationAppointment(Contract contract, Date date, boolean hasAlarm) {
 			super();
 			this.contract = contract;
 			this.date = date;
+			this.hasAlarm = hasAlarm;
 		}
 
 		/**
@@ -119,7 +123,7 @@ public class ContractCancellationReminderProvider implements
 		 * @see de.willuhn.jameica.gui.calendar.AbstractAppointment#hasAlarm()
 		 */
 		public boolean hasAlarm() {
-			return true;
+			return hasAlarm;
 		}
 
 		@Override
