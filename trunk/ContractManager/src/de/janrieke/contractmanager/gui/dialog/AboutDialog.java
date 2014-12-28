@@ -123,4 +123,9 @@ public class AboutDialog extends AbstractDialog<Object> {
 		return null;
 	}
 
+	@Override
+	protected void onEscape() {
+		// Avoid exception on ESC
+		close();
+	}
 }
