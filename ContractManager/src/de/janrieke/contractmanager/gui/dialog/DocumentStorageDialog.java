@@ -69,8 +69,7 @@ import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
 /**
- * Dialog for selecting a contract for a transaction. Uses a table and includes
- * search capabilities.
+ * Dialog for storing files for a contract.
  */
 public class DocumentStorageDialog extends AbstractDialog<Contract> {
 	private Contract contract = null;
@@ -574,5 +573,11 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 	@Override
 	protected Contract getData() throws Exception {
 		return null;
+	}
+
+	@Override
+	protected void onEscape() {
+		// Avoid exception when pressing ESC
+		close();
 	}
 }
