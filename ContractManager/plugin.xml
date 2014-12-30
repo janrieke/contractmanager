@@ -54,7 +54,7 @@
     <extension class="de.janrieke.contractmanager.ext.hibiscus.UmsatzListPartHibiscusExtension"      extends="de.willuhn.jameica.hbci.gui.parts.UmsatzList"            requires="hibiscus" />
     <extension class="de.janrieke.contractmanager.ext.hibiscus.UmsatzListMenuHibiscusExtension"      extends="de.willuhn.jameica.hbci.gui.menus.UmsatzList"            requires="hibiscus"/>
     <extension class="de.janrieke.contractmanager.ext.hibiscus.ContractDetailViewHibiscusCategories" extends="de.janrieke.contractmanager.gui.view.ContractDetailView" requires="hibiscus"/>
-    <extension class="de.janrieke.contractmanager.ext.jameica.SettingsView" extends="de.willuhn.jameica.gui.internal.views.Settings"/>
+    <extension class="de.janrieke.contractmanager.gui.view.SettingsView" extends="de.willuhn.jameica.gui.internal.views.Settings"/>
   </extensions>
 
 </plugin>
