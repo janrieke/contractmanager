@@ -17,13 +17,6 @@
  */
 /**********************************************************************
  * Kopie aus Hibiscus
- * 
- * $Source: /cvsroot/hibiscus/hibiscus/src/de/willuhn/jameica/hbci/server/DBSupportH2Impl.java,v $
- * $Revision: 1.12 $
- * $Date: 2010-11-02 12:02:19 $
- * $Author: willuhn $
- * $Locker:  $
- * $State: Exp $
  *
  * Copyright (c) by willuhn software & services
  * All rights reserved

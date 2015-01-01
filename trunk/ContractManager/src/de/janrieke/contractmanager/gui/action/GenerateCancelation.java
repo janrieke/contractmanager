@@ -20,10 +20,19 @@ package de.janrieke.contractmanager.gui.action;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
@@ -38,7 +47,10 @@ import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.server.SettingsUtil;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
+import de.willuhn.jameica.gui.dialogs.ListDialog;
 import de.willuhn.jameica.gui.dialogs.YesNoDialog;
+import de.willuhn.jameica.system.OperationCanceledException;
+import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 
 /**
@@ -59,7 +71,74 @@ public class GenerateCancelation implements Action {
 		//TODO: Also generate PDFs
 
 		Contract p = (Contract) context;
+		
+		// Which type of document should be generated?
+		final List<Path> templates = new ArrayList<>();
+		String templateFolderString;
+		try {
+			templateFolderString = Settings.getTemplateFolder();
+		} catch (RemoteException e) {
+			templateFolderString = ContractManagerPlugin.getInstance().getManifest().getPluginDir() + "/templates/";
+		}
+		Path templateFolderPath = Paths.get(templateFolderString);
+		try {
+			Files.walkFileTree(templateFolderPath, new SimpleFileVisitor<Path>() {
 
+				@Override
+				public FileVisitResult visitFile(Path path, BasicFileAttributes attributes)
+						throws IOException {
+					if (path.getFileName().toString().endsWith(".odt")) {
+						templates.add(path);
+					}
+					return FileVisitResult.CONTINUE;
+				}
+
+				@Override
+				public FileVisitResult visitFileFailed(Path path, IOException e)
+						throws IOException {
+					if (path.toString().endsWith(".odt")) {
+						Logger.error("Template file retrieval failed for " + path.toString(), e);
+					}
+					return FileVisitResult.CONTINUE;
+				}
+			});
+		} catch (IOException e) {
+			Logger.error("Template folder search failed for " + templateFolderString, e);
+		}
+
+		String templateBaseName;		
+		if (templates.size() == 0) {
+			Logger.error("No *.odt templates found in template folder " + templateFolderString);
+			return;
+		} else if (templates.size() > 1) {
+			ListDialog templateSelectionDialog = new ListDialog(templates, 0);
+			templateSelectionDialog.setPanelText(Settings.i18n().tr("Please select the template to use."));
+			templateSelectionDialog.setSize(450, SWT.DEFAULT);
+			templateSelectionDialog.setTitle(Settings.i18n().tr("Select template"));
+			templateSelectionDialog.addColumn(Settings.i18n().tr("Template"), "fileName");
+			Object dialogResult = null;
+			try {
+				dialogResult = templateSelectionDialog.open();
+			} catch (Exception e) {
+				if (e instanceof OperationCanceledException)
+					return;
+				Logger.error("Failed to open template selection dialog", e);
+				dialogResult = templates.get(0);
+			}
+			
+			if (dialogResult == null)
+				return;
+
+			templateBaseName = ((Path)dialogResult).getFileName().toString();
+		} else {
+			templateBaseName = templates.get(0).toString();
+		}
+		
+		if (templateBaseName.contains(".")) {
+			templateBaseName = templateBaseName.substring(0, templateBaseName.lastIndexOf("."));
+		}
+		
+		// Select file name
 		FileDialog fd = new FileDialog(GUI.getShell(), SWT.SAVE);
 		fd.setText(Settings.i18n().tr("Select Filename for Cancellation"));
 		fd.setOverwrite(true);
@@ -80,7 +159,7 @@ public class GenerateCancelation implements Action {
 				suggestedFilename.append('_');
 		}
 
-		fd.setFileName(Settings.i18n().tr("cancellation-{0}-{1}.odt",
+		fd.setFileName(Settings.i18n().tr(templateBaseName + "-{0}-{1}.odt",
 				Settings.dateformat(new Date()), suggestedFilename.toString()));
 
 		// String path = System.getProperty("user.home");
