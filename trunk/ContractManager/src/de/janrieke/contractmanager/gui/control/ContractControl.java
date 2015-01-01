@@ -116,6 +116,9 @@ public class ContractControl extends AbstractControl {
 	private Input partnerState;
 	private Input partnerCountry;
 
+	// Checkbox for filtering non-active contracts in list
+	private CheckboxInput activeFilterSwitch;
+
 	// list of transactions contained in this contract
 	// private TablePart transactionList;
 
@@ -140,18 +143,14 @@ public class ContractControl extends AbstractControl {
 	 * 
 	 * @param view
 	 *            this is our view (the contract details view).
+	 * @throws RemoteException 
 	 */
-	public ContractControl(AbstractView view) {
+	public ContractControl(AbstractView view) throws RemoteException {
 		super(view);
 		if (view instanceof ContractDetailView) {
-			try {
-				((ContractDetailView) view)
-						.setButtonActivationState(!((Contract) view
-								.getCurrentObject()).isNewObject());
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			((ContractDetailView) view)
+					.setButtonActivationState(!((Contract) view
+							.getCurrentObject()).isNewObject());
 		}
 	}
 
@@ -495,8 +494,7 @@ public class ContractControl extends AbstractControl {
 								currentAddress = newAddress;
 							}
 						} catch (RemoteException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							Logger.error("Error while setting address", e);
 						}
 					}
 				}
@@ -701,6 +699,48 @@ public class ContractControl extends AbstractControl {
 			}
 		});
 		return contractList;
+	}
+	
+	/**
+	 * Checkbox in the contract list view for filtering the inactive contracts.
+	 */
+	public CheckboxInput getActiveFilterSwitch() {
+		if (activeFilterSwitch != null)
+			return activeFilterSwitch;
+
+		activeFilterSwitch = new CheckboxInput(false);
+		activeFilterSwitch.addListener(new Listener() {
+			
+			@Override
+			public void handleEvent(Event event) {
+				try {
+					System.out.println(event.type);
+					if (event.type != SWT.Selection)
+						return;
+					if ((Boolean)activeFilterSwitch.getValue()) {
+						// Checkbox was active; remove inactive contracts
+						Date today = new Date();
+						List<Contract> contractsToRemove = new ArrayList<>();
+						for (Object item : contractList.getItems()) {
+							if (!((Contract)item).isActiveInMonth(today))
+								contractsToRemove.add((Contract) item);
+						}
+						for (Contract c : contractsToRemove)
+							contractList.removeItem(c);
+					} else {
+						// Checkbox was inactive; add all contracts
+						Object selection = contractList.getSelection();
+						contractList.removeAll();
+						GenericIterator contracts = getContracts();
+						while (contracts.hasNext())
+							contractList.addItem(contracts.next());
+						contractList.select(selection);
+					}
+				} catch (RemoteException e) {
+				}
+			}
+		});
+		return activeFilterSwitch;
 	}
 
 	static int index = 0;
@@ -1065,14 +1105,9 @@ public class ContractControl extends AbstractControl {
 		deletedCosts.add(c);
 	}
 
-	public void addTemporaryCostEntry(Costs c) {
-		try {
-			costsList.addItem(c);
-			newCosts.add(c);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void addTemporaryCostEntry(Costs c) throws RemoteException {
+		costsList.addItem(c);
+		newCosts.add(c);
 	}
 
 	public boolean isNewContract() {
