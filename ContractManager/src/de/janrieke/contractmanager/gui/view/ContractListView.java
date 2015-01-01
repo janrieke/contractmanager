@@ -17,12 +17,20 @@
  */
 package de.janrieke.contractmanager.gui.view;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.TabFolder;
+
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.ShowContractDetailView;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.util.ButtonArea;
+import de.willuhn.jameica.gui.util.ColumnLayout;
+import de.willuhn.jameica.gui.util.Container;
+import de.willuhn.jameica.gui.util.SimpleContainer;
+import de.willuhn.jameica.gui.util.TabGroup;
 import de.willuhn.util.ApplicationException;
 
 /**
@@ -34,11 +42,19 @@ public class ContractListView extends AbstractView {
 	 * @see de.willuhn.jameica.gui.AbstractView#bind()
 	 */
 	public void bind() throws Exception {
-
 		GUI.getView().setTitle(Settings.i18n().tr("Existing contracts"));
 
 		ContractControl control = new ContractControl(this);
 
+		TabFolder folder = new TabFolder(this.getParent(), SWT.NONE);
+		folder.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		TabGroup tab = new TabGroup(folder,Settings.i18n().tr("Filter view"));
+		
+		ColumnLayout cols = new ColumnLayout(tab.getComposite(),2);
+		
+		Container left = new SimpleContainer(cols.getComposite());
+		left.addCheckbox(control.getActiveFilterSwitch(), Settings.i18n().tr("Only show currently active contracts"));
+		
 		control.getContractsTable().paint(this.getParent());
 
 		ButtonArea buttons = new ButtonArea(this.getParent(), 3);
