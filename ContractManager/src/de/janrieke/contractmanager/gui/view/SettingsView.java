@@ -124,6 +124,9 @@ public class SettingsView extends AbstractView implements Extension {
 	    } else
 	    	right.addPart(new Button(Settings.i18n().tr("Open Jameica Calendar Settings"), new ShowJameicaSettings("Kalender")));
 
+	    right.addHeadline(Settings.i18n().tr("Document Templates"));
+	    right.addLabelPair(Settings.i18n().tr("Template folder"), settingsControl.getTemplateFolderInput());
+
 	    //Hibiscus integration
 	    mf = Application.getPluginLoader().getManifestByName("hibiscus");
 	    if (mf != null) {

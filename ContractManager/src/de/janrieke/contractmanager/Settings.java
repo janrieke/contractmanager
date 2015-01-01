@@ -170,6 +170,14 @@ public class Settings {
 		SettingsUtil.set("ical_name_export", Boolean.toString(name));
 	}
 
+	public static String getTemplateFolder() throws RemoteException {
+		String defaultFolder = ContractManagerPlugin.getInstance().getManifest().getPluginDir() + "/templates/";
+		return SettingsUtil.get("template_folder", defaultFolder);
+	}
+
+	public static void setTemplateFolder(String folder) throws RemoteException, ApplicationException {
+		SettingsUtil.set("template_folder", folder);
+	}
 
 	public static boolean getShowHibiscusCategorySelector() throws RemoteException {
 		return Boolean.parseBoolean(SettingsUtil.get("show_hibiscus_category_selector", "true"));

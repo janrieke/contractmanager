@@ -25,6 +25,7 @@ import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.input.CheckboxInput;
+import de.willuhn.jameica.gui.input.DirectoryInput;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.input.IntegerInput;
 import de.willuhn.jameica.gui.input.MultiInput;
@@ -55,6 +56,8 @@ public class SettingsControl extends AbstractControl {
 	private IntegerInput noticeTime;
 //	private CheckboxInput iCalAutoExport;
 	private CheckboxInput anonICalExport;
+	
+	private DirectoryInput templateFolderInput;
 
 	private CheckboxInput showSEPACreditorInput;
 	private CheckboxInput showSEPACustomerInput;
@@ -224,6 +227,14 @@ public class SettingsControl extends AbstractControl {
 		return noticeTime;
 	}
 
+	public DirectoryInput getTemplateFolderInput() throws RemoteException {
+		if (templateFolderInput == null) {
+			templateFolderInput = new DirectoryInput(Settings.getTemplateFolder());
+		}
+		return templateFolderInput;
+	}
+
+
 	public Input getHibiscusAutoImportNewTransactions() throws RemoteException {
 		if (autoImport == null) {
 			autoImport = new CheckboxInput(Settings.getHibiscusAutoImportNewTransactions());
@@ -250,8 +261,8 @@ public class SettingsControl extends AbstractControl {
 					.getValue());
 			Settings.setExtensionWarningTime((Integer) getWarningTime()
 					.getValue());
-//			Settings.setICalAutoExport((Boolean) getICalAutoExport().getValue());
 			Settings.setNamedICalExport((Boolean) getNamedICalExport().getValue());
+			Settings.setTemplateFolder((String)templateFolderInput.getValue());
 			Settings.setHibiscusAutoImportNewTransactions((Boolean) getHibiscusAutoImportNewTransactions().getValue());
 
 			GUI.getStatusBar().setSuccessText(
