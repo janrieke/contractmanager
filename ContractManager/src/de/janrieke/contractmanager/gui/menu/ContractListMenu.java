@@ -20,7 +20,7 @@ package de.janrieke.contractmanager.gui.menu;
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.DeleteContract;
 import de.janrieke.contractmanager.gui.action.DismissNextReminder;
-import de.janrieke.contractmanager.gui.action.GenerateCancelation;
+import de.janrieke.contractmanager.gui.action.GenerateOdfDocument;
 import de.janrieke.contractmanager.gui.action.ShowContractDetailView;
 import de.janrieke.contractmanager.gui.parts.OnlyForContractsWithRemindersContextMenuItem;
 import de.willuhn.jameica.gui.Action;
@@ -46,7 +46,7 @@ public class ContractListMenu extends ContextMenu {
 				new ShowContractDetailView(), "document-open.png"));
 
 		addItem(new CheckedContextMenuItem(Settings.i18n().tr(
-				"Generate Cancellation..."), new GenerateCancelation(),
+				"Generate Letter..."), new GenerateOdfDocument(),
 				"document-print.png"));
 
 		addItem(new OnlyForContractsWithRemindersContextMenuItem(Settings.i18n().tr(

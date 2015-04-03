@@ -21,7 +21,7 @@ import java.util.List;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.DeleteContract;
-import de.janrieke.contractmanager.gui.action.GenerateCancelation;
+import de.janrieke.contractmanager.gui.action.GenerateOdfDocument;
 import de.janrieke.contractmanager.gui.action.ShowDocumentStorage;
 import de.janrieke.contractmanager.gui.button.RestoreButton;
 import de.janrieke.contractmanager.gui.control.ContractControl;
@@ -106,7 +106,7 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    
 		// add some buttons
 		ButtonArea buttons = new ButtonArea(getParent(), 4);
-		buttons.addButton(Settings.i18n().tr("Generate Cancellation..."), new GenerateCancelation(), control.getCurrentObject(), false, "document-print.png");
+		buttons.addButton(Settings.i18n().tr("Generate Letter..."), new GenerateOdfDocument(), control.getCurrentObject(), false, "document-print.png");
 		deleteButton = new Button(Settings.i18n().tr("Delete Contract..."),
 				new DeleteContract(), control.getCurrentObject(), false, "window-close.png");
 		deleteButton.setEnabled(activationState);
