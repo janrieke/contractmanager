@@ -247,6 +247,20 @@ public class SettingsControl extends AbstractControl {
 	 */
 	public void handleStore() {
 		try {
+			Integer noticeTime = (Integer)getNoticeTime().getValue();
+			Integer warningTime = (Integer)getWarningTime().getValue();
+			
+			if (noticeTime == null) {
+				noticeTime = 30;
+			}
+			if (warningTime == null) {
+				warningTime = 7;
+			}
+			if (noticeTime != null && warningTime != null &&
+					noticeTime < warningTime) {
+				noticeTime = warningTime;
+			}
+
 			SettingsUtil.set("name", (String) getName().getValue());
 			SettingsUtil.set("street", (String) getStreet().getValue());
 			SettingsUtil.set("number", (String) getNumber().getValue());
