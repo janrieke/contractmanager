@@ -258,6 +258,7 @@ public class SettingsControl extends AbstractControl {
 			}
 			if (noticeTime != null && warningTime != null &&
 					noticeTime < warningTime) {
+				getNoticeTime().setValue(warningTime);
 				noticeTime = warningTime;
 			}
 
@@ -271,10 +272,8 @@ public class SettingsControl extends AbstractControl {
 			SettingsUtil.set("country", (String) getCountry().getValue());
 			SettingsUtil.set("email", (String) getEmail().getValue());
 			SettingsUtil.set("phone", (String) getPhone().getValue());
-			Settings.setExtensionNoticeTime((Integer) getNoticeTime()
-					.getValue());
-			Settings.setExtensionWarningTime((Integer) getWarningTime()
-					.getValue());
+			Settings.setExtensionNoticeTime(noticeTime);
+			Settings.setExtensionWarningTime(warningTime);
 			Settings.setNamedICalExport((Boolean) getNamedICalExport().getValue());
 			Settings.setTemplateFolder((String)templateFolderInput.getValue());
 			Settings.setHibiscusAutoImportNewTransactions((Boolean) getHibiscusAutoImportNewTransactions().getValue());
