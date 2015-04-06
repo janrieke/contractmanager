@@ -14,6 +14,7 @@ import de.willuhn.jameica.gui.Action;
 public class CostsListTablePart extends SizeableTablePart {
 
 	public CostsListTablePart(GenericIterator list, Action action) {
+		// We use the double-click action to insert a new cost entry. 
 		super(list, action);
 	}
 
@@ -44,5 +45,18 @@ public class CostsListTablePart extends SizeableTablePart {
 		}
 		else 
 			return super.getEditorControl(row, item, oldValue);
+	}
+	
+	@Override
+	public Object getSelection() {
+		Object selection = super.getSelection();
+		if (selection == null) {
+			// Don't return null when no element is selected, because the action will not be called when double-clicking.
+			// Handling of empty arrays is performed within CreateNewCostEntry.
+			return new Object[0];
+		}
+		else {
+			return selection;
+		}
 	}
 }

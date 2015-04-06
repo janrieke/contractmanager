@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableItem;
 
 import de.janrieke.contractmanager.Settings;
+import de.janrieke.contractmanager.gui.action.CreateNewCostEntry;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion;
 import de.janrieke.contractmanager.gui.input.PositiveIntegerInput;
 import de.janrieke.contractmanager.gui.menu.ContractListMenu;
@@ -854,7 +855,7 @@ public class ContractControl extends AbstractControl {
 			return costsList;
 
 		costsIterator = getContract().getCosts();
-		costsList = new CostsListTablePart(costsIterator, null);
+		costsList = new CostsListTablePart(costsIterator, new CreateNewCostEntry(this));
 		costsList.setFormatter(new TableFormatter() {
 
 			@Override
