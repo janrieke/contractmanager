@@ -1010,9 +1010,11 @@ public class ContractControl extends AbstractControl {
 			// Now, let's store the contract and its address.
 			// The store() method throws ApplicationExceptions if
 			// insertCheck() or updateCheck() failed.
+			boolean addressWasNew = false;
 			try {
+				addressWasNew = a.isNewObject();
 				a.store();
-				// We have to set the address here, because a new, unstored
+				// We have to set the address first, because a new, unstored
 				// object has no ID, yet. After storage, the ID is set.
 				c.setAddress(a);
 				c.store();
@@ -1020,8 +1022,6 @@ public class ContractControl extends AbstractControl {
 				// We have to reuse the old iterator that has been used for the
 				// costs list, because otherwise new beans will created that
 				// do not contain the values changed by the inline editor.
-				// DBIterator costs = p.getCosts();
-				// while (costs.hasNext()) {
 				costsIterator.begin();
 				while (costsIterator.hasNext()) {
 					Costs cost = (Costs) costsIterator.next();
@@ -1051,6 +1051,13 @@ public class ContractControl extends AbstractControl {
 						Settings.i18n().tr("Contract stored successfully"));
 			} catch (ApplicationException e) {
 				GUI.getView().setErrorText(e.getMessage());
+				// Remove potentially stored objects from DB.
+				if (addressWasNew)
+					try {
+						a.delete();
+					} catch (ApplicationException e1) {
+						// ignore
+					}
 			}
 		} catch (RemoteException e) {
 			Logger.error("error while storing contract", e);
