@@ -77,6 +77,4 @@ public class SizeableTablePart extends TablePart {
 		this.orderByColName   = colName;
 		super.orderBy(colName);
 	}
-	
-	
 }
