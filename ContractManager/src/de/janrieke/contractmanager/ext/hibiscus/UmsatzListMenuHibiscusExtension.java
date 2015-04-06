@@ -79,7 +79,7 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 
 				// Wenn wir mehr als 1 Buchung haben, fuehren wir das
 				// im Hintergrund aus. 
-				UmsatzImportWorker worker = new UmsatzImportWorker(umsaetze, false, false);
+				UmsatzImportWorker worker = new UmsatzImportWorker(umsaetze, false);
 				if (umsaetze.length > 1)
 					Application.getController().start(worker);
 				else

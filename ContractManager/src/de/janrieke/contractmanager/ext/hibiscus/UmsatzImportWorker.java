@@ -1,5 +1,6 @@
 package de.janrieke.contractmanager.ext.hibiscus;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.janrieke.contractmanager.ContractManagerPlugin;
@@ -17,6 +18,7 @@ import de.willuhn.jameica.hbci.server.VerwendungszweckUtil;
 import de.willuhn.jameica.messaging.StatusBarMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.system.BackgroundTask;
+import de.willuhn.jameica.system.OperationCanceledException;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
@@ -29,20 +31,18 @@ class UmsatzImportWorker implements BackgroundTask
 {
 	final static I18N i18n = Application.getPluginLoader().getPlugin(ContractManagerPlugin.class).getResources().getI18N();
 	private boolean cancel = false;
+	private boolean noUserInteraction = false;
 	private Umsatz[] list = null;
-	private boolean forceAuto;
-	private boolean silent;
 
 	/**
 	 * ct.
 	 * @param list
-	 * @param umsatzListMenuHibiscusExtension TODO
+	 * @param noUserInteraction do not show a dialog for transactions that are not automatically assignable
 	 */
-	UmsatzImportWorker(Umsatz[] list, boolean forceAuto, boolean silent)
+	UmsatzImportWorker(Umsatz[] list, boolean noUserInteraction)
 	{
 		this.list = list;
-		this.forceAuto = forceAuto;
-		this.silent = silent;
+		this.noUserInteraction = noUserInteraction;
 	}
 
 	/**
@@ -69,7 +69,7 @@ class UmsatzImportWorker implements BackgroundTask
 		try
 		{
 			if (monitor != null)
-				monitor.setStatusText(UmsatzListMenuHibiscusExtension.i18n.tr("Buche {0} Umsätze",""+list.length));
+				monitor.setStatusText(UmsatzListMenuHibiscusExtension.i18n.tr("Assigning {0} transaction to contracts",""+list.length));
 
 			double factor = 100d / (double) list.length;
 
@@ -77,12 +77,14 @@ class UmsatzImportWorker implements BackgroundTask
 			int error   = 0;
 			int skipped = 0;
 
+			List<Umsatz> transactionsForDialog = new ArrayList<>();
+
 			for (int i=0;i<list.length;++i)
 			{
 				if (monitor != null)
 				{
 					monitor.setPercentComplete((int)((i+1) * factor));
-					monitor.log("  " + UmsatzListMenuHibiscusExtension.i18n.tr("Assigning transaction {0}",Integer.toString(i+1)));
+					monitor.log("  " + UmsatzListMenuHibiscusExtension.i18n.tr("Trying to auto-assign transaction {0}",Integer.toString(i+1)));
 				}
 
 				Transaction transaction = null;
@@ -95,15 +97,23 @@ class UmsatzImportWorker implements BackgroundTask
 						continue;
 					}
 
-					transaction = createAssignedTransaction(list[i], forceAuto || list.length>1);
+					transaction = createAssignedTransaction(list[i]);
 					if (transaction != null) {
 						transaction.store();
 						created++;
+						if (monitor != null)
+						{
+							monitor.log("    " + UmsatzListMenuHibiscusExtension.i18n.tr("Successful."));
+						}
+					} else {
+						if (monitor != null)
+						{
+							monitor.log("    " + UmsatzListMenuHibiscusExtension.i18n.tr("Auto-asign not possible."));
+						}
+						transactionsForDialog.add(list[i]);
 					}
 
-					// Mit der Benachrichtigung wird dann gleich die Buchungsnummer in der Liste
-					// angezeigt. Vorher muessen wir der anderen Extension aber noch die neue
-					// Buchung mitteilen
+					// update the UmsatzList 
 					List<Extension> extensions = ExtensionRegistry.getExtensions("de.willuhn.jameica.hbci.gui.parts.UmsatzList");
 					if (extensions != null)
 					{
@@ -116,24 +126,42 @@ class UmsatzImportWorker implements BackgroundTask
 							}
 						}
 					}
+					// Notify other extensions about the update
 					Application.getMessagingFactory().sendMessage(new ObjectChangedMessage(list[i]));
 				}
 				catch (Exception e)
 				{
-					if (!silent)
-						Logger.error("unable to import umsatz",e);
+					Logger.error("unable to import umsatz", e);
 					if (monitor != null)
 						monitor.log("    " + UmsatzListMenuHibiscusExtension.i18n.tr("Fehler: {0}",e.getMessage()));
 					error++;
 				}
 			}
 
-			String text = UmsatzListMenuHibiscusExtension.i18n.tr("Import to ContractManager complete: {0} transactions imported, {1} error, {2} already assigned", new String[]{Integer.toString(created),Integer.toString(error),Integer.toString(skipped)});
+			if (!noUserInteraction && !transactionsForDialog.isEmpty()) {
+				if (monitor != null)
+				{
+					monitor.log("  " + UmsatzListMenuHibiscusExtension.i18n.tr("Interactivly assigning {0} transactions.", Integer.toString(transactionsForDialog.size())));
+				}
+				for (Umsatz u : transactionsForDialog) {
+					try {
+						Contract contract = new UmsatzImportListDialog(u, null).open();
+						if (contract != null) {
+							final Transaction transaction = (Transaction) Settings.getDBService().createObject(Transaction.class,null);
+							transaction.setContract(contract);
+							transaction.setTransactionID(Integer.parseInt(u.getID()));
+							transaction.store();
+							created++;
+						}
+					} catch (OperationCanceledException e) {
+						break;
+					}
+				}
+			}
+			
+			String text = UmsatzListMenuHibiscusExtension.i18n.tr("Import to ContractManager complete: {0} transactions imported, {1} erroneous, {2} skipped", new String[]{Integer.toString(created),Integer.toString(error),Integer.toString(skipped)});
 
-			if (!silent)
-				Application.getMessagingFactory().sendMessage(new StatusBarMessage(text,StatusBarMessage.TYPE_SUCCESS));
-			else
-				Logger.info(text);
+			Application.getMessagingFactory().sendMessage(new StatusBarMessage(text,StatusBarMessage.TYPE_SUCCESS));
 
 			if (monitor != null)
 			{
@@ -144,20 +172,19 @@ class UmsatzImportWorker implements BackgroundTask
 		}
 		catch (Exception e)
 		{
-			Logger.error("error while importing objects",e);
+			Logger.error("error while importing objects", e);
 			throw new ApplicationException(UmsatzListMenuHibiscusExtension.i18n.tr("Fehler beim Import der Umsätze"));
 		}
 	}
 	/**
-	 * Assigns a single transaction to a contract.
+	 * Auto-assigns a single transaction to a contract. 
+	 * It uses the category and the SEPA fields to find matching contracts.
+	 * If no matching contract can be found, we return null. 
 	 * @param u the transaction that should be assigned.
-	 * @param auto If there is more than one transaction, we run in auto mode, where 
-	 * we use the category and the SEPA references to identify a contract.
-	 * If this does not work, we cancel with an exception.
 	 * @return the assigned contract.
 	 * @throws Exception
 	 */
-	Transaction createAssignedTransaction(Umsatz u, boolean auto) throws Exception
+	Transaction createAssignedTransaction(Umsatz u) throws Exception
 	{
 		Contract contract = null;
 		//TODO: also perform auto import if SEPA references match
@@ -200,14 +227,6 @@ class UmsatzImportWorker implements BackgroundTask
 					} // else { // both SEPA references not set -> nothing to do }
 				}
 			}
-		}
-		
-
-		if (contract == null && auto)
-			throw new ApplicationException(i18n.tr("Auto-import not possible: No category assigned or no matching SEPA references found."));
-		
-		if (!auto) {
-			contract = new UmsatzImportListDialog(u, contract).open();
 		}
 
 		if (contract != null) {
