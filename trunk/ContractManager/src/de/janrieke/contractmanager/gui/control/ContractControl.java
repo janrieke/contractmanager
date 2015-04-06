@@ -861,7 +861,7 @@ public class ContractControl extends AbstractControl {
 			public void format(TableItem item) {
 				try {
 					double money = ((Costs) item.getData()).getMoney(); // Double.parseDouble(item.getText(1));
-					String text = String.format("%1$.2f", money) + " \u20AC";
+					String text = Settings.formatAsCurrency(money);
 					item.setText(1, text);
 					item.setText(2, ((Costs) item.getData()).getPeriod()
 							.getAdjective());

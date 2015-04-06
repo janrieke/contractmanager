@@ -70,7 +70,7 @@ public class NewTransactionsListener implements MessageConsumer {
 			return; // ignore transactions that have not been booked, yet
 
 		Umsatz[] u = {(Umsatz) o};
-		UmsatzImportWorker worker = new UmsatzImportWorker(u, true, true);
+		UmsatzImportWorker worker = new UmsatzImportWorker(u, true);
 		//Application.getController().start(worker);
 		worker.run(null);
 	}

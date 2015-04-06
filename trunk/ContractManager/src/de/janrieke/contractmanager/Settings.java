@@ -71,7 +71,15 @@ public class Settings {
 	/**
 	 * Our currency name.
 	 */
-	public final static String CURRENCY = "EUR";
+	public final static String CURRENCY = "\u20AC";
+
+	public static String formatAsCurrency(double value) {
+		return formatAsCurrency(value, CURRENCY);
+	}
+	
+	public static String formatAsCurrency(double value, String currencyLabel) {
+		return DECIMALFORMAT.format(value) + " " + currencyLabel;
+	}
 
 	static {
 		DECIMALFORMAT.setMinimumFractionDigits(2);

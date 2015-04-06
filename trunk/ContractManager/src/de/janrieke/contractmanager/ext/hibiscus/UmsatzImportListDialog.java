@@ -84,7 +84,8 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		this.umsatz = u;
 		this.chosen = preSelectedContract;
 
-		this.setTitle(Settings.i18n().tr("Select contract to assign to."));
+		this.setTitle(Settings.i18n().tr("Select contract"));
+		this.setPanelText(Settings.i18n().tr("Select contract to assign transaction to."));
 		this.setSize(370, 500);
 	}
 
@@ -103,10 +104,12 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 
 		Container group = new SimpleContainer(parent, true);
 
-		group.addText(
-				Settings.i18n().tr(
-						"Please select the contract to assign the transaction to."),
-				true);
+		group.addText(Settings.i18n().tr("Transaction to assign:"), true);
+		group.addText(Settings.i18n().tr("From/To") + ": " + StringUtils.defaultString(umsatz.getGegenkontoName(), ""), false);
+		group.addText(Settings.i18n().tr("Reference") + ": " + VerwendungszweckUtil.toString(umsatz), true);
+		group.addText(Settings.i18n().tr("Date") + ": " + Settings.dateformat(umsatz.getDatum()), false);
+		group.addText(Settings.i18n().tr("Value") + ": " + Settings.formatAsCurrency(umsatz.getBetrag()), false);
+
 		TextInput text = this.getSearch();
 		group.addInput(text);
 		group.addPart(this.getTable());
