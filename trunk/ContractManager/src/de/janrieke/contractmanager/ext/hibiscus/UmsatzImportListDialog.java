@@ -39,10 +39,17 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableItem;
 
 import de.janrieke.contractmanager.Settings;
+import de.janrieke.contractmanager.gui.action.ShowContractDetailView;
 import de.janrieke.contractmanager.gui.control.ContractControl;
+import de.janrieke.contractmanager.gui.view.ContractDetailView;
+import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
+import de.janrieke.contractmanager.rmi.Contract.IntervalType;
+import de.janrieke.contractmanager.rmi.Costs;
 import de.willuhn.datasource.GenericIterator;
+import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
+import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.dialogs.AbstractDialog;
 import de.willuhn.jameica.gui.formatter.TableFormatter;
 import de.willuhn.jameica.gui.input.TextInput;
@@ -68,7 +75,8 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 
 	private TextInput search = null;
 	private TablePart table = null;
-	private Button apply = null;
+	private Button assignButton = null;
+	private Button createContractButton = null;
 	private Umsatz umsatz;
 
 	/**
@@ -122,7 +130,8 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		text.getControl().addKeyListener(new DelayedAdapter());
 
 		ButtonArea buttons = new ButtonArea();
-		buttons.addButton(this.getApplyButton());
+		buttons.addButton(this.getAssignButton());
+		buttons.addButton(this.getCreateContractButton());
 		buttons.addButton(Settings.i18n().tr("Cancel"), new Action() {
 			public void handleAction(Object context)
 					throws ApplicationException {
@@ -134,18 +143,32 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 	}
 
 	/**
-	 * Returns the apply button.
+	 * Returns the import button.
 	 * 
 	 * @return the button.
 	 */
-	private Button getApplyButton() {
-		if (this.apply != null)
-			return this.apply;
+	private Button getAssignButton() {
+		if (this.assignButton != null)
+			return this.assignButton;
 
-		this.apply = new Button(Settings.i18n().tr("Import"), new Apply(),
+		this.assignButton = new Button(Settings.i18n().tr("Assign"), new AssingToContract(),
 				null, true, "ok.png");
-		this.apply.setEnabled(false); // initial deaktiviert
-		return this.apply;
+		this.assignButton.setEnabled(false); // initial deaktiviert
+		return this.assignButton;
+	}
+
+	/**
+	 * Returns the "Create new contract" button.
+	 * 
+	 * @return the button.
+	 */
+	private Button getCreateContractButton() {
+		if (this.createContractButton != null)
+			return this.createContractButton;
+
+		this.createContractButton = new Button(Settings.i18n().tr("New Contract from Transaction"), new CreateNewContract(),
+				null, true, "document-new.png");
+		return this.createContractButton;
 	}
 
 	/**
@@ -172,7 +195,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		if (this.table != null)
 			return this.table;
 
-		this.table = new TablePart(this.list, new Apply());
+		this.table = new TablePart(this.list, new AssingToContract());
 		this.table.setSummary(false);
 		this.table.addColumn(Settings.i18n().tr("Name of Contract"), "name");
 		this.table.addColumn(Settings.i18n().tr("Contract Partner"),
@@ -207,17 +230,17 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 
 		this.table.addSelectionListener(new Listener() {
 			public void handleEvent(Event event) {
-				getApplyButton().setEnabled(event.data != null);
+				getAssignButton().setEnabled(event.data != null);
 			}
 		});
-		this.getApplyButton().setEnabled(this.chosen != null);
+		this.getAssignButton().setEnabled(this.chosen != null);
 		return this.table;
 	}
 
 	/**
-	 * Action for applying
+	 * Action for assigning
 	 */
-	private class Apply implements Action {
+	private class AssingToContract implements Action {
 		public void handleAction(Object context) throws ApplicationException {
 			chosen = (Contract) getTable().getSelection();
 			if (chosen != null)
@@ -225,6 +248,49 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		}
 	}
 
+	/**
+	 * Action for creating a new contract from the transaction
+	 */
+	private class CreateNewContract implements Action {
+		public void handleAction(Object context) throws ApplicationException {
+			// Create a new contract from the data of the transaction
+			ShowContractDetailView showContractDetailView = new ShowContractDetailView();
+			try {
+				Contract c = (Contract) Settings.getDBService().createObject(
+						Contract.class, null);
+				c.setStartDate(umsatz.getDatum());
+				c.setComment(VerwendungszweckUtil.toString(umsatz));
+				c.setCancelationPeriodType(IntervalType.MONTHS);
+				c.setFirstMinRuntimeType(IntervalType.MONTHS);
+				c.setFollowingMinRuntimeType(IntervalType.MONTHS);
+
+				if (StringUtils.isNotBlank(umsatz.getGegenkontoName())) {
+					Address a = (Address) Settings.getDBService().createObject(
+							Address.class, null);
+					a.setName(umsatz.getGegenkontoName());
+					c.setAddress(a);
+				}
+
+				Costs costs = (Costs) Settings.getDBService().createObject(
+						Costs.class, null);
+				costs.setContract(c);
+				costs.setMoney(umsatz.getBetrag());
+				costs.setPeriod(IntervalType.MONTHS);
+				
+				chosen = null;
+				close();
+				showContractDetailView.handleAction(c);
+				AbstractView currentView = GUI.getCurrentView();
+				if (currentView instanceof ContractDetailView) {
+					((ContractDetailView)currentView).getControl().addTemporaryCostEntry(costs);
+				}
+			} catch (RemoteException e) {
+				throw new ApplicationException(Settings.i18n().tr(
+						"Error while creating new contract"), e);
+			}
+		}
+	}
+	
 	/**
 	 * Initialize the list of contracts by calculating the probability that the
 	 * contract is the intended contract. The list will be sorted by this
