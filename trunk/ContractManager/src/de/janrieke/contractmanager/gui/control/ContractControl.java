@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -141,10 +141,10 @@ public class ContractControl extends AbstractControl {
 
 	/**
 	 * ct.
-	 * 
+	 *
 	 * @param view
 	 *            this is our view (the contract details view).
-	 * @throws RemoteException 
+	 * @throws RemoteException
 	 */
 	public ContractControl(AbstractView view) throws RemoteException {
 		super(view);
@@ -157,19 +157,20 @@ public class ContractControl extends AbstractControl {
 
 	/**
 	 * Small helper method to get the current contract.
-	 * 
+	 *
 	 * @return
 	 */
 	private Contract getContract() {
-		if (contract != null)
+		if (contract != null) {
 			return contract;
+		}
 		contract = (Contract) getCurrentObject();
 		return contract;
 	}
 
 	/**
 	 * Returns an iterator with all contracts in the database.
-	 * 
+	 *
 	 * @throws RemoteException
 	 * @return iterator containing all addresses
 	 */
@@ -181,7 +182,7 @@ public class ContractControl extends AbstractControl {
 
 	/**
 	 * Returns the input field for the contract name.
-	 * 
+	 *
 	 * @return input field.
 	 * @throws RemoteException
 	 */
@@ -194,50 +195,56 @@ public class ContractControl extends AbstractControl {
 	}
 
 	public Input getContractNumber() throws RemoteException {
-		if (contractNo == null)
+		if (contractNo == null) {
 			contractNo = new TextInput(getContract().getContractNumber(), 255);
+		}
 		return contractNo;
 	}
 
 	public Input getCustomerNumber() throws RemoteException {
-		if (customerNo == null)
+		if (customerNo == null) {
 			customerNo = new TextInput(getContract().getCustomerNumber(), 255);
+		}
 		return customerNo;
 	}
 
 	public Input getSEPACreditorReference() throws RemoteException {
-		if (sepaCreditorRef == null)
+		if (sepaCreditorRef == null) {
 			sepaCreditorRef = new TextInput(getContract().getSepaCreditorRef(), 35);
+		}
 		return sepaCreditorRef;
 	}
 
 	public Input getSEPACustomerReference() throws RemoteException {
-		if (sepaCustomerRef == null)
+		if (sepaCustomerRef == null) {
 			sepaCustomerRef = new TextInput(getContract().getSepaCustomerRef(), 35);
+		}
 		return sepaCustomerRef;
 	}
 
 	/**
 	 * Returns the input field for the contract description.
-	 * 
+	 *
 	 * @return input field.
 	 * @throws RemoteException
 	 */
 	public Input getComment() throws RemoteException {
-		if (comment == null)
+		if (comment == null) {
 			comment = new TextAreaInput(getContract().getComment(), 10000);
+		}
 		return comment;
 	}
 
 	/**
 	 * Returns the input field for the start date.
-	 * 
+	 *
 	 * @return input field.
 	 * @throws RemoteException
 	 */
 	public Input getStartDate() throws RemoteException {
-		if (startDate != null)
+		if (startDate != null) {
 			return startDate;
+		}
 
 		// this is a custom dialog that shows a calendar widget.
 		CalendarDialog d = new CalendarDialog(CalendarDialog.POSITION_MOUSE);
@@ -246,9 +253,11 @@ public class ContractControl extends AbstractControl {
 		// we have to add a close listener to display the chosen
 		// date in the right format.
 		d.addCloseListener(new Listener() {
+			@Override
 			public void handleEvent(Event event) {
-				if (event == null || event.data == null)
+				if (event == null || event.data == null) {
 					return;
+				}
 
 				startDate.setText(Settings.dateformat((Date) event.data));
 			}
@@ -269,20 +278,23 @@ public class ContractControl extends AbstractControl {
 
 	/**
 	 * Returns the input field for the end date.
-	 * 
+	 *
 	 * @return input field.
 	 * @throws RemoteException
 	 */
 	public Input getEndDate() throws RemoteException {
-		if (endDate != null)
+		if (endDate != null) {
 			return endDate;
+		}
 
 		CalendarDialog d = new CalendarDialog(CalendarDialog.POSITION_MOUSE);
 		d.setTitle(Settings.i18n().tr("Choose an end date"));
 		d.addCloseListener(new Listener() {
+			@Override
 			public void handleEvent(Event event) {
-				if (event == null || event.data == null)
+				if (event == null || event.data == null) {
 					return;
+				}
 
 				endDate.setText(Settings.dateformat((Date) event.data));
 			}
@@ -302,8 +314,9 @@ public class ContractControl extends AbstractControl {
 	}
 
 	public Input getNextTerm() throws RemoteException {
-		if (nextExtension != null)
+		if (nextExtension != null) {
 			return nextExtension;
+		}
 
 		nextExtension = new LabelInput(getNextTermValueString());
 		return nextExtension;
@@ -325,8 +338,9 @@ public class ContractControl extends AbstractControl {
 	}
 
 	public LabelInput getNextCancellationDeadline() throws RemoteException {
-		if (nextCancellationDeadline != null)
+		if (nextCancellationDeadline != null) {
 			return nextCancellationDeadline;
+		}
 
 		Date ne = getContract().getNextCancellationDeadline();
 		nextCancellationDeadline = new LabelInput(ne == null ? ""
@@ -335,8 +349,9 @@ public class ContractControl extends AbstractControl {
 	}
 
 	public LabelInput getCostsPerTerm() throws RemoteException {
-		if (costsPerTerm != null)
+		if (costsPerTerm != null) {
 			return costsPerTerm;
+		}
 
 		double costs = getContract().getMoneyPerTerm();
 		if (Double.isNaN(costs)) {
@@ -349,8 +364,9 @@ public class ContractControl extends AbstractControl {
 	}
 
 	public LabelInput getCostsPerMonth() throws RemoteException {
-		if (costsPerMonth != null)
+		if (costsPerMonth != null) {
 			return costsPerMonth;
+		}
 
 		double costs = getContract().getMoneyPerMonth();
 		costsPerMonth = new LabelInput(Settings.DECIMALFORMAT.format(costs));
@@ -359,8 +375,9 @@ public class ContractControl extends AbstractControl {
 	}
 
 	public Input getCancellationPeriod() throws RemoteException {
-		if (cancellationPeriodMulti != null)
+		if (cancellationPeriodMulti != null) {
 			return cancellationPeriodMulti;
+		}
 
 		cancellationPeriodMulti = new MultiInput(getCancellationPeriodCount(),
 				getCancellationPeriodType());
@@ -390,8 +407,9 @@ public class ContractControl extends AbstractControl {
 	}
 
 	public Input getFirstRuntime() throws RemoteException {
-		if (firstRuntimeMulti != null)
+		if (firstRuntimeMulti != null) {
 			return firstRuntimeMulti;
+		}
 
 		firstRuntimeMulti = new MultiInput(getFirstRuntimeCount(),
 				getFirstRuntimeType());
@@ -421,8 +439,9 @@ public class ContractControl extends AbstractControl {
 	}
 
 	public Input getNextRuntime() throws RemoteException {
-		if (nextRuntimeMulti != null)
+		if (nextRuntimeMulti != null) {
 			return nextRuntimeMulti;
+		}
 
 		nextRuntimeMulti = new MultiInput(getNextRuntimeCount(),
 				getNextRuntimeType());
@@ -434,11 +453,11 @@ public class ContractControl extends AbstractControl {
 		if (nextRuntimeCount == null) {
 			nextRuntimeCount = new PositiveIntegerInput(getContract()
 					.getFollowingMinRuntimeCount());
-			
-			// when focusing this input, transfer the values from the first runtime 
+
+			// when focusing this input, transfer the values from the first runtime
 			//  as default values if no value is set, yet
 			nextRuntimeCount.addListener(new Listener() {
-				
+
 				@Override
 				public void handleEvent(Event event) {
 					if (event.type == SWT.FocusIn) {
@@ -536,24 +555,27 @@ public class ContractControl extends AbstractControl {
 	}
 
 	public Input getPartnerStreet() throws RemoteException {
-		if (partnerStreet == null)
+		if (partnerStreet == null) {
 			partnerStreet = new TextInput(
 					getContract().getAddress() == null ? "" : getContract()
 							.getAddress().getStreet(), 255);
+		}
 		return partnerStreet;
 	}
 
 	public Input getPartnerNumber() throws RemoteException {
-		if (partnerNumber == null)
+		if (partnerNumber == null) {
 			partnerNumber = new TextInput(
 					getContract().getAddress() == null ? "" : getContract()
 							.getAddress().getNumber(), 16);
+		}
 		return partnerNumber;
 	}
 
 	public Input getPartnerStreetNumber() throws RemoteException {
-		if (partnerStreetNumber != null)
+		if (partnerStreetNumber != null) {
 			return partnerStreetNumber;
+		}
 
 		partnerStreetNumber = new MultiInput(getPartnerStreet(),
 				new LabelInput(Settings.i18n().tr("Number")),
@@ -563,31 +585,35 @@ public class ContractControl extends AbstractControl {
 	}
 
 	public Input getPartnerExtra() throws RemoteException {
-		if (partnerExtra == null)
+		if (partnerExtra == null) {
 			partnerExtra = new TextInput(
 					getContract().getAddress() == null ? "" : getContract()
 							.getAddress().getExtra(), 255);
+		}
 		return partnerExtra;
 	}
 
 	public Input getPartnerZipcode() throws RemoteException {
-		if (partnerZipcode == null)
+		if (partnerZipcode == null) {
 			partnerZipcode = new TextInput(
 					getContract().getAddress() == null ? "" : getContract()
 							.getAddress().getZipcode(), 5);
+		}
 		return partnerZipcode;
 	}
 
 	public Input getPartnerCity() throws RemoteException {
-		if (partnerCity == null)
+		if (partnerCity == null) {
 			partnerCity = new TextInput(getContract().getAddress() == null ? ""
 					: getContract().getAddress().getCity(), 255);
+		}
 		return partnerCity;
 	}
 
 	public Input getPartnerZipcodeCity() throws RemoteException {
-		if (partnerZipcodeCity != null)
+		if (partnerZipcodeCity != null) {
 			return partnerZipcodeCity;
+		}
 
 		partnerZipcodeCity = new MultiInput(getPartnerZipcode(),
 				new LabelInput(Settings.i18n().tr("City")), getPartnerCity());
@@ -596,43 +622,48 @@ public class ContractControl extends AbstractControl {
 	}
 
 	public Input getPartnerState() throws RemoteException {
-		if (partnerState == null)
+		if (partnerState == null) {
 			partnerState = new TextInput(
 					getContract().getAddress() == null ? "" : getContract()
 							.getAddress().getState(), 255);
+		}
 		return partnerState;
 	}
 
 	public Input getPartnerCountry() throws RemoteException {
-		if (partnerCountry == null)
+		if (partnerCountry == null) {
 			partnerCountry = new TextInput(
 					getContract().getAddress() == null ? "" : getContract()
 							.getAddress().getCountry(), 255);
+		}
 		return partnerCountry;
 	}
 
 	/**
 	 * Creates a table containing all contracts.
-	 * 
+	 *
 	 * @return a table with contracts.
 	 * @throws RemoteException
 	 */
 	public ContractListTablePart getContractsTable() throws RemoteException {
-		if (contractList != null)
+		if (contractList != null) {
 			return contractList;
+		}
 
-		GenericIterator contracts = getContracts();
-		Date today = new Date(); 
+		GenericIterator allContracts = getContracts();
+		Date today = new Date();
+		List<Contract> contracts = new ArrayList<>();
 
 		double total = 0d;
-		while (contracts.hasNext()) {
-			Contract c = (Contract) contracts.next();
-			if (c.isActiveInMonth(today))
+		while (allContracts.hasNext()) {
+			Contract c = (Contract) allContracts.next();
+			if (c.isActiveInMonth(today)) {
+				// Only add active contracts.
 				total += c.getMoneyPerMonth();
+				contracts.add(c);
+			}
 		}
-		
-		contracts.begin();
-		
+
 		// 4) create the table
 		contractList = new ContractListTablePart(
 				contracts,
@@ -658,16 +689,18 @@ public class ContractControl extends AbstractControl {
 				Contract.MONEY_PER_MONTH, new CurrencyFormatter(
 						Settings.CURRENCY, Settings.DECIMALFORMAT));
 		contractList.addColumn(Settings.i18n().tr("Remind?"), "ignore_cancellations", new Formatter() {
-			
+
 			@Override
 			public String format(Object o) {
 				if (o instanceof Integer) {
-					if (((Integer)o).intValue() == 0)
+					if (((Integer)o).intValue() == 0) {
 						return "\u2611";
-					else
+					} else {
 						return "\u2610";
+					}
+				} else {
+					return "";
 				}
-				else return "";
 			}
 		}, true, Column.ALIGN_LEFT);
 
@@ -685,15 +718,17 @@ public class ContractControl extends AbstractControl {
 							item.setForeground(Settings.getNotActiveForegroundColor());
 						}
 
-						if (contract.getDoNotRemind())
+						if (contract.getDoNotRemind()) {
 							return;
-						if (contract.isNextDeadlineWithinWarningTime())
+						}
+						if (contract.isNextDeadlineWithinWarningTime()) {
 							item.setBackground(Color.ERROR.getSWTColor());
-						else if (contract.isNextDeadlineWithinNoticeTime())
-								item.setBackground(Color.MANDATORY_BG
-										.getSWTColor());
-						else //set default background in case that we are updating 
+						} else if (contract.isNextDeadlineWithinNoticeTime()) {
+							item.setBackground(Color.MANDATORY_BG
+									.getSWTColor());
+						} else {
 							item.setBackground(null);
+						}
 					} catch (RemoteException e) {
 					}
 				}
@@ -701,41 +736,48 @@ public class ContractControl extends AbstractControl {
 		});
 		return contractList;
 	}
-	
+
 	/**
 	 * Checkbox in the contract list view for filtering the inactive contracts.
 	 */
 	public CheckboxInput getActiveFilterSwitch() {
-		if (activeFilterSwitch != null)
+		if (activeFilterSwitch != null) {
 			return activeFilterSwitch;
+		}
 
 		activeFilterSwitch = new CheckboxInput(false);
+		activeFilterSwitch.setValue(true);
 		activeFilterSwitch.addListener(new Listener() {
-			
+
 			@Override
 			public void handleEvent(Event event) {
 				try {
 					System.out.println(event.type);
-					if (event.type != SWT.Selection)
+					if (event.type != SWT.Selection) {
 						return;
+					}
 					if ((Boolean)activeFilterSwitch.getValue()) {
-						// Checkbox was active; remove inactive contracts
+						// Checkbox was active; remove inactive contracts.
 						Date today = new Date();
 						List<Contract> contractsToRemove = new ArrayList<>();
 						for (Object item : contractList.getItems()) {
-							if (!((Contract)item).isActiveInMonth(today))
+							if (!((Contract)item).isActiveInMonth(today)) {
 								contractsToRemove.add((Contract) item);
+							}
 						}
-						for (Contract c : contractsToRemove)
+						for (Contract c : contractsToRemove) {
 							contractList.removeItem(c);
+						}
 					} else {
-						// Checkbox was inactive; add all contracts
+						// Checkbox was inactive; add all contracts.
 						Object selection = contractList.getSelection();
 						contractList.removeAll();
 						GenericIterator contracts = getContracts();
-						while (contracts.hasNext())
+						while (contracts.hasNext()) {
 							contractList.addItem(contracts.next());
+						}
 						contractList.select(selection);
+						contractList.sort();
 					}
 				} catch (RemoteException e) {
 				}
@@ -751,13 +793,14 @@ public class ContractControl extends AbstractControl {
 	/**
 	 * Creates a table containing all contracts in extension warning or notice
 	 * time.
-	 * 
+	 *
 	 * @return a table with contracts.
 	 * @throws RemoteException
 	 */
 	public TablePart getContractsExtensionWarningTable() throws RemoteException {
-		if (contractListWarnings != null)
+		if (contractListWarnings != null) {
 			return contractListWarnings;
+		}
 
 		// 1) get the dataservice
 		DBService service = Settings.getDBService();
@@ -774,8 +817,9 @@ public class ContractControl extends AbstractControl {
 		while (contracts.hasNext()) {
 			Contract contract = (Contract) contracts.next();
 			try {
-				if (contract.getDoNotRemind())
+				if (contract.getDoNotRemind()) {
 					continue;
+				}
 
 				if (contract.isNextDeadlineWithinNoticeTime()) {
 					filteredContracts.add(contract);
@@ -823,36 +867,37 @@ public class ContractControl extends AbstractControl {
 				if (item.getData() instanceof Contract) {
 					Contract contract = (Contract) item.getData();
 					try {
-						if (contract.isNextDeadlineWithinWarningTime())
+						if (contract.isNextDeadlineWithinWarningTime()) {
 							item.setBackground(Color.ERROR.getSWTColor());
-						else if (contract.isNextDeadlineWithinNoticeTime())
+						} else if (contract.isNextDeadlineWithinNoticeTime()) {
 							item.setBackground(Color.MANDATORY_BG.getSWTColor());
-						else {
+						} else {
 							//this may happen if user dismissed the next reminder
 							//remove the entry in this case
 							int index = item.getParent().indexOf(item);
 							item.getParent().remove(index);
 						}
-							
+
 					} catch (RemoteException e) {
 					}
 				}
 			}
 		});
 		contractListWarnings.orderBy(3);
-		
+
 		return contractListWarnings;
 	}
 
 	/**
 	 * Returns a list of transactions in this contract.
-	 * 
+	 *
 	 * @return list of transactions in this contract
 	 * @throws RemoteException
 	 */
 	public Part getCostsList() throws RemoteException {
-		if (costsList != null)
+		if (costsList != null) {
 			return costsList;
+		}
 
 		costsIterator = getContract().getCosts();
 		costsList = new CostsListTablePart(costsIterator, new CreateNewCostEntry(this));
@@ -897,11 +942,12 @@ public class ContractControl extends AbstractControl {
 						} catch (ParseException e) {
 							((Costs) object).setMoney(0d);
 						}
-					} else if ("period".equals(attribute))
+					} else if ("period".equals(attribute)) {
 						((Costs) object).setPeriod(Contract.IntervalType
 								.valueOfAdjective(newValue));
-					else
+					} else {
 						assert false;
+					}
 				} catch (RemoteException e) {
 					throw new ApplicationException(e);
 				}
@@ -923,11 +969,11 @@ public class ContractControl extends AbstractControl {
 			c.setContractNumber((String) getContractNumber().getValue());
 			c.setCustomerNumber((String) getCustomerNumber().getValue());
 			c.setComment((String) getComment().getValue());
-			
+
 			//If dates or runtime values have changed, reset the "do not remind before" field
 			// because deadlines may have changed and the user may want to be notified again.
 			boolean resetDoNotRemindBefore = false;
-			
+
 			Object newValue = getStartDate().getValue();
 			Object oldValue = c.getStartDate();
 			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
@@ -978,12 +1024,13 @@ public class ContractControl extends AbstractControl {
 				resetDoNotRemindBefore = true;
 				c.setFollowingMinRuntimeType((IntervalType) newValue);
 			}
-			
+
 			c.setDoNotRemind(!(Boolean) getRemind().getValue());
 
 			//At least one relevant field changed, reset the "do not remind before" field
-			if (resetDoNotRemindBefore)
-				c.setDoNotRemindBefore(null);	
+			if (resetDoNotRemindBefore) {
+				c.setDoNotRemindBefore(null);
+			}
 
 			c.setHibiscusCategoryID(hibiscusCategoryID);
 
@@ -1002,10 +1049,12 @@ public class ContractControl extends AbstractControl {
 			a.setCountry((String) getPartnerCountry().getValue());
 
 			//only store these if Hibicus extension was registered
-			if (sepaCreditorRef != null)
+			if (sepaCreditorRef != null) {
 				c.setSepaCreditorRef((String) getSEPACreditorReference().getValue());
-			if (sepaCustomerRef != null)
+			}
+			if (sepaCustomerRef != null) {
 				c.setSepaCustomerRef((String) getSEPACustomerReference().getValue());
+			}
 
 			// Now, let's store the contract and its address.
 			// The store() method throws ApplicationExceptions if
@@ -1025,10 +1074,11 @@ public class ContractControl extends AbstractControl {
 				costsIterator.begin();
 				while (costsIterator.hasNext()) {
 					Costs cost = (Costs) costsIterator.next();
-					if (!deletedCosts.contains(cost))
+					if (!deletedCosts.contains(cost)) {
 						cost.store();
-					else
+					} else {
 						cost.delete();
+					}
 				}
 				for (Costs cost : newCosts) {
 					// Again: Set the contract's new ID.
@@ -1044,20 +1094,22 @@ public class ContractControl extends AbstractControl {
 				getPartnerAddress().setValue(a);
 				currentAddress = a;
 
-				if (view instanceof ContractDetailView)
+				if (view instanceof ContractDetailView) {
 					((ContractDetailView) view).setButtonActivationState(true);
+				}
 
 				GUI.getStatusBar().setSuccessText(
 						Settings.i18n().tr("Contract stored successfully"));
 			} catch (ApplicationException e) {
 				GUI.getView().setErrorText(e.getMessage());
 				// Remove potentially stored objects from DB.
-				if (addressWasNew)
+				if (addressWasNew) {
 					try {
 						a.delete();
 					} catch (ApplicationException e1) {
 						// ignore
 					}
+				}
 			}
 		} catch (RemoteException e) {
 			Logger.error("error while storing contract", e);
