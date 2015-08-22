@@ -11,13 +11,14 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.janrieke.contractmanager.gui.parts;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
@@ -26,7 +27,6 @@ import org.eclipse.swt.widgets.TableItem;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
-import de.willuhn.datasource.GenericIterator;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.parts.TableChangeListener;
@@ -38,11 +38,11 @@ public class ContractListTablePart extends TablePart {
 
 	private double sum;
 
-	public ContractListTablePart(GenericIterator list, Action action) {
+	public ContractListTablePart(List<Contract> list, Action action) {
 		super(list, action);
 	    setRememberColWidths(true);
 		this.addChangeListener(new TableChangeListener() {
-			
+
 			@Override
 			public void itemChanged(Object object, String attribute, String newValue)
 					throws ApplicationException {
@@ -58,33 +58,34 @@ public class ContractListTablePart extends TablePart {
 			}
 		});
 	}
-	
+
 	@Override
 	protected String getControlValue(Control control) {
 		if (control instanceof Button) {
 			return ((Button) control).getSelection()?"\u2611":"\u2610";
-		} else
+		} else {
 			return super.getControlValue(control);
+		}
 	}
 
 	@Override
 	protected Control getEditorControl(int row, TableItem item, String oldValue) {
-			if (item.getData() instanceof Contract && row == 7) {
-				Button newButton = new Button(item.getParent(), SWT.CHECK);
-				newButton.setSelection("\u2611".equals(oldValue));
-				newButton.setFocus();
-			    return newButton;
-			}
-			else 
-				return super.getEditorControl(row, item, oldValue);
+		if (item.getData() instanceof Contract && row == 7) {
+			Button newButton = new Button(item.getParent(), SWT.CHECK);
+			newButton.setSelection("\u2611".equals(oldValue));
+			newButton.setFocus();
+		    return newButton;
+		} else {
+			return super.getEditorControl(row, item, oldValue);
 		}
-	
+	}
+
 	public void setSum(double sum) {
 		this.sum = sum;
 	}
-	
+
 	@Override
 	protected String getSummary() {
-		return Settings.i18n().tr("Total in this month") + ": " + Settings.DECIMALFORMAT.format(Math.round(sum*100d)/100d) + " EUR"; 
-	};
+		return Settings.i18n().tr("Total in this month") + ": " + Settings.DECIMALFORMAT.format(Math.round(sum*100d)/100d) + " EUR";
+	}
 }
