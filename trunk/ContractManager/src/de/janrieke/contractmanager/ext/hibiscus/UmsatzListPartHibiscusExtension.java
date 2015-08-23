@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -46,6 +46,7 @@ public class UmsatzListPartHibiscusExtension implements Extension {
 	/**
 	 * @see de.willuhn.jameica.gui.extension.Extension#extend(de.willuhn.jameica.gui.extension.Extendable)
 	 */
+	@Override
 	public void extend(Extendable extendable) {
 		if (extendable == null || !(extendable instanceof TablePart)) {
 			Logger.warn("invalid extendable, skipping extension");
@@ -56,9 +57,11 @@ public class UmsatzListPartHibiscusExtension implements Extension {
 
 		TablePart table = (TablePart) extendable;
 		table.addColumn(i18n.tr("Vertrag"), "id-int", new Formatter() {
+			@Override
 			public String format(Object o) {
-				if (o == null || !(o instanceof Integer))
+				if (o == null || !(o instanceof Integer)) {
 					return null;
+				}
 
 				DBIterator transactions = null;
 				try {
@@ -66,20 +69,22 @@ public class UmsatzListPartHibiscusExtension implements Extension {
 							Transaction.class);
 					transactions.addFilter("transaction_id = ?",
 							new Object[] { o });
-					if (transactions.size() > 1)
+					if (transactions.size() > 1) {
 						Logger.warn("Umsatz assigned to more than one contract. Possible DB error.");
+					}
 					if (transactions.hasNext()) {
 						Transaction transaction = (Transaction) transactions
 								.next();
-						if (transaction.getContract() != null)
+						if (transaction.getContract() != null) {
 							return transaction.getContract().getName();
-						else
+						} else {
 							try {
 								transaction.delete();
 							} catch (ApplicationException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
+						}
 					}
 				} catch (RemoteException e) {
 					Logger.error("unable to load transactions", e);
@@ -93,12 +98,13 @@ public class UmsatzListPartHibiscusExtension implements Extension {
 
 	/**
 	 * Liefert den Cache zum Lookup von Hibiscus Umsatz-ID zu Buchung.
-	 * 
+	 *
 	 * @return der Cache.
 	 */
 	private Map<Integer, Transaction> getCache() {
-		if (this.cache != null)
+		if (this.cache != null) {
 			return this.cache;
+		}
 
 		this.cache = new HashMap<Integer, Transaction>();
 		try {
@@ -106,8 +112,9 @@ public class UmsatzListPartHibiscusExtension implements Extension {
 					Transaction.class);
 			while (list.hasNext()) {
 				Transaction b = (Transaction) list.next();
-				if (b.getTransactionID() == null)
+				if (b.getTransactionID() == null) {
 					continue;
+				}
 				cache.put(b.getTransactionID(), b);
 			}
 		} catch (Exception e) {
@@ -118,18 +125,41 @@ public class UmsatzListPartHibiscusExtension implements Extension {
 
 	/**
 	 * Fuegt eine Buchung manuell zum Cache hinzu.
-	 * 
+	 *
 	 * @param b
 	 *            die neue Buchung.
 	 * @throws RemoteException
 	 */
 	void add(Transaction b) throws RemoteException {
-		if (b == null)
+		if (b == null) {
 			return;
+		}
 
 		Integer umsatzId = b.getTransactionID();
 		if (umsatzId == null || umsatzId == 0)
+		 {
 			return; // Buchung ist gar nicht zugeordnet
+		}
 		getCache().put(umsatzId, b);
+	}
+
+	/**
+	 * Entfernt eine Buchung manuell aus dem Cache.
+	 *
+	 * @param b
+	 *            die neue Buchung.
+	 * @throws RemoteException
+	 */
+	void remove(Transaction b) throws RemoteException {
+		if (b == null) {
+			return;
+		}
+
+		Integer umsatzId = b.getTransactionID();
+		if (umsatzId == null || umsatzId == 0)
+		 {
+			return; // Buchung ist gar nicht zugeordnet
+		}
+		getCache().remove(umsatzId);
 	}
 }

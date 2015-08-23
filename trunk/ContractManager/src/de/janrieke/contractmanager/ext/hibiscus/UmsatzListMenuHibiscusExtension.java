@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -50,6 +50,7 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 	/**
 	 * @see de.willuhn.jameica.gui.extension.Extension#extend(de.willuhn.jameica.gui.extension.Extendable)
 	 */
+	@Override
 	public void extend(Extendable extendable)
 	{
 		if (extendable == null || !(extendable instanceof ContextMenu))
@@ -63,29 +64,65 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 
 		menu.addItem(new MyContextMenuItem(i18n.tr("Import to ContractManager"), new Action() {
 
+			@Override
 			public void handleAction(Object context) throws ApplicationException
 			{
-				if (context == null)
+				if (context == null) {
 					return;
+				}
 
 				Umsatz[] umsaetze = null;
-				if (context instanceof Umsatz)
+				if (context instanceof Umsatz) {
 					umsaetze = new Umsatz[]{(Umsatz)context};
-				else if (context instanceof Umsatz[])
+				} else if (context instanceof Umsatz[]) {
 					umsaetze = (Umsatz[]) context;
+				}
 
-				if (umsaetze == null || umsaetze.length == 0)
+				if (umsaetze == null || umsaetze.length == 0) {
 					return;
+				}
 
 				// Wenn wir mehr als 1 Buchung haben, fuehren wir das
-				// im Hintergrund aus. 
+				// im Hintergrund aus.
 				UmsatzImportWorker worker = new UmsatzImportWorker(umsaetze, false);
-				if (umsaetze.length > 1)
+				if (umsaetze.length > 1) {
 					Application.getController().start(worker);
-				else
+				} else {
 					worker.run(null);
+				}
 			}
-		}));
+		}, false));
+
+		menu.addItem(new MyContextMenuItem(i18n.tr("Remove from ContractManager"), new Action() {
+
+			@Override
+			public void handleAction(Object context) throws ApplicationException
+			{
+				if (context == null) {
+					return;
+				}
+
+				Umsatz[] umsaetze = null;
+				if (context instanceof Umsatz) {
+					umsaetze = new Umsatz[]{(Umsatz)context};
+				} else if (context instanceof Umsatz[]) {
+					umsaetze = (Umsatz[]) context;
+				}
+
+				if (umsaetze == null || umsaetze.length == 0) {
+					return;
+				}
+
+				// Wenn wir mehr als 1 Buchung haben, fuehren wir das
+				// im Hintergrund aus.
+				UmsatzRemoveWorker worker = new UmsatzRemoveWorker(umsaetze);
+				if (umsaetze.length > 1) {
+					Application.getController().start(worker);
+				} else {
+					worker.run(null);
+				}
+			}
+		}, true));
 	}
 
 
@@ -95,50 +132,48 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 	 */
 	private class MyContextMenuItem extends CheckedContextMenuItem
 	{
+		private boolean activeWhenAssigned;
+
 		/**
 		 * ct.
 		 * @param text
 		 * @param a
 		 */
-		public MyContextMenuItem(String text, Action a)
+		public MyContextMenuItem(String text, Action a, boolean activeWhenAssigned)
 		{
 			super(text, a);
+			this.activeWhenAssigned = activeWhenAssigned;
 		}
 
 		/**
 		 * @see de.willuhn.jameica.gui.parts.CheckedContextMenuItem#isEnabledFor(java.lang.Object)
 		 */
+		@Override
 		public boolean isEnabledFor(Object o)
 		{
-			if (o == null)
+			if (o == null) {
 				return false;
+			}
 
 			// Wenn wir eine ganze Liste von Buchungen haben, pruefen
 			// wir nicht jede einzeln, ob sie schon in ContractManager vorhanden
 			// ist. Die werden dann beim Import (weiter unten) einfach ausgesiebt.
-			if (o instanceof Umsatz[])
+			if (o instanceof Umsatz[]) {
 				return super.isEnabledFor(o);
+			}
 
-			if (!(o instanceof Umsatz))
+			if (!(o instanceof Umsatz)) {
 				return false;
+			}
 
-			boolean found = false;
-			try
-			{
-				found = isAssigned((Umsatz) o);
-			}
-			catch (ApplicationException ae)
-			{
-				Application.getMessagingFactory().sendMessage(new StatusBarMessage(ae.getMessage(), StatusBarMessage.TYPE_ERROR));
-			}
-			catch (Exception e)
-			{
-				Logger.error("unable to detect if buchung is allready assigned",e);
+			try {
+				return (activeWhenAssigned ^ !isAssigned((Umsatz) o)) && super.isEnabledFor(o);
+			} catch (Exception e) {
+				Logger.error("unable to detect if buchung is already assigned",e);
 				Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Error while checking for assigned contracts in ContractManager"), StatusBarMessage.TYPE_ERROR));
 			}
-			return !found && super.isEnabledFor(o);
+			return false;
 		}
-
 	}
 
 	/**

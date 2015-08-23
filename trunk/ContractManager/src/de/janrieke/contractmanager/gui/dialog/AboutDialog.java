@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,7 +44,7 @@ public class AboutDialog extends AbstractDialog<Object> {
 	int WINDOW_HEIGHT = 350;
 	/**
 	 * ct.
-	 * 
+	 *
 	 * @param position
 	 */
 	public AboutDialog(int position) {
@@ -67,7 +67,7 @@ public class AboutDialog extends AbstractDialog<Object> {
 				+ manifest.getDescription()
 				+ "</b></p>"
 				+ "<br/>Licence: GPL 3.0 (http://www.gnu.org/licenses/gpl-3.0.txt)"
-				+ "<br/><p>Copyright by Jan Rieke [it@janrieke.de]</p>"
+				+ "<br/><p>Copyright by Jan Rieke [it@janrieke.de] 2010-2015</p>"
 				+ "<p>"
 				+ manifest.getHomepage()
 				+ "</p>"
@@ -88,6 +88,7 @@ public class AboutDialog extends AbstractDialog<Object> {
 
 		ButtonArea buttons = new ButtonArea();
 		buttons.addButton(Settings.i18n().tr("Database Information"), new Action() {
+			@Override
 			public void handleAction(Object context)
 					throws ApplicationException {
 				try {
@@ -107,6 +108,7 @@ public class AboutDialog extends AbstractDialog<Object> {
 			}
 		}, null, false, "dialog-information.png");
 		buttons.addButton(Settings.i18n().tr("Close"), new Action() {
+			@Override
 			public void handleAction(Object context)
 					throws ApplicationException {
 				close();
