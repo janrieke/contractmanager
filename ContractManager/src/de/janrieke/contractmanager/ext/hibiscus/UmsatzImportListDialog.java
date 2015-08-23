@@ -244,7 +244,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 	}
 
 	public boolean isApplyForAll() {
-		return (Boolean)applyForAll.getValue();
+		return applyForAll != null && (Boolean)applyForAll.getValue();
 	}
 
 	/**
