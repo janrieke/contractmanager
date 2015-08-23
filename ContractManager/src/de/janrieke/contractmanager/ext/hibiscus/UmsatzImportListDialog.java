@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -30,8 +30,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -52,6 +55,7 @@ import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.dialogs.AbstractDialog;
 import de.willuhn.jameica.gui.formatter.TableFormatter;
+import de.willuhn.jameica.gui.input.CheckboxInput;
 import de.willuhn.jameica.gui.input.TextInput;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.parts.ButtonArea;
@@ -78,19 +82,22 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 	private Button assignButton = null;
 	private Button createContractButton = null;
 	private Umsatz umsatz;
+	private boolean moreImportsFollow;
+	private CheckboxInput applyForAll;
 
 	/**
 	 * ct.
-	 * 
+	 *
 	 * @param position
 	 * @param preselected
 	 *            the preselected contract.
 	 * @throws RemoteException
 	 */
-	public UmsatzImportListDialog(Umsatz u, Contract preSelectedContract) throws RemoteException {
+	public UmsatzImportListDialog(Umsatz u, Contract preSelectedContract, boolean moreImportsFollow) throws RemoteException {
 		super(AbstractDialog.POSITION_CENTER, true);
 		this.umsatz = u;
 		this.chosen = preSelectedContract;
+		this.moreImportsFollow = moreImportsFollow;
 
 		this.setTitle(Settings.i18n().tr("Select contract"));
 		this.setPanelText(Settings.i18n().tr("Select contract to assign transaction to."));
@@ -100,6 +107,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 	/**
 	 * @see de.willuhn.jameica.gui.dialogs.AbstractDialog#getData()
 	 */
+	@Override
 	protected Contract getData() throws Exception {
 		return chosen;
 	}
@@ -107,8 +115,9 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 	/**
 	 * @see de.willuhn.jameica.gui.dialogs.AbstractDialog#paint(org.eclipse.swt.widgets.Composite)
 	 */
-	protected void paint(Composite parent) throws Exception {
-		this.list = this.initializeContractList();
+	@Override
+	protected void paint(final Composite parent) throws Exception {
+		this.list = initializeContractList();
 
 		Container group = new SimpleContainer(parent, true);
 
@@ -124,15 +133,21 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 
 		// //////////////
 		// geht erst nach dem Paint
-		if (this.chosen != null)
-			this.getTable().select(this.chosen);
+		if (chosen != null) {
+			getTable().select(chosen);
+		}
 
 		text.getControl().addKeyListener(new DelayedAdapter());
 
+		if (moreImportsFollow) {
+			group.addCheckbox(getApplyForAllCheckbox(), Settings.i18n().tr("Also assign all further transactions to this contract"));
+		}
+
 		ButtonArea buttons = new ButtonArea();
-		buttons.addButton(this.getAssignButton());
-		buttons.addButton(this.getCreateContractButton());
+		buttons.addButton(getAssignButton());
+		buttons.addButton(getCreateContractButton());
 		buttons.addButton(Settings.i18n().tr("Cancel"), new Action() {
+			@Override
 			public void handleAction(Object context)
 					throws ApplicationException {
 				throw new OperationCanceledException();
@@ -140,31 +155,44 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		}, null, false, "process-stop.png");
 
 		group.addButtonArea(buttons);
+
+		// Replace the 'wrong' text on the assign button.
+		parent.addPaintListener(new PaintListener() {
+			@Override
+			public void paintControl(PaintEvent e) {
+				getAssignButton().setText(Settings.i18n().tr("Assign"));
+				parent.removePaintListener(this);
+			}
+		});
 	}
 
 	/**
 	 * Returns the import button.
-	 * 
+	 *
 	 * @return the button.
 	 */
 	private Button getAssignButton() {
-		if (this.assignButton != null)
-			return this.assignButton;
+		if (assignButton != null) {
+			return assignButton;
+		}
 
-		this.assignButton = new Button(Settings.i18n().tr("Assign"), new AssingToContract(),
+		// Use the 'wrong', but longer text on the assign button, first.
+		// It will be replaced immediately on the first draw.
+		assignButton = new Button(Settings.i18n().tr("Assign all"), new AssingToContract(),
 				null, true, "ok.png");
-		this.assignButton.setEnabled(false); // initial deaktiviert
-		return this.assignButton;
+		assignButton.setEnabled(false); // initially disabled
+		return assignButton;
 	}
 
 	/**
 	 * Returns the "Create new contract" button.
-	 * 
+	 *
 	 * @return the button.
 	 */
 	private Button getCreateContractButton() {
-		if (this.createContractButton != null)
+		if (this.createContractButton != null) {
 			return this.createContractButton;
+		}
 
 		this.createContractButton = new Button(Settings.i18n().tr("New Contract from Transaction"), new CreateNewContract(),
 				null, true, "document-new.png");
@@ -173,12 +201,13 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 
 	/**
 	 * Returns the search input
-	 * 
+	 *
 	 * @return the search input
 	 */
 	private TextInput getSearch() {
-		if (this.search != null)
+		if (this.search != null) {
 			return this.search;
+		}
 
 		this.search = new TextInput("");
 		this.search.focus();
@@ -187,13 +216,46 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 	}
 
 	/**
+	 * Returns the select input "apply for all"
+	 *
+	 * @return the select input
+	 */
+	private CheckboxInput getApplyForAllCheckbox() {
+		if (applyForAll != null) {
+			return applyForAll;
+		}
+
+		applyForAll = new CheckboxInput(false);
+		applyForAll.addListener(new Listener() {
+
+			@Override
+			public void handleEvent(Event event) {
+				if (event == null || event.type != SWT.Selection) {
+					return;
+				}
+				if (Boolean.TRUE.equals(applyForAll.getValue())) {
+					getAssignButton().setText(Settings.i18n().tr("Assign all"));
+				} else {
+					getAssignButton().setText(Settings.i18n().tr("Assign"));
+				}
+			}
+		});
+		return applyForAll;
+	}
+
+	public boolean isApplyForAll() {
+		return (Boolean)applyForAll.getValue();
+	}
+
+	/**
 	 * Returns the contract table
-	 * 
+	 *
 	 * @return the contract table
 	 */
 	private TablePart getTable() {
-		if (this.table != null)
+		if (this.table != null) {
 			return this.table;
+		}
 
 		this.table = new TablePart(this.list, new AssingToContract());
 		this.table.setSummary(false);
@@ -204,23 +266,27 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 			/**
 			 * @see de.willuhn.jameica.gui.formatter.TableFormatter#format(org.eclipse.swt.widgets.TableItem)
 			 */
+			@Override
 			public void format(TableItem item) {
-				if (item == null)
+				if (item == null) {
 					return;
+				}
 
 				try {
 					Contract c = (Contract) item.getData();
-					if (c == null)
+					if (c == null) {
 						return;
+					}
 
 					Color col = null;
 
 					boolean t = c.isActiveInMonth(new Date());
-					if (!t)
+					if (!t) {
 						col = Settings.getNotActiveForegroundColor();
-					else
+					} else {
 						col = de.willuhn.jameica.gui.util.Color.FOREGROUND
 								.getSWTColor();
+					}
 					item.setForeground(col);
 				} catch (Exception e) {
 					Logger.error("unable to apply color", e);
@@ -229,6 +295,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		});
 
 		this.table.addSelectionListener(new Listener() {
+			@Override
 			public void handleEvent(Event event) {
 				getAssignButton().setEnabled(event.data != null);
 			}
@@ -241,10 +308,12 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 	 * Action for assigning
 	 */
 	private class AssingToContract implements Action {
+		@Override
 		public void handleAction(Object context) throws ApplicationException {
 			chosen = (Contract) getTable().getSelection();
-			if (chosen != null)
+			if (chosen != null) {
 				close();
+			}
 		}
 	}
 
@@ -252,6 +321,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 	 * Action for creating a new contract from the transaction
 	 */
 	private class CreateNewContract implements Action {
+		@Override
 		public void handleAction(Object context) throws ApplicationException {
 			// Create a new contract from the data of the transaction
 			ShowContractDetailView showContractDetailView = new ShowContractDetailView();
@@ -276,7 +346,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 				costs.setContract(c);
 				costs.setMoney(umsatz.getBetrag());
 				costs.setPeriod(IntervalType.MONTHS);
-				
+
 				chosen = null;
 				close();
 				showContractDetailView.handleAction(c);
@@ -290,12 +360,12 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 			}
 		}
 	}
-	
+
 	/**
 	 * Initialize the list of contracts by calculating the probability that the
 	 * contract is the intended contract. The list will be sorted by this
 	 * probability.
-	 * 
+	 *
 	 * @return initialized list
 	 * @throws RemoteException
 	 */
@@ -304,7 +374,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 			private float value;
 			private Contract c;
 			public Contract getContract() {return c;}
-			
+
 			public SortedContract(Contract c, float value) {
 				this.value = value;
 				this.c = c;
@@ -312,7 +382,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 
 			@Override
 			public int compareTo(SortedContract o) {
-				return Float.compare(this.value, o.value); 
+				return Float.compare(this.value, o.value);
 			}
 
 			@Override
@@ -322,10 +392,11 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 
 			@Override
 			public boolean equals(Object obj) {
-				if (obj != null && obj instanceof SortedContract && ((SortedContract)obj).c == this.c)
+				if (obj != null && obj instanceof SortedContract && ((SortedContract)obj).c == this.c) {
 					return true;
-				else 
+				} else {
 					return false;
+				}
 			}
 		}
 
@@ -355,6 +426,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 			/**
 			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
 			 */
+			@Override
 			public void handleEvent(Event event) {
 				TablePart table = getTable();
 				table.removeAll();
@@ -369,8 +441,9 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 						}
 
 						if (t.getName().toLowerCase().contains(text)
-								|| t.getPartnerName().toLowerCase().contains(text))
+								|| t.getPartnerName().toLowerCase().contains(text)) {
 							table.addItem(t);
+						}
 					}
 				} catch (RemoteException re) {
 					Logger.error("error while adding items to table", re);
@@ -382,6 +455,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		/**
 		 * @see org.eclipse.swt.events.KeyAdapter#keyReleased(org.eclipse.swt.events.KeyEvent)
 		 */
+		@Override
 		public void keyReleased(KeyEvent e) {
 			forward.handleEvent(null); // Das Event-Objekt interessiert uns eh
 										// nicht
@@ -406,10 +480,11 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 	private float calculateSimilarity(Contract c, Umsatz transaction) {
 		try {
 			String trName = "";
-			if (transaction.getGegenkontoName() != null)
+			if (transaction.getGegenkontoName() != null) {
 				trName = transaction.getGegenkontoName();
+			}
 
-			//No separators between lines until we have a working SEPA rewriter - 
+			//No separators between lines until we have a working SEPA rewriter -
 			// lines end after 27 chars, but fields may be 35 chars long.
 			String trUse = VerwendungszweckUtil.toString(transaction, "");
 
@@ -422,22 +497,24 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 
 			// try finding the partner name in the owner of the opposite account
 			for (int i = 0; i < trNameTokens.length; i++) {
-				if (trNameTokens[i].length() < MINIMUM_TOKEN_SIZE)
+				if (trNameTokens[i].length() < MINIMUM_TOKEN_SIZE) {
 					distanceName[i] = 1; // do not count small tokens
-				else
+				} else {
 					distanceName[i] = getRelativeLevenshteinDistance(
 							trNameTokens[i], c.getPartnerName());
+				}
 			}
 
 			// try finding the contract name in the reason for payment
 			for (int i = 0; i < trUseTokens.length; i++) {
-				if (trUseTokens[i].length() < MINIMUM_TOKEN_SIZE)
+				if (trUseTokens[i].length() < MINIMUM_TOKEN_SIZE) {
 					distanceUse[i] = 1; // do not count small tokens
-				else
+				} else {
 					distanceUse[i] = getRelativeLevenshteinDistance(
 							trUseTokens[i], c.getName());
+				}
 			}
-			
+
 			// try finding the contract numbers or SEPA refs in the reason for payment
 			String customerNumber = c.getCustomerNumber();
 			String contractNumber = c.getContractNumber();
@@ -445,29 +522,39 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 			String sepaCustomerRef = c.getSepaCustomerRef();
 
 			int exactHits = 0;
-			if (customerNumber != null && !"".equals(customerNumber))
-				if (trUse.toString().contains(customerNumber))
+			if (customerNumber != null && !"".equals(customerNumber)) {
+				if (trUse.toString().contains(customerNumber)) {
 					exactHits++;
-			if (contractNumber != null && !"".equals(contractNumber))
-				if (trUse.toString().contains(contractNumber))
+				}
+			}
+			if (contractNumber != null && !"".equals(contractNumber)) {
+				if (trUse.toString().contains(contractNumber)) {
 					exactHits++;
-			if (sepaCreditorRef != null && !"".equals(sepaCreditorRef))
-				if (trUse.toString().contains(sepaCreditorRef))
+				}
+			}
+			if (sepaCreditorRef != null && !"".equals(sepaCreditorRef)) {
+				if (trUse.toString().contains(sepaCreditorRef)) {
 					exactHits++;
-			if (sepaCustomerRef != null && !"".equals(sepaCustomerRef))
-				if (trUse.toString().contains(sepaCustomerRef))
+				}
+			}
+			if (sepaCustomerRef != null && !"".equals(sepaCustomerRef)) {
+				if (trUse.toString().contains(sepaCustomerRef)) {
 					exactHits++;
-			
+				}
+			}
+
 			float result = 1;
 			for (int i = 0; i < trNameTokens.length; i++) {
 				result *= distanceName[i];
-				if (distanceName[i] == 0)
+				if (distanceName[i] == 0) {
 					exactHits++;
+				}
 			}
 			for (int i = 0; i < trUseTokens.length; i++) {
 				result *= distanceUse[i];
-				if (distanceUse[i] == 0)
+				if (distanceUse[i] == 0) {
 					exactHits++;
+				}
 			}
 			return result - exactHits;
 		} catch (RemoteException e) {
