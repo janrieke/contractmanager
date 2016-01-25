@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -86,7 +86,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 
 	/**
 	 * ct.
-	 * 
+	 *
 	 * @param position
 	 * @param preselected
 	 *            the preselected contract.
@@ -103,6 +103,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 	/**
 	 * @see de.willuhn.jameica.gui.dialogs.AbstractDialog#paint(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	protected void paint(Composite parent) throws Exception {
 		Container group = new SimpleContainer(parent, true);
 
@@ -110,7 +111,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 
 		left.addText(Settings.i18n().tr("List of files:"), true);
 		left.addPart(this.getTable());
-		
+
 		//compute max width of the buttons
 		GC gc = new GC(parent.getShell());
 		int maxwidth = 0;
@@ -119,7 +120,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 		maxwidth = Math.max(maxwidth, gc.stringExtent(Settings.i18n().tr("Remove")).x);
 		maxwidth = Math.max(maxwidth, gc.stringExtent(Settings.i18n().tr("Open")).x);
 		BUTTON_HORIZONTAL_SIZE = maxwidth + 12;
-		
+
 		Container right = new SimpleContainer(group.getComposite(), false, 1);
 		right.getComposite().setLayoutData(
 				new GridData(BUTTON_HORIZONTAL_SIZE + 10, SWT.DEFAULT));
@@ -130,6 +131,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 
 		ButtonArea buttons = new ButtonArea();
 		buttons.addButton(Settings.i18n().tr("Close"), new Action() {
+			@Override
 			public void handleAction(Object context)
 					throws ApplicationException {
 				close();
@@ -141,12 +143,13 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 
 	/**
 	 * Returns the open button to open the selected storage entry.
-	 * 
+	 *
 	 * @return the button.
 	 */
 	private Button getAddFileButton() {
-		if (buttonAddFile != null)
+		if (buttonAddFile != null) {
 			return buttonAddFile;
+		}
 
 		buttonAddFile = new Button(Settings.i18n().tr("Add File..."),
 				new AddFile()) {
@@ -162,12 +165,13 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 
 	/**
 	 * Returns the open button to open the selected storage entry.
-	 * 
+	 *
 	 * @return the button.
 	 */
 	private Button getAddLocalLinkFileButton() {
-		if (buttonAddLocalFileLink != null)
+		if (buttonAddLocalFileLink != null) {
 			return buttonAddLocalFileLink;
+		}
 
 		buttonAddLocalFileLink = new Button(Settings.i18n().tr(
 				"Add Local File Link..."), new AddLocalFileLink()) {
@@ -183,12 +187,13 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 
 	/**
 	 * Returns the open button to open the selected storage entry.
-	 * 
+	 *
 	 * @return the button.
 	 */
 	private Button getRemoveButton() {
-		if (buttonRemove != null)
+		if (buttonRemove != null) {
 			return buttonRemove;
+		}
 
 		buttonRemove = new Button(Settings.i18n().tr("Remove"), new Remove()) {
 			@Override
@@ -204,12 +209,13 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 
 	/**
 	 * Returns the open button to open the selected storage entry.
-	 * 
+	 *
 	 * @return the button.
 	 */
 	private Button getOpenButton() {
-		if (buttonOpen != null)
+		if (buttonOpen != null) {
 			return buttonOpen;
+		}
 
 		buttonOpen = new Button(Settings.i18n().tr("Open"), new OpenFile()) {
 			@Override
@@ -225,12 +231,13 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 
 	/**
 	 * Returns the file table
-	 * 
+	 *
 	 * @return the file table
 	 */
 	private TablePart getTable() {
-		if (this.table != null)
+		if (this.table != null) {
 			return this.table;
+		}
 
 		try {
 			this.table = new TablePart(contract.getAttachedFiles(),
@@ -250,8 +257,14 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 										Settings.i18n().tr("File in database"));
 								item.setForeground(1,
 										Settings.getNotActiveForegroundColor());
-							} else
-								item.setText(1, ((Storage) o).getPath());
+							} else {
+								String path = ((Storage) o).getPath();
+								if (path != null) {
+									item.setText(1, path);
+								} else {
+									item.setText(1, "invalid entry");
+								}
+							}
 						} catch (RemoteException e) {
 							item.setText(1, "Error while reading database");
 							item.setForeground(1, Settings.getErrorColor());
@@ -295,6 +308,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 	 * Action for opening the selected entry
 	 */
 	private class OpenFile implements Action {
+		@Override
 		public void handleAction(Object context) throws ApplicationException {
 			Storage storage = (Storage) getTable().getSelection();
 			if (storage != null) {
@@ -373,8 +387,9 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 								+ e.getMessage());
 					}
 				}
-				if (success)
+				if (success) {
 					return true;
+				}
 				Logger.warn("Error while opening file using AWT");
 
 				// 2. Try using the SWT mechanism: find the associated program
@@ -385,17 +400,20 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 					final Program p = Program.findProgram(suffix);
 					if (p != null) {
 						success = p.execute(file.getAbsolutePath());
-					} else
+					} else {
 						Program.launch(file.getAbsolutePath());
+					}
 				}
-				if (success)
+				if (success) {
 					return true;
+				}
 				Logger.warn("Error while opening file using SWT");
-				
+
 				// 3. Use OS command line
 				success = FileOpener.getFileOpener().open(file);
-				if (success)
+				if (success) {
 					return true;
+				}
 				Logger.warn("Error while opening file using command line");
 
 				// Finally: report fatal error
@@ -412,6 +430,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 	 * Action for adding a new file as blob
 	 */
 	private class AddFile implements Action {
+		@Override
 		public void handleAction(Object context) throws ApplicationException {
 			FileDialog fd = new FileDialog(GUI.getShell(), SWT.OPEN);
 			fd.setText(Settings.i18n().tr("Select File to Add"));
@@ -437,10 +456,11 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 											.tr("Enter description here"));
 
 							int lastDot = localfile.getName().lastIndexOf(".");
-							if (lastDot != -1)
+							if (lastDot != -1) {
 								stmt.setString(3, localfile.getName().substring(lastDot));
-							else
+							} else {
 								stmt.setString(3, "");
+							}
 
 							FileInputStream fis = new FileInputStream(localfile);
 
@@ -449,8 +469,9 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 							stmt.execute();
 							ResultSet res = stmt.getGeneratedKeys();
 							int newid = 0;
-							if (res != null && res.next())
+							if (res != null && res.next()) {
 								newid = res.getInt(1);
+							}
 
 							fis.close();
 							stmt.close();
@@ -487,22 +508,25 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 	 * Action for adding a new link
 	 */
 	private class AddLocalFileLink implements Action {
+		@Override
 		public void handleAction(Object context) throws ApplicationException {
 			FileDialog fd = new FileDialog(GUI.getShell(), SWT.OPEN);
 			fd.setText(Settings.i18n().tr("Select File to Add as Link"));
 
 			final String filename = fd.open();
-			try {
-				Storage s = (Storage) Settings.getDBService().createObject(
-						Storage.class, null);
-				s.setContract(contract);
-				s.setDescription(Settings.i18n().tr("Enter description here"));
-				s.setPath(filename);
-				s.store();
-				table.addItem(s);
-			} catch (RemoteException e) {
-				throw new ApplicationException(Settings.i18n().tr(
-						"Error while creating new storage entry"), e);
+			if (filename != null && !"".equals(filename)) {
+				try {
+					Storage s = (Storage) Settings.getDBService().createObject(
+							Storage.class, null);
+					s.setContract(contract);
+					s.setDescription(Settings.i18n().tr("Enter description here"));
+					s.setPath(filename);
+					s.store();
+					table.addItem(s);
+				} catch (RemoteException e) {
+					throw new ApplicationException(Settings.i18n().tr(
+							"Error while creating new storage entry"), e);
+				}
 			}
 		}
 	}
@@ -511,6 +535,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 	 * Action for removing an entry
 	 */
 	private class Remove implements Action {
+		@Override
 		public void handleAction(Object context) throws ApplicationException {
 			try {
 				if (table.getSelection() != null
@@ -524,7 +549,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 					messageBox.setText(Settings.i18n().tr("Remove file?"));
 					// messageBox.setPanelText(Settings.i18n().tr("Do you really want to remove the file?"));
 
-					if (st.getFile() != null)
+					if (st.getFile() != null) {
 						messageBox
 								.setMessage(Settings
 										.i18n()
@@ -533,7 +558,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 										+ Settings
 												.i18n()
 												.tr("This will delete the file from the database permanently."));
-					else
+					} else {
 						messageBox
 								.setMessage(Settings
 										.i18n()
@@ -542,6 +567,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 										+ Settings
 												.i18n()
 												.tr("This will remove the file link, but will not delete the actual file."));
+					}
 
 					boolean choice = messageBox.open() == SWT.YES;
 
@@ -554,9 +580,11 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 					if (table.getSelection() == null) {
 						getRemoveButton().setEnabled(false);
 						getOpenButton().setEnabled(false);
-					} else
+					}
+					else {
 						table.select(table.getSelection()); // refresh selection
 															// marker
+					}
 				}
 			} catch (OperationCanceledException e) {
 				// user pressed ESC, do nothing
