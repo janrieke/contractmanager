@@ -59,6 +59,8 @@ import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.dialogs.ListDialog;
 import de.willuhn.jameica.gui.dialogs.YesNoDialog;
+import de.willuhn.jameica.messaging.StatusBarMessage;
+import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.system.OperationCanceledException;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
@@ -314,6 +316,11 @@ public class GenerateOdfDocument implements Action {
 			doc.save(filename);
 			GUI.getStatusBar().setSuccessText(
 					Settings.i18n().tr("Document successfully generated."));
+		} catch (IllegalArgumentException e) {
+			Logger.error("error with invalid template >>" + selectedTemplate.getFileName() + "<<", e);
+			throw new ApplicationException(Settings.i18n().tr(
+					"Error invalid template"), e);
+			
 		} catch (Exception e) {
 			throw new ApplicationException(Settings.i18n().tr(
 					"Error while storing document"), e);
