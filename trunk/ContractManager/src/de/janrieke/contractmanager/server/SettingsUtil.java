@@ -127,7 +127,7 @@ public class SettingsUtil
     // Mal schauen, ob wir das Property schon haben
     DBService service = Settings.getDBService();
     DBIterator i = service.createList(Setting.class);
-    i.addFilter("key = ?",new Object[]{name});
+    i.addFilter("mkey = ?",new Object[]{name});
     if (i.hasNext())
       return (Setting) i.next();
 

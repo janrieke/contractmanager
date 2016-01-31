@@ -72,7 +72,7 @@ public class SettingImpl extends AbstractDBObject implements Setting {
 
 	@Override
 	protected String getIDField() {
-	    return upper ? "KEY" : "key";
+	    return upper ? "MKEY" : "mkey";
 	}
 
 	/**
@@ -86,14 +86,14 @@ public class SettingImpl extends AbstractDBObject implements Setting {
 	 * @see de.willuhn.jameica.hbci.rmi.DBProperty#getName()
 	 */
 	public String getKey() throws RemoteException {
-		return (String) getAttribute("key");
+		return (String) getAttribute("mkey");
 	}
 
 	/**
 	 * @see de.willuhn.jameica.hbci.rmi.DBProperty#setValue(java.lang.String)
 	 */
 	public void setKey(String key) throws RemoteException {
-		setAttribute("key", key);
+		setAttribute("mkey", key);
 	}
 
 	/**
