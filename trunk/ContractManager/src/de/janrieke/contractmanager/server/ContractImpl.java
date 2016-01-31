@@ -700,10 +700,10 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 				costsPerYear += costEntry.getMoney();
 				break;
 			case HALF_YEARS:
-				costsPerMonth += costEntry.getMoney()*6;
+				costsPerMonth += costEntry.getMoney()/6;
 				break;
 			case QUARTER_YEAR:
-				costsPerMonth += costEntry.getMoney()*3;
+				costsPerMonth += costEntry.getMoney()/3;
 				break;
 
 			default:
