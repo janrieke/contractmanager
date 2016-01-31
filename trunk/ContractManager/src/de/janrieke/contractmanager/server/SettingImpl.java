@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -50,7 +50,7 @@ public class SettingImpl extends AbstractDBObject implements Setting {
 
 	/**
 	 * ct
-	 * 
+	 *
 	 * @throws RemoteException
 	 */
 	public SettingImpl() throws RemoteException {
@@ -66,8 +66,9 @@ public class SettingImpl extends AbstractDBObject implements Setting {
 	/**
 	 * @see de.willuhn.datasource.db.AbstractDBObject#getPrimaryAttribute()
 	 */
+	@Override
 	public String getPrimaryAttribute() throws RemoteException {
-		return "key";
+		return "mkey";
 	}
 
 	@Override
@@ -78,6 +79,7 @@ public class SettingImpl extends AbstractDBObject implements Setting {
 	/**
 	 * @see de.willuhn.datasource.db.AbstractDBObject#getTableName()
 	 */
+	@Override
 	protected String getTableName() {
 		return "settings";
 	}
@@ -85,6 +87,7 @@ public class SettingImpl extends AbstractDBObject implements Setting {
 	/**
 	 * @see de.willuhn.jameica.hbci.rmi.DBProperty#getName()
 	 */
+	@Override
 	public String getKey() throws RemoteException {
 		return (String) getAttribute("mkey");
 	}
@@ -92,6 +95,7 @@ public class SettingImpl extends AbstractDBObject implements Setting {
 	/**
 	 * @see de.willuhn.jameica.hbci.rmi.DBProperty#setValue(java.lang.String)
 	 */
+	@Override
 	public void setKey(String key) throws RemoteException {
 		setAttribute("mkey", key);
 	}
@@ -99,6 +103,7 @@ public class SettingImpl extends AbstractDBObject implements Setting {
 	/**
 	 * @see de.willuhn.jameica.hbci.rmi.DBProperty#getValue()
 	 */
+	@Override
 	public String getValue() throws RemoteException {
 		return (String) getAttribute("value");
 	}
@@ -106,6 +111,7 @@ public class SettingImpl extends AbstractDBObject implements Setting {
 	/**
 	 * @see de.willuhn.jameica.hbci.rmi.DBProperty#setValue(java.lang.String)
 	 */
+	@Override
 	public void setValue(String value) throws RemoteException {
 		setAttribute("value", value);
 	}

@@ -3,8 +3,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.janrieke.contractmanager.rmi.ContractDBService;
-import de.janrieke.contractmanager.server.DBSupportH2Impl;
 import de.janrieke.contractmanager.server.ContractDBUpdateProvider;
+import de.janrieke.contractmanager.server.DBSupportH2Impl;
 import de.willuhn.logging.Logger;
 import de.willuhn.sql.ScriptExecutor;
 import de.willuhn.sql.version.Update;
@@ -24,13 +24,13 @@ public class update0022 implements Update {
 	public update0022() {
 		// Update for H2
 		statements.put(DBSupportH2Impl.class.getName(),
-				"ALTER TABLE settings ALTER COLUMN key RENAME TO mkey;\n" +
-				"\n");
+				"ALTER TABLE settings ALTER COLUMN key RENAME TO mkey;\n");
 	}
 
 	/**
 	 * @see de.willuhn.sql.version.Update#execute(de.willuhn.sql.version.UpdateProvider)
 	 */
+	@Override
 	public void execute(UpdateProvider provider) throws ApplicationException {
 		ContractDBUpdateProvider myProvider = (ContractDBUpdateProvider) provider;
 		I18N i18n = myProvider.getResources().getI18N();
@@ -38,10 +38,11 @@ public class update0022 implements Update {
 		// Get the SQL dialect
 		String driver = ContractDBService.SETTINGS.getString("database.driver",
 				DBSupportH2Impl.class.getName());
-		String sql = (String) statements.get(driver);
-		if (sql == null)
+		String sql = statements.get(driver);
+		if (sql == null) {
 			throw new ApplicationException(i18n.tr(
 					"Database {0} not supported", driver));
+		}
 
 		try {
 			ScriptExecutor
@@ -60,6 +61,7 @@ public class update0022 implements Update {
 	/**
 	 * @see de.willuhn.sql.version.Update#getName()
 	 */
+	@Override
 	public String getName() {
 		return "Database update v21 to v22 (add support for mysql)";
 	}
