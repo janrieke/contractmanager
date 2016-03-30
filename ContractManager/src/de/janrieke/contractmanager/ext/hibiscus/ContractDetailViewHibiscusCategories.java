@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -62,28 +62,31 @@ import de.willuhn.util.I18N;
 public class ContractDetailViewHibiscusCategories implements Extension {
 
 	private SizeableTablePart umsatzList;
-	
+
 	private final static I18N hibiscusI18n = Application.getPluginLoader().getPlugin(HBCI.class).getResources().getI18N();
 
 	/**
 	 * @see de.willuhn.jameica.gui.extension.Extension#extend(de.willuhn.jameica.gui.extension.Extendable)
 	 */
+	@Override
 	public void extend(Extendable extendable) {
-		if (extendable == null || !(extendable instanceof ContractDetailView))
+		if (extendable == null || !(extendable instanceof ContractDetailView)) {
 			return;
+		}
 
 		ContractDetailView view = (ContractDetailView) extendable;
 		final ContractControl control = view.getControl();
 		Composite parent = view.getParent();
 
-		if (control == null || parent == null)
+		if (control == null || parent == null) {
 			return;
+		}
 
 	    PanelButton settings = new PanelButton("document-properties.png", new ShowHibiscusSettings(), Settings.i18n().tr("Settings"));
 	    GUI.getView().addPanelButton(settings);
 
 		final Contract contract = (Contract) view.getCurrentObject();
-		
+
 		ArrayList<String> labels = new ArrayList<String>(3);
 		ArrayList<Input> inputs  = new ArrayList<Input>(3);
 
@@ -126,7 +129,7 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 						try
 						{
 							UmsatzTyp t = (UmsatzTyp) input.getValue();
-							//do not immediately write to DB, let the controller do 
+							//do not immediately write to DB, let the controller do
 							// this when storing everything else
 							control.hibiscusCategoryID = (t != null ? t.getID() : null);
 						}
@@ -145,9 +148,9 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 			// 3) add a container that holds the list of assigned transactions
 			if (Settings.getShowHibiscusTransactionList()) {
 				List<Umsatz> umsaetze = new Vector<Umsatz>();
-				DBIterator transactions = contract.getTransactions();
+				DBIterator<Transaction> transactions = contract.getTransactions();
 				while (transactions.hasNext()) {
-					Transaction transaction = (Transaction) transactions.next();
+					Transaction transaction = transactions.next();
 					Umsatz umsatz = null;
 					try
 					{
@@ -158,8 +161,9 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 					{
 						transaction.delete();
 					}
-					if (umsatz != null)
+					if (umsatz != null) {
 						umsaetze.add(umsatz);
+					}
 				}
 				umsatzList = new SizeableTablePart(umsaetze, new UmsatzDetail());
 				umsatzList.setHeightHint(Settings.getHibiscusTransactionListHeight());
@@ -184,7 +188,7 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 			Logger.error("unable to extend ContractDetailView",e);
 		}
 	}
-	
+
 	public void removeTransactionFromTable(Transaction tr) {
 		Umsatz umsatz = null;
 		try
@@ -200,7 +204,8 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if (umsatz != null)
+		if (umsatz != null) {
 			umsatzList.removeItem(umsatz);
+		}
 	}
 }

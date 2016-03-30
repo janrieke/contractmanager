@@ -63,7 +63,7 @@ public class UmsatzListPartHibiscusExtension implements Extension {
 					return null;
 				}
 
-				DBIterator transactions = null;
+				DBIterator<Transaction> transactions = null;
 				try {
 					transactions = Settings.getDBService().createList(
 							Transaction.class);
@@ -73,7 +73,7 @@ public class UmsatzListPartHibiscusExtension implements Extension {
 						Logger.warn("Umsatz assigned to more than one contract. Possible DB error.");
 					}
 					if (transactions.hasNext()) {
-						Transaction transaction = (Transaction) transactions
+						Transaction transaction = transactions
 								.next();
 						if (transaction.getContract() != null) {
 							return transaction.getContract().getName();
@@ -108,10 +108,10 @@ public class UmsatzListPartHibiscusExtension implements Extension {
 
 		this.cache = new HashMap<Integer, Transaction>();
 		try {
-			DBIterator list = Settings.getDBService().createList(
+			DBIterator<Transaction> list = Settings.getDBService().createList(
 					Transaction.class);
 			while (list.hasNext()) {
-				Transaction b = (Transaction) list.next();
+				Transaction b = list.next();
 				if (b.getTransactionID() == null) {
 					continue;
 				}

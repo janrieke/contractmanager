@@ -20,8 +20,7 @@ import de.willuhn.jameica.gui.calendar.AppointmentProvider;
 import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
-public class ContractCancellationReminderProvider implements
-		AppointmentProvider {
+public class ContractCancellationReminderProvider implements AppointmentProvider {
 
 	I18N i18n = Settings.i18n();
 
@@ -33,31 +32,34 @@ public class ContractCancellationReminderProvider implements
 	@Override
 	public List<Appointment> getAppointments(Date from, Date to) {
 		List<Appointment> result = new ArrayList<Appointment>();
-		GenericIterator iterator;
+		GenericIterator<Contract> iterator;
 		try {
 			iterator = ContractControl.getContracts();
-		while (iterator.hasNext()) {
-			Contract contract = (Contract) iterator.next();
-			Date nextCancellationDeadline = contract.getNextCancellationDeadline();
-			while (nextCancellationDeadline != null && nextCancellationDeadline.before(to)) {
-				if (nextCancellationDeadline.after(from)) {
-					Date doNotRemindBefore = contract.getDoNotRemindBefore();
-					boolean hasAlarm = !contract.getDoNotRemind() && !(doNotRemindBefore != null && nextCancellationDeadline.before(doNotRemindBefore));
-					result.add(new ContractCancellationAppointment(contract, nextCancellationDeadline, hasAlarm));
+			while (iterator.hasNext()) {
+				Contract contract = iterator.next();
+				Date nextCancellationDeadline = contract.getNextCancellationDeadline();
+				while (nextCancellationDeadline != null && nextCancellationDeadline.before(to)) {
+					if (nextCancellationDeadline.after(from)) {
+						Date doNotRemindBefore = contract.getDoNotRemindBefore();
+						boolean hasAlarm = !contract.getDoNotRemind()
+								&& !(doNotRemindBefore != null && nextCancellationDeadline
+										.before(doNotRemindBefore));
+						result.add(new ContractCancellationAppointment(contract,
+								nextCancellationDeadline, hasAlarm));
+					}
+					Calendar next = Calendar.getInstance();
+					next.setTime(nextCancellationDeadline);
+					next.add(Calendar.DAY_OF_YEAR, 1);
+					nextCancellationDeadline = contract.getNextCancellationDeadline(next.getTime());
 				}
-				Calendar next = Calendar.getInstance();
-				next.setTime(nextCancellationDeadline);
-				next.add(Calendar.DAY_OF_YEAR, 1);
-				nextCancellationDeadline = contract.getNextCancellationDeadline(next.getTime());
 			}
-		}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Hilfsklasse zum Anzeigen und Oeffnen des Appointments.
 	 */
@@ -68,9 +70,10 @@ public class ContractCancellationReminderProvider implements
 
 		/**
 		 * ct.
-		 * @param date 
-		 * @param hasAlarm 
-		 * 
+		 *
+		 * @param date
+		 * @param hasAlarm
+		 *
 		 * @param schedule
 		 *            der Termin.
 		 */
@@ -84,13 +87,15 @@ public class ContractCancellationReminderProvider implements
 		/**
 		 * @see de.willuhn.jameica.gui.calendar.AbstractAppointment#getDescription()
 		 */
+		@Override
 		public String getDescription() {
 			try {
-				if (Settings.getNamedICalExport()) { 
-					return i18n.tr("Cancellation deadline of contract ") + contract.getName() + 
-							i18n.tr(". Check Jameica/ContractManager for details.");
+				if (Settings.getNamedICalExport()) {
+					return i18n.tr("Cancellation deadline of contract ") + contract.getName()
+							+ i18n.tr(". Check Jameica/ContractManager for details.");
 				} else {
-					return i18n.tr("Cancellation deadline of a contract. Check Jameica/ContractManager for details."); 
+					return i18n
+							.tr("Cancellation deadline of a contract. Check Jameica/ContractManager for details.");
 				}
 			} catch (RemoteException e) {
 				return "Error while getting contract name";
@@ -100,9 +105,10 @@ public class ContractCancellationReminderProvider implements
 		/**
 		 * @see de.willuhn.jameica.gui.calendar.Appointment#getName()
 		 */
+		@Override
 		public String getName() {
 			try {
-				if (Settings.getNamedICalExport()) { 
+				if (Settings.getNamedICalExport()) {
 					return i18n.tr("Cancellation Deadline: ") + contract.getName();
 				} else {
 					return i18n.tr("Cancellation Deadline");
@@ -115,13 +121,15 @@ public class ContractCancellationReminderProvider implements
 		/**
 		 * @see de.willuhn.jameica.hbci.calendar.AbstractAppointmentProvider.AbstractHibiscusAppointment#getColor()
 		 */
+		@Override
 		public RGB getColor() {
-			return new RGB(255,0,0);
+			return new RGB(255, 0, 0);
 		}
 
 		/**
 		 * @see de.willuhn.jameica.gui.calendar.AbstractAppointment#hasAlarm()
 		 */
+		@Override
 		public boolean hasAlarm() {
 			return hasAlarm;
 		}
@@ -133,8 +141,8 @@ public class ContractCancellationReminderProvider implements
 
 		@Override
 		public void execute() throws ApplicationException {
-			GUI.startView(de.janrieke.contractmanager.gui.view.ContractDetailView.class
-					.getName(), contract);
+			GUI.startView(de.janrieke.contractmanager.gui.view.ContractDetailView.class.getName(),
+					contract);
 		}
 
 		@Override

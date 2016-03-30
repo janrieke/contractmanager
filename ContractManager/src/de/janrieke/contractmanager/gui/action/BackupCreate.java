@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -71,6 +71,7 @@ public class BackupCreate implements Action {
 	/**
 	 * @see de.willuhn.jameica.gui.Action#handleAction(java.lang.Object)
 	 */
+	@Override
 	public void handleAction(Object context) throws ApplicationException {
 		FileDialog fd = new FileDialog(GUI.getShell(), SWT.SAVE);
 		fd.setOverwrite(true);
@@ -80,8 +81,9 @@ public class BackupCreate implements Action {
 				i18n.tr("Comma-separated values (compressed) (*.zip)") });
 		fd.setText(i18n.tr("Select file for export"));
 		String f = fd.open();
-		if (f == null || f.length() == 0)
+		if (f == null || f.length() == 0) {
 			return;
+		}
 		final int filterIndex = fd.getFilterIndex();
 
 		final File file = new File(f);
@@ -91,6 +93,7 @@ public class BackupCreate implements Action {
 			/**
 			 * @see de.willuhn.jameica.system.BackgroundTask#run(de.willuhn.util.ProgressMonitor)
 			 */
+			@Override
 			public void run(ProgressMonitor monitor) throws ApplicationException {
 				Writer writer = null;
 				try {
@@ -148,6 +151,7 @@ public class BackupCreate implements Action {
 			/**
 			 * @see de.willuhn.jameica.system.BackgroundTask#isInterrupted()
 			 */
+			@Override
 			public boolean isInterrupted() {
 				return this.cancel;
 			}
@@ -155,6 +159,7 @@ public class BackupCreate implements Action {
 			/**
 			 * @see de.willuhn.jameica.system.BackgroundTask#interrupt()
 			 */
+			@Override
 			public void interrupt() {
 				this.cancel = true;
 			}
@@ -164,7 +169,7 @@ public class BackupCreate implements Action {
 
 	/**
 	 * Hilfsfunktion.
-	 * 
+	 *
 	 * @param type
 	 *            der Typ der zu speichernden Objekte.
 	 * @param writer
@@ -175,7 +180,7 @@ public class BackupCreate implements Action {
 	 */
 	private static void backup(Class<? extends DBObject> type, Writer writer,
 			ProgressMonitor monitor) throws Exception {
-		DBIterator list = Settings.getDBService().createList(type);
+		DBIterator<DBObject> list = Settings.getDBService().createList(type);
 
 		while (list.hasNext()) {
 			GenericObject o = null;

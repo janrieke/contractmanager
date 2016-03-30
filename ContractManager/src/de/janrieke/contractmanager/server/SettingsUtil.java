@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -47,93 +47,108 @@ import de.willuhn.util.ApplicationException;
 /**
  * Hilfsklasse zum Laden und Speichern der Properties.
  */
-public class SettingsUtil
-{
-  /**
-   * Speichert ein Property.
-   * @param name Name des Property.
-   * @param value Wert des Property.
-   * @throws RemoteException
-   * @throws ApplicationException
-   */
-  public static void set(String name, String value) throws RemoteException, ApplicationException
-  {
-    Setting prop = find(name);
-    if (prop == null)
-    {
-      Logger.warn("parameter name " + name + " invalid");
-      return;
-    }
-    
-    prop.setValue(value);
-    prop.store();
-  }
-  
-  /**
-   * Liefert den Wert des Parameters.
-   * @param name Name des Parameters.
-   * @param defaultValue Default-Wert, wenn der Parameter nicht existiert oder keinen Wert hat.
-   * @return Wert des Parameters.
-   * @throws RemoteException
-   */
-  public static String get(String name, String defaultValue) throws RemoteException
-  {
-	  Setting prop = find(name);
-    if (prop == null)
-      return defaultValue;
-    String value = prop.getValue();
-    return value != null ? value : defaultValue;
-  }
-  
-  /**
-   * Fragt einen einzelnen Parameter-Wert ab, jedoch mit einem Custom-Query.
-   * @param query Das SQL-Query.
-   * Ggf. mit Platzhaltern ("?") fuer das PreparedStatement versehen.
-   * @param params optionale Liste der Parameter fuer das Statement.
-   * @param defaultValue optionaler Default-Wert, falls das Query <code>null</code> liefert.
-   * @return der Wert aus der ersten Spalte des Resultsets oder der Default-Wert, wenn der Wert des Resultsets <code>null</code> ist.
-   * @throws RemoteException
-   */
-  static String query(String query, Object[] params, final String defaultValue) throws RemoteException
-  {
-    if (query == null || query.length() == 0)
-      return defaultValue;
-    
-    return (String) Settings.getDBService().execute(query,params,new ResultSetExtractor()
-    {
-      public Object extract(ResultSet rs) throws RemoteException, SQLException
-      {
-        if (!rs.next())
-          return defaultValue;
-        
-        String result = rs.getString(1);
-        return result != null ? result : defaultValue;
-      }
-    });
-  }
-  
-  /**
-   * Liefert den Parameter mit dem genannten Namen.
-   * Wenn er nicht existiert, wird er automatisch angelegt.
-   * @param name Name des Parameters. Darf nicht <code>null</code> sein.
-   * @return der Parameter oder <code>null</code>, wenn kein Name angegeben wurde.
-   * @throws RemoteException
-   */
-  private static Setting find(String name) throws RemoteException
-  {
-    if (name == null)
-      return null;
-    
-    // Mal schauen, ob wir das Property schon haben
-    DBService service = Settings.getDBService();
-    DBIterator i = service.createList(Setting.class);
-    i.addFilter("mkey = ?",new Object[]{name});
-    if (i.hasNext())
-      return (Setting) i.next();
+public class SettingsUtil {
+	/**
+	 * Speichert ein Property.
+	 *
+	 * @param name
+	 *            Name des Property.
+	 * @param value
+	 *            Wert des Property.
+	 * @throws RemoteException
+	 * @throws ApplicationException
+	 */
+	public static void set(String name, String value) throws RemoteException, ApplicationException {
+		Setting prop = find(name);
+		if (prop == null) {
+			Logger.warn("parameter name " + name + " invalid");
+			return;
+		}
 
-    // Ne, dann neu anlegen
-    Setting prop = (Setting) service.createObject(Setting.class,null);
-    prop.setKey(name);
-    return prop;
-  }
+		prop.setValue(value);
+		prop.store();
+	}
+
+	/**
+	 * Liefert den Wert des Parameters.
+	 *
+	 * @param name
+	 *            Name des Parameters.
+	 * @param defaultValue
+	 *            Default-Wert, wenn der Parameter nicht existiert oder keinen
+	 *            Wert hat.
+	 * @return Wert des Parameters.
+	 * @throws RemoteException
+	 */
+	public static String get(String name, String defaultValue) throws RemoteException {
+		Setting prop = find(name);
+		if (prop == null) {
+			return defaultValue;
+		}
+		String value = prop.getValue();
+		return value != null ? value : defaultValue;
+	}
+
+	/**
+	 * Fragt einen einzelnen Parameter-Wert ab, jedoch mit einem Custom-Query.
+	 *
+	 * @param query
+	 *            Das SQL-Query. Ggf. mit Platzhaltern ("?") fuer das
+	 *            PreparedStatement versehen.
+	 * @param params
+	 *            optionale Liste der Parameter fuer das Statement.
+	 * @param defaultValue
+	 *            optionaler Default-Wert, falls das Query <code>null</code>
+	 *            liefert.
+	 * @return der Wert aus der ersten Spalte des Resultsets oder der
+	 *         Default-Wert, wenn der Wert des Resultsets <code>null</code> ist.
+	 * @throws RemoteException
+	 */
+	static String query(String query, Object[] params, final String defaultValue)
+			throws RemoteException {
+		if (query == null || query.length() == 0) {
+			return defaultValue;
+		}
+
+		return (String) Settings.getDBService().execute(query, params, new ResultSetExtractor() {
+			@Override
+			public Object extract(ResultSet rs) throws RemoteException, SQLException {
+				if (!rs.next()) {
+					return defaultValue;
+				}
+
+				String result = rs.getString(1);
+				return result != null ? result : defaultValue;
+			}
+		});
+	}
+
+	/**
+	 * Liefert den Parameter mit dem genannten Namen. Wenn er nicht existiert,
+	 * wird er automatisch angelegt.
+	 *
+	 * @param name
+	 *            Name des Parameters. Darf nicht <code>null</code> sein.
+	 * @return der Parameter oder <code>null</code>, wenn kein Name angegeben
+	 *         wurde.
+	 * @throws RemoteException
+	 */
+	private static Setting find(String name) throws RemoteException {
+		if (name == null) {
+			return null;
+		}
+
+		// Mal schauen, ob wir das Property schon haben
+		DBService service = Settings.getDBService();
+		DBIterator<Setting> i = service.createList(Setting.class);
+		i.addFilter("mkey = ?", new Object[] { name });
+		if (i.hasNext()) {
+			return i.next();
+		}
+
+		// Ne, dann neu anlegen
+		Setting prop = (Setting) service.createObject(Setting.class, null);
+		prop.setKey(name);
+		return prop;
+	}
 }

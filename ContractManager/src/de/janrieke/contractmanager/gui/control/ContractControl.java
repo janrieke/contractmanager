@@ -174,9 +174,9 @@ public class ContractControl extends AbstractControl {
 	 * @throws RemoteException
 	 * @return iterator containing all addresses
 	 */
-	public static DBIterator getContracts() throws RemoteException {
+	public static DBIterator<Contract> getContracts() throws RemoteException {
 		DBService service = Settings.getDBService();
-		DBIterator contracts = service.createList(Contract.class);
+		DBIterator<Contract> contracts = service.createList(Contract.class);
 		return contracts;
 	}
 
@@ -650,13 +650,13 @@ public class ContractControl extends AbstractControl {
 			return contractList;
 		}
 
-		GenericIterator allContracts = getContracts();
+		GenericIterator<Contract> allContracts = getContracts();
 		Date today = new Date();
 		List<Contract> contracts = new ArrayList<>();
 
 		double total = 0d;
 		while (allContracts.hasNext()) {
-			Contract c = (Contract) allContracts.next();
+			Contract c = allContracts.next();
 			if (c.isActiveInMonth(today)) {
 				// Only add active contracts.
 				total += c.getMoneyPerMonth();
@@ -772,7 +772,7 @@ public class ContractControl extends AbstractControl {
 						// Checkbox was inactive; add all contracts.
 						Object selection = contractList.getSelection();
 						contractList.removeAll();
-						GenericIterator contracts = getContracts();
+						GenericIterator<Contract> contracts = getContracts();
 						while (contracts.hasNext()) {
 							contractList.addItem(contracts.next());
 						}
@@ -788,7 +788,7 @@ public class ContractControl extends AbstractControl {
 
 	static int index = 0;
 
-	private GenericIterator costsIterator;
+	private GenericIterator<Costs> costsIterator;
 
 	/**
 	 * Creates a table containing all contracts in extension warning or notice
@@ -809,13 +809,13 @@ public class ContractControl extends AbstractControl {
 		// We do not need to specify the implementing class for
 		// the interface "Contract". Jameica's classloader knows
 		// all classes an finds the right implementation automatically. ;)
-		DBIterator contracts = service.createList(Contract.class);
+		DBIterator<Contract> contracts = service.createList(Contract.class);
 
 		ArrayList<Contract> filteredContracts = new ArrayList<Contract>();
 
 		// Iterate through the list and filter
 		while (contracts.hasNext()) {
-			Contract contract = (Contract) contracts.next();
+			Contract contract = contracts.next();
 			try {
 				if (contract.getDoNotRemind()) {
 					continue;
@@ -828,7 +828,7 @@ public class ContractControl extends AbstractControl {
 			}
 		}
 		Contract[] filteredArray = new Contract[filteredContracts.size()];
-		GenericIterator filteredIterator = PseudoIterator
+		GenericIterator<?> filteredIterator = PseudoIterator
 				.fromArray(filteredContracts.toArray(filteredArray));
 
 		// 4) create the table
@@ -1073,7 +1073,7 @@ public class ContractControl extends AbstractControl {
 				// do not contain the values changed by the inline editor.
 				costsIterator.begin();
 				while (costsIterator.hasNext()) {
-					Costs cost = (Costs) costsIterator.next();
+					Costs cost = costsIterator.next();
 					if (!deletedCosts.contains(cost)) {
 						cost.store();
 					} else {

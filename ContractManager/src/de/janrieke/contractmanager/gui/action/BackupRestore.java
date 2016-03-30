@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -39,6 +39,7 @@ import de.janrieke.contractmanager.rmi.Contract;
 import de.willuhn.datasource.BeanUtil;
 import de.willuhn.datasource.GenericObject;
 import de.willuhn.datasource.db.AbstractDBObject;
+import de.willuhn.datasource.rmi.DBObject;
 import de.willuhn.datasource.serialize.ObjectFactory;
 import de.willuhn.datasource.serialize.Reader;
 import de.willuhn.datasource.serialize.XmlReader;
@@ -62,6 +63,7 @@ public class BackupRestore implements Action {
 	/**
 	 * @see de.willuhn.jameica.gui.Action#handleAction(java.lang.Object)
 	 */
+	@Override
 	public void handleAction(Object context) throws ApplicationException {
 		// Wir checken vorher, ob die Datenbank leer ist. Ansonsten koennen wir
 		// das
@@ -71,8 +73,9 @@ public class BackupRestore implements Action {
 				String text = i18n.tr("The ContractManager installation already contains data.\n" +
 						"Importing data may lead to errors or unforseeable behavior.\n" +
 						"Do you really want to continue?");
-				if (!Application.getCallback().askUser(text))
+				if (!Application.getCallback().askUser(text)) {
 					return;
+				}
 			}
 		} catch (ApplicationException ae) {
 			throw ae;
@@ -88,12 +91,14 @@ public class BackupRestore implements Action {
 		fd.setFilterExtensions(new String[] { "*.xml" });
 		fd.setText(i18n.tr("Please select file for import"));
 		String f = fd.open();
-		if (f == null || f.length() == 0)
+		if (f == null || f.length() == 0) {
 			return;
+		}
 
 		final File file = new File(f);
-		if (!file.exists())
+		if (!file.exists()) {
 			return;
+		}
 
 		Application.getController().start(new BackgroundTask() {
 			private boolean cancel = false;
@@ -101,6 +106,7 @@ public class BackupRestore implements Action {
 			/**
 			 * @see de.willuhn.jameica.system.BackgroundTask#run(de.willuhn.util.ProgressMonitor)
 			 */
+			@Override
 			public void run(ProgressMonitor monitor) throws ApplicationException {
 				monitor.setStatusText(i18n.tr("Importing data"));
 				Logger.info("importing data from " + file.getAbsolutePath());
@@ -114,8 +120,9 @@ public class BackupRestore implements Action {
 						@Override
 						public GenericObject create(String type, String id, @SuppressWarnings("rawtypes") Map values)
 								throws Exception {
+							@SuppressWarnings("unchecked")
 							AbstractDBObject object = (AbstractDBObject) Settings.getDBService()
-									.createObject(loader.loadClass(type), null);
+									.createObject((Class<? extends DBObject>) loader.loadClass(type), null);
 							object.setID(id);
 							Iterator<?> i = values.keySet().iterator();
 							while (i.hasNext()) {
@@ -140,8 +147,9 @@ public class BackupRestore implements Action {
 									+ i18n.tr("Error during export of {0} ({1}), skipping", new String[] {
 											BeanUtil.toString(o), e.getMessage() }));
 						}
-						if (count++ % 100 == 0)
+						if (count++ % 100 == 0) {
 							monitor.addPercentComplete(1);
+						}
 					}
 
 					monitor.setStatus(ProgressMonitor.STATUS_DONE);
@@ -164,6 +172,7 @@ public class BackupRestore implements Action {
 			/**
 			 * @see de.willuhn.jameica.system.BackgroundTask#isInterrupted()
 			 */
+			@Override
 			public boolean isInterrupted() {
 				return this.cancel;
 			}
@@ -171,6 +180,7 @@ public class BackupRestore implements Action {
 			/**
 			 * @see de.willuhn.jameica.system.BackgroundTask#interrupt()
 			 */
+			@Override
 			public void interrupt() {
 				this.cancel = true;
 			}

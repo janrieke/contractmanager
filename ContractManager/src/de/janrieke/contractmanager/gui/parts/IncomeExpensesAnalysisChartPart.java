@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,7 +44,7 @@ public class IncomeExpensesAnalysisChartPart implements Part {
     private IncomeExpensesBarChart chart = null;
 
     public class ContractIncomeExpensesAnalysisData {
-    	
+
 		private float amount;
 		private String label;
 		public ContractIncomeExpensesAnalysisData(float amount, String label) {
@@ -59,13 +59,13 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 			return label;
 		}
     }
-    
+
 	@Override
 	public void paint(Composite parent) throws RemoteException {
 		chart = new IncomeExpensesBarChart();
 		chart.setTitle(Settings.i18n().tr("Income/Expenses Comparison"));
 		addChartData();
-		
+
 		chart.paint(parent);
 	}
 
@@ -73,19 +73,19 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 	protected void addChartData() throws RemoteException {
 		int month = control.getMonthNumber((String)control.getMonthSelector().getValue());
 		int year = (Integer)control.getYearSelector().getValue();
-		
+
 		Calendar monthCal = Calendar.getInstance();
 		monthCal.set(year, month, 1, 0, 0, 0);
-		
+
 	    sum = 0;
-		GenericIterator contracts = ContractControl.getContracts();
+		GenericIterator<Contract> contracts = ContractControl.getContracts();
 		while (contracts.hasNext()) {
-			final Contract c = (Contract) contracts.next();
+			final Contract c = contracts.next();
 			if (!c.isActiveInMonth(monthCal.getTime())) {
 				continue;
 			}
 			sum += c.getMoneyPerMonth();
-						
+
 			chart.addData(new ChartData() {
 
 				@Override
@@ -121,7 +121,7 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 		}
 		chart.setSum(sum);
 	}
-	
+
 	public void redraw() {
         chart.removeAllData();
         try {

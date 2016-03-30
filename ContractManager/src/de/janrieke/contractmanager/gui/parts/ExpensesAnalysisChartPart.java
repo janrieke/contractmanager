@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -44,7 +44,7 @@ public class ExpensesAnalysisChartPart implements Part {
     private BarChart chart = null;
 
     public class ContractExpensesAnalysisData {
-    	
+
 		private float amount;
 		private String label;
 		public ContractExpensesAnalysisData(float amount, String label) {
@@ -59,7 +59,7 @@ public class ExpensesAnalysisChartPart implements Part {
 			return label;
 		}
     }
-    
+
 	@Override
 	public void paint(Composite parent) throws RemoteException {
 		chart = new BarChart();
@@ -72,19 +72,20 @@ public class ExpensesAnalysisChartPart implements Part {
 	protected void addChartData() throws RemoteException {
 		int month = control.getMonthNumber((String)control.getMonthSelector().getValue());
 		int year = (Integer)control.getYearSelector().getValue();
-		
+
 		Calendar calBegin = Calendar.getInstance();
 		calBegin.set(year, month, 1, 0, 0, 0);
 		Calendar calEnd = Calendar.getInstance();
-		if (month==11)
+		if (month==11) {
 			calEnd.set(year+1, 0, 1, 23, 59, 59);
-		else
+		} else {
 			calEnd.set(year, month+1, 1, 23, 59, 59);
+		}
 		calEnd.add(Calendar.DAY_OF_MONTH, -1);
-		
-		GenericIterator contracts = ContractControl.getContracts();
+
+		GenericIterator<Contract> contracts = ContractControl.getContracts();
 		while (contracts.hasNext()) {
-			final Contract c = (Contract) contracts.next();
+			final Contract c = contracts.next();
 			if ((c.getEndDate() != null && c.getEndDate().before(calBegin.getTime())) ||
 					(c.getStartDate() != null && c.getStartDate().after(calEnd.getTime()))) {
 				continue;

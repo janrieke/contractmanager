@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -45,25 +45,27 @@ public class SizeableTablePart extends TablePart {
 		} else {
 		    super.paint(parent);
 		}
-		if (orderByIndex != -1)
+		if (orderByIndex != -1) {
 			super.orderBy(orderByIndex);
-		if (orderByColName != null)
+		}
+		if (orderByColName != null) {
 			super.orderBy(orderByColName);
+		}
 	}
 
-	public SizeableTablePart(GenericIterator list, Action action) {
+	public SizeableTablePart(GenericIterator<?> list, Action action) {
 		super(list, action);
 	}
-	
-	public SizeableTablePart(@SuppressWarnings("rawtypes") List list, Action action)
+
+	public SizeableTablePart(List<?> list, Action action)
 	{
 		super(list, action);
 	}
 
 	public synchronized void setHeightHint(int heightHint) {
-		this.heightHint = heightHint; 
+		this.heightHint = heightHint;
 	}
-	
+
 	@Override
 	public synchronized void orderBy(int index) {
 		// make method public

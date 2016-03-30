@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -48,7 +48,7 @@ public class UmsatzListContextMenu extends ContextMenu
 
 	/**
 	 * Context menu for the table of hibiscus transactions that are assigned to a contract.
-	 * @param extension 
+	 * @param extension
 	 * @param konto optionale Angabe des Kontos.
 	 */
 	public UmsatzListContextMenu(Contract contr, ContractDetailViewHibiscusCategories extension)
@@ -58,22 +58,23 @@ public class UmsatzListContextMenu extends ContextMenu
 		i18n = Settings.i18n();
 
 		addItem(new UmsatzItem(i18n.tr("Unassign this transaction from contract"), new Action() {
-			
+
 			@Override
 			public void handleAction(Object context) throws ApplicationException {
-				if (context instanceof Umsatz)
+				if (context instanceof Umsatz) {
 					try {
-						DBIterator transactions = contract.getTransactions();
+						DBIterator<Transaction> transactions = contract.getTransactions();
 						transactions.addFilter("transaction_id = ?",new Object[]{((Umsatz)context).getID()});
 						while (transactions.hasNext()) {
-							Transaction tr = ((Transaction)transactions.next());
+							Transaction tr = (transactions.next());
 							ext.removeTransactionFromTable(tr);
 							tr.delete();
 						}
 					} catch (RemoteException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}				
+					}
+				}
 			}
 		},"user-trash-full.png"));
 		addItem(ContextMenuItem.SEPARATOR);
@@ -99,10 +100,12 @@ public class UmsatzListContextMenu extends ContextMenu
 		/**
 		 * @see de.willuhn.jameica.gui.parts.CheckedContextMenuItem#isEnabledFor(java.lang.Object)
 		 */
+		@Override
 		public boolean isEnabledFor(Object o)
 		{
-			if ((o instanceof Umsatz) || (o instanceof Umsatz[]))
+			if ((o instanceof Umsatz) || (o instanceof Umsatz[])) {
 				return super.isEnabledFor(o);
+			}
 			return false;
 		}
 
@@ -120,10 +123,12 @@ public class UmsatzListContextMenu extends ContextMenu
 		/**
 		 * @see de.willuhn.jameica.gui.parts.ContextMenuItem#isEnabledFor(java.lang.Object)
 		 */
+		@Override
 		public boolean isEnabledFor(Object o)
 		{
-			if (o instanceof Umsatz)
+			if (o instanceof Umsatz) {
 				return super.isEnabledFor(o);
+			}
 			return false;
 		}
 	}

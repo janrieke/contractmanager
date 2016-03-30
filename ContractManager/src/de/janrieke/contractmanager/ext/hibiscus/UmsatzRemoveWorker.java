@@ -127,10 +127,10 @@ class UmsatzRemoveWorker implements BackgroundTask
 				{
 					// Checken, ob der Umsatz einer Buchung zugeordnet ist
 					DBService service = Settings.getDBService();
-					DBIterator transactions = service.createList(Transaction.class);
+					DBIterator<Transaction> transactions = service.createList(Transaction.class);
 					transactions.addFilter("transaction_id = ?",new Object[]{list[i].getID()});
 					if (transactions.hasNext()) {
-						Transaction transaction = (Transaction) transactions.next();
+						Transaction transaction = transactions.next();
 						// update the UmsatzList
 						if (extension != null) {
 							extension.remove(transaction);

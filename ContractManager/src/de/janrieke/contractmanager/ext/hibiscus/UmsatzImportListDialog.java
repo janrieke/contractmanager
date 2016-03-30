@@ -401,9 +401,9 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		}
 
 		List<SortedContract> sorted = new ArrayList<SortedContract>();
-		GenericIterator contracts = ContractControl.getContracts();
+		GenericIterator<Contract> contracts = ContractControl.getContracts();
 		while (contracts.hasNext()) {
-			Contract c = (Contract) contracts.next();
+			Contract c = contracts.next();
 			float simliarity = calculateSimilarity(c, this.umsatz);
 			sorted.add(new SortedContract(c, simliarity));
 		}

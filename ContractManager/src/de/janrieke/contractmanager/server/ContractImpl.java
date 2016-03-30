@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -25,6 +25,7 @@ import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Costs;
+import de.janrieke.contractmanager.rmi.Storage;
 import de.janrieke.contractmanager.rmi.Transaction;
 import de.willuhn.datasource.db.AbstractDBObject;
 import de.willuhn.datasource.rmi.DBIterator;
@@ -38,18 +39,18 @@ import de.willuhn.util.ApplicationException;
  * This is the implementor of the project interface. You never need to
  * instantiate this class directly. Instead of this, use the dbService to find
  * the right implementor of your interface. Example:
- * 
+ *
  * AbstractPlugin p =
  * Application.getPluginLoader().getPlugin(ExamplePlugin.class); DBService
  * service = (DBService)
  * Application.getServiceFactory().lookup(p,"contract_db");
- * 
+ *
  * a) create new project Project project = (Project)
  * service.createObject(Project.class,null);
- * 
+ *
  * b) load existing project with id "4". Project project = (Project)
  * service.createObject(Project.class,"4");
- * 
+ *
  * @author willuhn, jrieke
  */
 public class ContractImpl extends AbstractDBObject implements Contract {
@@ -69,7 +70,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	/**
 	 * We have to return the name of the sql table here.
-	 * 
+	 *
 	 * @see de.willuhn.datasource.db.AbstractDBObject#getTableName()
 	 */
 	@Override
@@ -81,7 +82,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 * Sometimes you can display only one of the projects attributes (in combo
 	 * boxes). Here you can define the name of this field. Please don't confuse
 	 * this with the "primary KEY".
-	 * 
+	 *
 	 * @see de.willuhn.datasource.GenericObject#getPrimaryAttribute()
 	 */
 	@Override
@@ -96,7 +97,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 * of failed dependencies) you have to throw an ApplicationException. The
 	 * message of this one will be shown in users UI. So please translate the
 	 * text into the users language.
-	 * 
+	 *
 	 * @see de.willuhn.datasource.db.AbstractDBObject#deleteCheck()
 	 */
 	@Override
@@ -106,34 +107,40 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	/**
 	 * This method is invoked before executing insert(). So lets check the
 	 * entered data.
-	 * 
+	 *
 	 * @see de.willuhn.datasource.db.AbstractDBObject#insertCheck()
 	 */
 	@Override
 	protected void insertCheck() throws ApplicationException {
 		try {
-			if (getName() == null || getName().length() == 0)
+			if (getName() == null || getName().length() == 0) {
 				throw new ApplicationException(Settings.i18n().tr(
 						"Please enter a contract name."));
+			}
 
-			if (getStartDate() == null && getEndDate() != null)
+			if (getStartDate() == null && getEndDate() != null) {
 				throw new ApplicationException(Settings.i18n().tr(
 						"Start date must be set if end date is."));
+			}
 
 			if (getStartDate() != null && getEndDate() != null
-					&& getStartDate().after(getEndDate()))
+					&& getStartDate().after(getEndDate())) {
 				throw new ApplicationException(Settings.i18n().tr(
 						"Start date cannot be after end date."));
+			}
 
-			if (getCancellationPeriodCount() < 0)
+			if (getCancellationPeriodCount() < 0) {
 				throw new ApplicationException(Settings.i18n().tr(
 						"Cancellation period must not be negative."));
-			if (getFirstMinRuntimeCount() < 0)
+			}
+			if (getFirstMinRuntimeCount() < 0) {
 				throw new ApplicationException(Settings.i18n().tr(
 						"First minimal runtime must not be negative."));
-			if (getFollowingMinRuntimeCount() < 0)
+			}
+			if (getFollowingMinRuntimeCount() < 0) {
 				throw new ApplicationException(Settings.i18n().tr(
 						"Next minimal runtime must not be negative."));
+			}
 
 		} catch (RemoteException e) {
 			Logger.error("Insert check of contract failed.", e);
@@ -144,7 +151,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	/**
 	 * This method is invoked before every update().
-	 * 
+	 *
 	 * @see de.willuhn.datasource.db.AbstractDBObject#updateCheck()
 	 */
 	@Override
@@ -158,14 +165,15 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 */
 	@Override
 	protected Class<?> getForeignObject(String field) throws RemoteException {
-		if ("address_id".equals(field))
+		if ("address_id".equals(field)) {
 			return Address.class;
+		}
 		return null;
 	}
 
 	/**
 	 * We overwrite the delete method to delete all assigned transactions too.
-	 * 
+	 *
 	 * @see de.willuhn.datasource.rmi.Changeable#delete()
 	 */
 	@Override
@@ -175,15 +183,15 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			// to delete all or nothing
 			this.transactionBegin();
 
-			DBIterator transactions = getTransactions();
+			DBIterator<Transaction> transactions = getTransactions();
 			while (transactions.hasNext()) {
-				Transaction t = (Transaction) transactions.next();
+				Transaction t = transactions.next();
 				t.delete();
 			}
 
-			DBIterator costs = getCosts();
+			DBIterator<Costs> costs = getCosts();
 			while (costs.hasNext()) {
-				Costs cost = (Costs) costs.next();
+				Costs cost = costs.next();
 				cost.delete();
 			}
 
@@ -209,35 +217,36 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public Object getAttribute(String arg0) throws RemoteException {
 		// check derived fields
-		if (NEXT_CANCELLATION_DEADLINE.equals(arg0))
+		if (NEXT_CANCELLATION_DEADLINE.equals(arg0)) {
 			return getNextCancellationDeadline();
-		else if (NEXT_TERM_BEGIN.equals(arg0))
+		} else if (NEXT_TERM_BEGIN.equals(arg0)) {
 			return getNextTermBegin();
-		else if (NEXT_TERM_END.equals(arg0))
+		} else if (NEXT_TERM_END.equals(arg0)) {
 			return getNextTermEnd();
-		else if (NEXT_CANCEL_TERM_BEGIN.equals(arg0))
+		} else if (NEXT_CANCEL_TERM_BEGIN.equals(arg0)) {
 			return getNextCancelableTermBegin();
-		else if (NEXT_CANCEL_TERM_END.equals(arg0))
+		} else if (NEXT_CANCEL_TERM_END.equals(arg0)) {
 			return getNextCancelableTermEnd();
-		else if (MONEY_PER_TERM.equals(arg0)) {
+		} else if (MONEY_PER_TERM.equals(arg0)) {
 			Double money = getMoneyPerTerm();
 			return money.isNaN()?null:money;
 		}
-		else if (MONEY_PER_MONTH.equals(arg0))
+		else if (MONEY_PER_MONTH.equals(arg0)) {
 			return getMoneyPerMonth();
-		else if (PARTNER_NAME.equals(arg0))
+		} else if (PARTNER_NAME.equals(arg0)) {
 			return getPartnerName();
-		else if (CONTRACT_NAME_PLUS_PARTNER_NAME.equals(arg0))
+		} else if (CONTRACT_NAME_PLUS_PARTNER_NAME.equals(arg0)) {
 			return getContractAndPartnerName();
-		else if ("ignore_cancellations".equals(arg0)) { // prevent "null" result
+		} else if ("ignore_cancellations".equals(arg0)) { // prevent "null" result
 			Object result = super.getAttribute(arg0);
-			if (result == null)
+			if (result == null) {
 				return 0;
-			else 
+			} else {
 				return result;
-		}
-		else
+			}
+		} else {
 			return super.getAttribute(arg0);
+		}
 	}
 
 	/**
@@ -314,14 +323,13 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 * @see de.janrieke.contractmanager.rmi.Contract#getTransactions()
 	 */
 	@Override
-	public DBIterator getTransactions() throws RemoteException {
+	public DBIterator<Transaction> getTransactions() throws RemoteException {
 		try {
 			// 1) Get the Database Service.
 			DBService service = Settings.getDBService();
 
 			// 2) We create the transaction list using createList(Class)
-			DBIterator transactions = service
-					.createList(de.janrieke.contractmanager.rmi.Transaction.class);
+			DBIterator<Transaction> transactions = service.createList(Transaction.class);
 
 			// 3) we add a filter to only query for tasks with our project id
 			transactions.addFilter("contract_id = " + this.getID());
@@ -471,9 +479,9 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	@Override
-	public DBIterator getCosts() throws RemoteException {
-		DBIterator costsIterator = null;
-//		if (this.costsIterator == null) { 
+	public DBIterator<Costs> getCosts() throws RemoteException {
+		DBIterator<Costs> costsIterator = null;
+//		if (this.costsIterator == null) {
 			try {
 				DBService service = this.getService();
 				costsIterator = service.createList(Costs.class);
@@ -497,7 +505,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	/* Instances of this class shall only be returned if all fields are
-	 * set and valid. 
+	 * set and valid.
 	 */
 	class ValidRuntimes {
 		IntervalType firstMinRuntimeType;
@@ -505,23 +513,24 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		IntervalType followingMinRuntimeType;
 		Integer followingMinRuntimeCount;
 	}
-	
+
 	@Override
 	public boolean hasValidRuntimeInformation() throws RemoteException {
 		return getValidRuntimes() != null;
 	}
-	
+
 	/**
 	 * Convenience method to find out whether all necessary info is available
 	 * to calculate terms and cancellation information.
 	 * @return a ValidRuntimes object if all info is available, or null otherwise
 	 */
 	private ValidRuntimes getValidRuntimes() throws RemoteException {
-		if (getStartDate() == null)
+		if (getStartDate() == null) {
 			return null;
-		
+		}
+
 		ValidRuntimes result = new ValidRuntimes();
-		
+
 		Date startDate = DateUtil.startOfDay(getStartDate());
 
 		Calendar calendar = Calendar.getInstance();
@@ -545,15 +554,16 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		}
 		// do nothing if both are invalid
 		if (result.followingMinRuntimeType == null || result.followingMinRuntimeCount == null
-				|| result.followingMinRuntimeCount <= 0)
+				|| result.followingMinRuntimeCount <= 0) {
 			return null;
+		}
 
 		return result;
 	}
-	
+
 	/**
 	 * Calculates the next contractual term's end after the given date.
-	 * 
+	 *
 	 * @param after
 	 * @return The end of the term.
 	 * @throws RemoteException
@@ -561,12 +571,14 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	private Date calculateNextTermBegin(Date after)
 			throws RemoteException {
 		ValidRuntimes rt = getValidRuntimes();
-		if (rt == null)
+		if (rt == null) {
 			return null;
-		
+		}
+
 		Date startDate = DateUtil.startOfDay(getStartDate());
-		if (after == null)
+		if (after == null) {
 			return null;
+		}
 		Calendar afterCal = Calendar.getInstance();
 		afterCal.setTime(DateUtil.endOfDay(after));
 
@@ -585,15 +597,17 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		}
 
 		if (getEndDate() != null && DateUtil.endOfDay(getEndDate()).before(calendar.getTime()))
+		 {
 			return null; // if the end has already passed, there is no need for
 						 // further cancellations
+		}
 
 		return calendar.getTime();
 	}
 
 	/**
 	 * Calculates the next cancellation deadline after the given date.
-	 * 
+	 *
 	 * @param after
 	 * @return The cancellation deadline or null if no deadline exists after the given date.
 	 * @throws RemoteException
@@ -610,11 +624,12 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		addToCalendar(calendar, cancellationPeriodType, cancellationPeriodCount);
 
 		Date termEnd = calculateNextTermBegin(calendar.getTime());
-		if (termEnd == null)
+		if (termEnd == null) {
 			return null;
-		
+		}
+
 		calendar.setTime(termEnd);
-		
+
 		addToCalendar(calendar, cancellationPeriodType, -cancellationPeriodCount);
 
 		calendar.add(Calendar.DAY_OF_YEAR, -1); //term end is one day before next term's start
@@ -625,20 +640,21 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public Date getNextTermBegin() throws RemoteException {
 		Calendar calendar = Calendar.getInstance();
-		
+
 		return calculateNextTermBegin(calendar.getTime());
 	}
 
 	@Override
 	public Date getNextTermEnd() throws RemoteException {
 		Date begin = getNextTermBegin();
-		if (begin == null)
+		if (begin == null) {
 			return null;
+		}
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(begin);
 		addToCalendar(calendar, getFollowingMinRuntimeType(), getFollowingMinRuntimeCount());
 		calendar.add(Calendar.DAY_OF_YEAR, -1); //term end is one day before next term's start
-		
+
 		return calendar.getTime();
 	}
 
@@ -646,15 +662,16 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	public Date getNextCancelableTermBegin() throws RemoteException {
 		Calendar calendar = Calendar.getInstance();
 		addToCalendar(calendar, getCancellationPeriodType(), getCancellationPeriodCount());
-		
+
 		return calculateNextTermBegin(calendar.getTime());
 	}
 
 	@Override
 	public Date getNextCancelableTermEnd() throws RemoteException {
 		Date begin = getNextCancelableTermBegin();
-		if (begin == null)
+		if (begin == null) {
 			return null;
+		}
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(begin);
 		addToCalendar(calendar, getFollowingMinRuntimeType(), getFollowingMinRuntimeCount());
@@ -662,7 +679,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 		return calendar.getTime();
 	}
-	
+
 	@Override
 	public Date getNextCancellationDeadline() throws RemoteException {
 		Calendar calendar = Calendar.getInstance();
@@ -677,15 +694,16 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	@Override
 	public double getMoneyPerTerm() throws RemoteException {
-		if (getFollowingMinRuntimeCount() <= 0)
+		if (getFollowingMinRuntimeCount() <= 0) {
 			return Double.NaN;
-		double costsPerDay = 0; 
-		double costsPerWeek = 0; 
-		double costsPerMonth = 0; 
-		double costsPerYear = 0; 
-		DBIterator costsIterator = getCosts();
+		}
+		double costsPerDay = 0;
+		double costsPerWeek = 0;
+		double costsPerMonth = 0;
+		double costsPerYear = 0;
+		DBIterator<Costs> costsIterator = getCosts();
 		while (costsIterator.hasNext()) {
-			Costs costEntry = (Costs) costsIterator.next();
+			Costs costEntry = costsIterator.next();
 			switch (costEntry.getPeriod()) {
 			case DAYS:
 				costsPerDay += costEntry.getMoney();
@@ -733,7 +751,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			break;
 		}
 
-		
+
 		return result * getFollowingMinRuntimeCount();
 	}
 
@@ -741,10 +759,10 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public double getMoneyPerMonth() throws RemoteException {
 		// FIXME: Calculate costs based on a real calendar
-		double costsPerMonth = 0; 
-		DBIterator costsIterator = getCosts();
+		double costsPerMonth = 0;
+		DBIterator<Costs> costsIterator = getCosts();
 		while (costsIterator.hasNext()) {
-			Costs costEntry = (Costs) costsIterator.next();
+			Costs costEntry = costsIterator.next();
 			switch (costEntry.getPeriod()) {
 			case DAYS:
 				costsPerMonth += costEntry.getMoney()*30.42;
@@ -772,12 +790,12 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		return costsPerMonth;
 	}
 
-	
+
 	@Override
 	public String getPartnerName() throws RemoteException {
 		return getAddress().getName();
 	}
-	
+
 	@Override
 	public String getContractAndPartnerName() throws RemoteException {
 		return getName() + " [" + getPartnerName() + "]";
@@ -819,7 +837,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		monthBegin.set(Calendar.SECOND, 0);
 		monthBegin.set(Calendar.MILLISECOND, 0);
 		monthBegin.add(Calendar.MILLISECOND, -1);
-		
+
 		Calendar monthEnd = Calendar.getInstance();
 		monthEnd.setTime(month);
 		monthEnd.add(Calendar.MONTH, 1);
@@ -828,12 +846,13 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		monthEnd.set(Calendar.MINUTE, 0);
 		monthEnd.set(Calendar.SECOND, 0);
 		monthEnd.set(Calendar.MILLISECOND, 0);
-		
-		if ((this.getStartDate() == null || this.getStartDate().before(monthEnd.getTime())) && 
-				(this.getEndDate() == null || this.getEndDate().after(monthBegin.getTime())))
+
+		if ((this.getStartDate() == null || this.getStartDate().before(monthEnd.getTime())) &&
+				(this.getEndDate() == null || this.getEndDate().after(monthBegin.getTime()))) {
 			return true;
-		else
+		} else {
 			return false;
+		}
 	}
 
 	@Override
@@ -857,14 +876,13 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	@Override
-	public DBIterator getAttachedFiles() throws RemoteException {
+	public DBIterator<Storage> getAttachedFiles() throws RemoteException {
 		try {
 			// 1) Get the Database Service.
 			DBService service = Settings.getDBService();
 
 			// 2) We create the transaction list using createList(Class)
-			DBIterator transactions = service
-					.createList(de.janrieke.contractmanager.rmi.Storage.class);
+			DBIterator<Storage> transactions = service.createList(Storage.class);
 
 			// 3) we add a filter to only query for tasks with our project id
 			transactions.addFilter("contract_id = " + this.getID());
@@ -905,17 +923,19 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	public boolean isNextDeadlineWithinWarningTime() throws RemoteException {
 		return isNextDeadlineWithin(Settings.getExtensionWarningTime());
 	}
-	
+
 	private boolean isNextDeadlineWithin(int days) throws RemoteException {
 		Date doNotRemindBefore = getDoNotRemindBefore();
 		Date deadline;
-		if (doNotRemindBefore != null)
+		if (doNotRemindBefore != null) {
 			deadline = getNextCancellationDeadline(doNotRemindBefore);
-		else
+		} else {
 			deadline = getNextCancellationDeadline();
+		}
 
-		if (deadline == null)
+		if (deadline == null) {
 			return false;
+		}
 
 		final Calendar today = Calendar.getInstance();
 		Calendar calendar = Calendar.getInstance();

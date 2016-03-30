@@ -480,7 +480,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 
 							// add the new entry to the table
 							if (newid != 0) {
-								DBIterator storageIterator = service
+								DBIterator<Storage> storageIterator = service
 										.createList(Storage.class);
 								storageIterator.addFilter("id = " + newid);
 								GenericObject newEntry = storageIterator.next();

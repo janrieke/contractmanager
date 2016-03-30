@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -68,7 +68,7 @@ public class AddressControl extends AbstractControl {
 
 	/**
 	 * ct.
-	 * 
+	 *
 	 * @param view
 	 *            this is our view (the address details view).
 	 */
@@ -88,12 +88,13 @@ public class AddressControl extends AbstractControl {
 
 	/**
 	 * Small helper method to get the current address.
-	 * 
+	 *
 	 * @return
 	 */
 	private Address getAddress() {
-		if (address != null)
+		if (address != null) {
 			return address;
+		}
 		address = (Address) getCurrentObject();
 		return address;
 	}
@@ -108,20 +109,23 @@ public class AddressControl extends AbstractControl {
 	}
 
 	public Input getPartnerStreet() throws RemoteException {
-		if (partnerStreet == null)
+		if (partnerStreet == null) {
 			partnerStreet = new TextInput(getAddress().getStreet(), 255);
+		}
 		return partnerStreet;
 	}
 
 	public Input getPartnerNumber() throws RemoteException {
-		if (partnerNumber == null)
+		if (partnerNumber == null) {
 			partnerNumber = new TextInput(getAddress().getNumber(), 16);
+		}
 		return partnerNumber;
 	}
 
 	public Input getPartnerStreetNumber() throws RemoteException {
-		if (partnerStreetNumber != null)
+		if (partnerStreetNumber != null) {
 			return partnerStreetNumber;
+		}
 
 		partnerStreetNumber = new MultiInput(getPartnerStreet(),
 				new LabelInput(Settings.i18n().tr("Number")),
@@ -131,28 +135,32 @@ public class AddressControl extends AbstractControl {
 	}
 
 	public Input getPartnerExtra() throws RemoteException {
-		if (partnerExtra == null)
+		if (partnerExtra == null) {
 			partnerExtra = new TextInput(getAddress().getExtra(),
 					255);
+		}
 		return partnerExtra;
 	}
 
 	public Input getPartnerZipcode() throws RemoteException {
-		if (partnerZipcode == null)
+		if (partnerZipcode == null) {
 			partnerZipcode = new TextInput(getAddress().getZipcode(), 5);
+		}
 		return partnerZipcode;
 	}
 
 	public Input getPartnerCity() throws RemoteException {
-		if (partnerCity == null)
+		if (partnerCity == null) {
 			partnerCity = new TextInput(getAddress().getCity(),
 					255);
+		}
 		return partnerCity;
 	}
 
 	public Input getPartnerZipcodeCity() throws RemoteException {
-		if (partnerZipcodeCity != null)
+		if (partnerZipcodeCity != null) {
 			return partnerZipcodeCity;
+		}
 
 		partnerZipcodeCity = new MultiInput(getPartnerZipcode(),
 				new LabelInput(Settings.i18n().tr("City")), getPartnerCity());
@@ -161,39 +169,42 @@ public class AddressControl extends AbstractControl {
 	}
 
 	public Input getPartnerState() throws RemoteException {
-		if (partnerState == null)
+		if (partnerState == null) {
 			partnerState = new TextInput(getAddress().getState(),
 					255);
+		}
 		return partnerState;
 	}
 
 	public Input getPartnerCountry() throws RemoteException {
-		if (partnerCountry == null)
+		if (partnerCountry == null) {
 			partnerCountry = new TextInput(getAddress().getCountry(), 255);
+		}
 		return partnerCountry;
 	}
 
 	/**
 	 * Returns an iterator with all addresses in the database.
-	 * 
-	 * @throws RemoteException 
+	 *
+	 * @throws RemoteException
 	 * @return iterator containing all addresses
 	 */
-	public static GenericIterator getAddresses() throws RemoteException {
+	public static GenericIterator<Address> getAddresses() throws RemoteException {
 		DBService service = Settings.getDBService();
-		DBIterator addresses = service.createList(Address.class);
+		DBIterator<Address> addresses = service.createList(Address.class);
 		return addresses;
 	}
-	
+
 	/**
 	 * Creates a table containing all addresses.
-	 * 
+	 *
 	 * @return a table with addresss.
 	 * @throws RemoteException
 	 */
 	public Part getAddressesTable() throws RemoteException {
-		if (addressList != null)
+		if (addressList != null) {
 			return addressList;
+		}
 
 		// 1) get the dataservice
 		DBService service = Settings.getDBService();
@@ -202,7 +213,7 @@ public class AddressControl extends AbstractControl {
 		// We do not need to specify the implementing class for
 		// the interface "Address". Jameica's classloader knows
 		// all classes an finds the right implementation automatically. ;)
-		DBIterator addresses = service.createList(Address.class);
+		DBIterator<Address> addresses = service.createList(Address.class);
 
 		// 4) create the table
 		addressList = new TablePart(
@@ -220,12 +231,12 @@ public class AddressControl extends AbstractControl {
 
 		// 6) we are adding a context menu
 		addressList.setContextMenu(new AddressListMenu(true));
-		
+
 		addressList.setRememberColWidths(true);
 
 		return addressList;
 	}
-	
+
 
 	public Part getContractList() throws RemoteException  {
 		if (contractList == null) {
@@ -236,7 +247,7 @@ public class AddressControl extends AbstractControl {
 			// We do not need to specify the implementing class for
 			// the interface "Address". Jameica's classloader knows
 			// all classes an finds the right implementation automatically. ;)
-			DBIterator contracts = service.createList(Contract.class);
+			DBIterator<Contract> contracts = service.createList(Contract.class);
 			contracts.addFilter("address_id = " + getAddress().getID());
 
 			// 4) create the table
@@ -287,10 +298,11 @@ public class AddressControl extends AbstractControl {
 				a.store();
 
 				updateDerivedAttributes();
-				
-				if (view instanceof AddressDetailView)
+
+				if (view instanceof AddressDetailView) {
 					((AddressDetailView) view).setButtonActivationState(true);
-				
+				}
+
 				GUI.getStatusBar().setSuccessText(
 						Settings.i18n().tr("Address stored successfully"));
 			} catch (ApplicationException e) {

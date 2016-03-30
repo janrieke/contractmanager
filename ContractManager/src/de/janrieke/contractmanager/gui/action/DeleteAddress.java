@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,6 +22,7 @@ import java.rmi.RemoteException;
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.view.AddressDetailView;
 import de.janrieke.contractmanager.rmi.Address;
+import de.janrieke.contractmanager.rmi.Contract;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.jameica.gui.Action;
@@ -38,12 +39,14 @@ public class DeleteAddress implements Action {
 	/**
 	 * @see de.willuhn.jameica.gui.Action#handleAction(java.lang.Object)
 	 */
+	@Override
 	public void handleAction(Object context) throws ApplicationException {
 
 		// check if the context is a address
-		if (context == null || !(context instanceof Address))
+		if (context == null || !(context instanceof Address)) {
 			throw new ApplicationException(Settings.i18n().tr(
 					"Please choose a address."));
+		}
 
 		Address p = (Address) context;
 
@@ -53,12 +56,11 @@ public class DeleteAddress implements Action {
 			DBService service = Settings.getDBService();
 
 			// 2) We create the contract list using createList(Class)
-			DBIterator contracts = service
-					.createList(de.janrieke.contractmanager.rmi.Contract.class);
+			DBIterator<Contract> contracts = service.createList(Contract.class);
 
 			// 3) we add a filter to only query for tasks with our address id
 			contracts.addFilter("address_id = " + p.getID());
-			
+
 			if (contracts.size()>0) {
 				GUI.getView().setErrorText(Settings.i18n().tr("Address was not deleted because it is still in use."));
 				GUI.getStatusBar().setErrorText(Settings.i18n().tr("Address was not deleted because it is still in use."));
@@ -77,8 +79,9 @@ public class DeleteAddress implements Action {
 					"Do you really want to delete this address?"));
 
 			Boolean choice = (Boolean) d.open();
-			if (!choice.booleanValue())
+			if (!choice.booleanValue()) {
 				return;
+			}
 
 			p.delete();
 			GUI.getStatusBar().setSuccessText(
@@ -88,9 +91,10 @@ public class DeleteAddress implements Action {
 			throw new ApplicationException(Settings.i18n().tr(
 					"Error while deleting address"));
 		}
-		
-		if (GUI.getCurrentView() instanceof AddressDetailView)
+
+		if (GUI.getCurrentView() instanceof AddressDetailView) {
 			GUI.startPreviousView();
+		}
 	}
 
 }

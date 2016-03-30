@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,7 +27,7 @@ import de.willuhn.datasource.rmi.DBObject;
 /**
  * Interface of the business object for contracts. According to the SQL table, we
  * define some getters and setters here.
- * 
+ *
  * <pre>
  * CREATE TABLE contract (
  *   id IDENTITY,
@@ -51,46 +51,46 @@ import de.willuhn.datasource.rmi.DBObject;
  *   PRIMARY KEY (id)
  * );
  * </pre>
- * 
+ *
  * <br>
  * Getters and setters for the primary key (id) are not needed. Every one of the
  * following methods has to throw a RemoteException. <br>
- * 
+ *
  * #############################################################################
  * # IMPORTANT: # # All business objects are RMI objects. So you have to run the
  * # # rmi compiler (rmic) to create the needed stubs. # # Without that you will
  * get a # # java.lang.reflect.InvocationTargetException # # (caused by
  * java.rmi.StubNotFoundException) #
  * #############################################################################
- * 
+ *
  * @author willuhn, jrieke
  */
 public interface Contract extends DBObject {
-	
+
 	public enum IntervalType {
 		//Will be sorted by order
-		ONCE		(0, "undefined",	"once"), 
-		DAYS		(1, "Days",			"daily"), 
-		WEEKS		(2, "Weeks", 		"weekly"), 
-		MONTHS		(3, "Months", 		"monthly"), 
-		QUARTER_YEAR(5, "Quarter Years","quarterly"), 
+		ONCE		(0, "undefined",	"once"),
+		DAYS		(1, "Days",			"daily"),
+		WEEKS		(2, "Weeks", 		"weekly"),
+		MONTHS		(3, "Months", 		"monthly"),
+		QUARTER_YEAR(5, "Quarter Years","quarterly"),
 		HALF_YEARS	(6, "Half Years", 	"semiannually"),
 		YEARS		(4, "Years", 		"annually");
-		
+
 		private final int value; //used for DB storage
 		private final String name;
 		private final String adjective;
-		
+
 		private IntervalType(int value, String name, String adjective) {
 			this.value = value;
 			this.name = name;
 			this.adjective = adjective;
 		}
-		
+
 		public int getValue() {
 			return value;
 		}
-		
+
 		public String getName() {
 			return Settings.i18n().tr(name);
 		}
@@ -103,31 +103,34 @@ public interface Contract extends DBObject {
 		public String getAdjective() {
 			return Settings.i18n().tr(adjective);
 		}
-		
+
 		public static IntervalType valueOfAdjective(String adjective) {
 			for (IntervalType interval : IntervalType.values()) {
-				if (interval.adjective.equals(adjective) || Settings.i18n().tr(interval.adjective).equals(adjective))
+				if (interval.adjective.equals(adjective) || Settings.i18n().tr(interval.adjective).equals(adjective)) {
 					return interval;
+				}
 			}
 			return ONCE;
 		}
 
 		public static IntervalType valueOfName(String name) {
 			for (IntervalType interval : IntervalType.values()) {
-				if (interval.name.equals(name) || Settings.i18n().tr(interval.name).equals(name))
+				if (interval.name.equals(name) || Settings.i18n().tr(interval.name).equals(name)) {
 					return interval;
+				}
 			}
 			return ONCE;
 		}
 
 		public static IntervalType valueOf(int value) {
 			for (IntervalType interval : IntervalType.values()) {
-				if (interval.value == value)
+				if (interval.value == value) {
 					return interval;
+				}
 			}
 			return ONCE;
 		}
-		
+
 		public static String[] getAdjectives() {
 			String[] res = new String[IntervalType.values().length];
 			for (IntervalType interval : IntervalType.values()) {
@@ -140,19 +143,19 @@ public interface Contract extends DBObject {
 
 	/**
 	 * Returns the name of the contract.
-	 * 
+	 *
 	 * @return name of the contract.
 	 * @throws RemoteException
 	 */
 	public String getName() throws RemoteException;
 	public void setName(String name) throws RemoteException;
-	
+
 	public String getContractNumber() throws RemoteException;
 	public void setContractNumber(String contractNo) throws RemoteException;
-	
+
 	public String getCustomerNumber() throws RemoteException;
 	public void setCustomerNumber(String customerNo) throws RemoteException;
-	
+
 	public String getSepaCreditorRef() throws RemoteException;
 	public void setSepaCreditorRef(String ref) throws RemoteException;
 
@@ -161,34 +164,34 @@ public interface Contract extends DBObject {
 
 	public Address getAddress() throws RemoteException;
 	public void setAddress(Address address) throws RemoteException;
-	
+
 	public String getComment() throws RemoteException;
 	public void setComment(String comment) throws RemoteException;
-	
+
 	public Date getStartDate() throws RemoteException;
 	public void setStartDate(Date start) throws RemoteException;
-	
+
 	public Date getEndDate() throws RemoteException;
 	public void setEndDate(Date end) throws RemoteException;
-	
+
 	public Integer getCancellationPeriodCount() throws RemoteException;
 	public void setCancelationPeriodCount(Integer count) throws RemoteException;
-	
+
 	public IntervalType getCancellationPeriodType() throws RemoteException;
 	public void setCancelationPeriodType(IntervalType type) throws RemoteException;
-	
+
 	public Integer getFirstMinRuntimeCount() throws RemoteException;
 	public void setFirstMinRuntimeCount(Integer count) throws RemoteException;
-	
+
 	public IntervalType getFirstMinRuntimeType() throws RemoteException;
 	public void setFirstMinRuntimeType(IntervalType type) throws RemoteException;
 
 	public Integer getFollowingMinRuntimeCount() throws RemoteException;
 	public void setFollowingMinRuntimeCount(Integer count) throws RemoteException;
-	
+
 	public IntervalType getFollowingMinRuntimeType() throws RemoteException;
 	public void setFollowingMinRuntimeType(IntervalType type) throws RemoteException;
-	
+
 	public Boolean getDoNotRemind() throws RemoteException;
 	public void setDoNotRemind(Boolean value) throws RemoteException;
 
@@ -196,32 +199,32 @@ public interface Contract extends DBObject {
 	public void setURI(String uri) throws RemoteException;
 
 	public String getHibiscusCategoryID() throws RemoteException;
-	public void setHibiscusCategoryID(String category) throws RemoteException;	
+	public void setHibiscusCategoryID(String category) throws RemoteException;
 
 	public Date getDoNotRemindBefore() throws RemoteException;
 	public void setDoNotRemindBefore(Date date) throws RemoteException;
-		
+
 	//derived features
-	public DBIterator getTransactions() throws RemoteException;
-	public DBIterator getCosts() throws RemoteException;
-	
-	public DBIterator getAttachedFiles() throws RemoteException;
+	public DBIterator<Transaction> getTransactions() throws RemoteException;
+	public DBIterator<Costs> getCosts() throws RemoteException;
+
+	public DBIterator<Storage> getAttachedFiles() throws RemoteException;
 
 	public static final String NEXT_TERM_BEGIN = "next_term_begin";
 	public Date getNextTermBegin() throws RemoteException;
-	
+
 	public static final String NEXT_TERM_END = "next_term_end";
 	public Date getNextTermEnd() throws RemoteException;
-	
+
 	public static final String NEXT_CANCEL_TERM_BEGIN = "next_cancel_term_begin";
 	public Date getNextCancelableTermBegin() throws RemoteException;
-	
+
 	public static final String NEXT_CANCEL_TERM_END = "next_cancel_term_end";
 	public Date getNextCancelableTermEnd() throws RemoteException;
 
 	public static final String NEXT_CANCELLATION_DEADLINE = "next_cancellation_deadline";
 	public Date getNextCancellationDeadline() throws RemoteException;
-	
+
 	public static final String MONEY_PER_TERM = "costs_per_term";
 	public double getMoneyPerTerm() throws RemoteException;
 
@@ -236,11 +239,11 @@ public interface Contract extends DBObject {
 
 	//helper methods
 	public Date getNextCancellationDeadline(Date after) throws RemoteException;
-	
+
 	public boolean isActiveInMonth(Date month) throws RemoteException;
-	
+
 	public void doNotRemindAboutNextCancellation() throws RemoteException;
-	
+
 	public boolean isNextDeadlineWithinNoticeTime() throws RemoteException;
 	public boolean isNextDeadlineWithinWarningTime() throws RemoteException;
 	public abstract boolean hasValidRuntimeInformation() throws RemoteException;

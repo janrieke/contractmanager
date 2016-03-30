@@ -196,9 +196,9 @@ class UmsatzImportWorker implements BackgroundTask
 		//No separators between lines until we have a working SEPA rewriter -
 		// lines end after 27 chars, but fields may be 35 chars long.
 		String trUse = VerwendungszweckUtil.toString(u, "");
-		DBIterator i = ContractControl.getContracts();
+		DBIterator<Contract> i = ContractControl.getContracts();
 		while (i.hasNext()) {
-			Contract c = (Contract) i.next();
+			Contract c = i.next();
 			if (c.getSepaCreditorRef() != null && !"".equals(c.getSepaCreditorRef())) {
 				if (c.getSepaCustomerRef() != null && !"".equals(c.getSepaCustomerRef())) {
 					//Both SEPA references set -> both must be contained in the use string
@@ -228,7 +228,7 @@ class UmsatzImportWorker implements BackgroundTask
 			i = ContractControl.getContracts();
 			i.addFilter("hibiscus_category = ?", new Object[]{typ.getID()});
 			if (i.size() == 1) {
-				return (Contract) i.next();
+				return i.next();
 			}
 		}
 

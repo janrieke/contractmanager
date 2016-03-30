@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -59,8 +59,6 @@ import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.dialogs.ListDialog;
 import de.willuhn.jameica.gui.dialogs.YesNoDialog;
-import de.willuhn.jameica.messaging.StatusBarMessage;
-import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.system.OperationCanceledException;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
@@ -69,7 +67,7 @@ import de.willuhn.util.ApplicationException;
  * Generic Action for "History back" ;).
  */
 public class GenerateOdfDocument implements Action {
-	
+
 	public class TemplateListEntry {
 		private Path file;
 		private String title;
@@ -89,21 +87,23 @@ public class GenerateOdfDocument implements Action {
 	}
 
 	private static final Charset UTF8_CHARSET = Charset.forName("UTF-8");
-	
+
 	/**
 	 * @see de.willuhn.jameica.gui.Action#handleAction(java.lang.Object)
 	 */
+	@Override
 	public void handleAction(Object context) throws ApplicationException {
 
 		// check if the context is a contract
-		if (context == null || !(context instanceof Contract))
+		if (context == null || !(context instanceof Contract)) {
 			throw new ApplicationException(Settings.i18n().tr(
 					"Please choose a contract."));
+		}
 
 		//TODO: Also generate PDFs
 
 		Contract p = (Contract) context;
-		
+
 		// Which type of document should be generated?
 		final List<TemplateListEntry> templates = new ArrayList<>();
 		String templateFolderString;
@@ -132,31 +132,37 @@ public class GenerateOdfDocument implements Action {
 					try {
 						zipFile = new ZipFile(path.toFile());
 						ZipEntry meta = zipFile.getEntry("meta.xml");
-						if (meta == null)
+						if (meta == null) {
 							return null;
+						}
 						InputStream inputStream = zipFile.getInputStream(meta);
-						if (inputStream == null)
+						if (inputStream == null) {
 							return null;
+						}
 					    s = new Scanner(inputStream);
 					    s.useDelimiter("\\A");
-					    if (!s.hasNext())
-					    	return null;
+					    if (!s.hasNext()) {
+							return null;
+						}
 					    String fileContents = s.next();
-					    
+
 					    Pattern TITLE_PATTERN = Pattern.compile("<dc:title>(.*)</dc:title>");
 					    Matcher m = TITLE_PATTERN.matcher(fileContents);
-					    if (m.find())
-					    	return new String(m.group(1).getBytes(), UTF8_CHARSET);
-					    
+					    if (m.find()) {
+							return new String(m.group(1).getBytes(), UTF8_CHARSET);
+						}
+
 						return null;
 					} catch (IOException e) {
 						return null;
 					} finally {
 						try {
-							if (zipFile != null)
+							if (zipFile != null) {
 								zipFile.close();
-							if (s != null)
+							}
+							if (s != null) {
 								s.close();
+							}
 						} catch (IOException e) {
 							// Ok
 						}
@@ -190,14 +196,16 @@ public class GenerateOdfDocument implements Action {
 			try {
 				selectedTemplate = (TemplateListEntry) templateSelectionDialog.open();
 			} catch (Exception e) {
-				if (e instanceof OperationCanceledException)
+				if (e instanceof OperationCanceledException) {
 					return;
+				}
 				Logger.error("Failed to open template selection dialog", e);
 				selectedTemplate = templates.get(0);
 			}
-			
-			if (selectedTemplate == null)
+
+			if (selectedTemplate == null) {
 				return;
+			}
 		} else {
 			selectedTemplate = templates.get(0);
 		}
@@ -207,7 +215,7 @@ public class GenerateOdfDocument implements Action {
 		if (templateBaseName.contains(".")) {
 			templateBaseName = templateBaseName.substring(0, templateBaseName.lastIndexOf("."));
 		}
-		
+
 		// Select document filename
 		FileDialog fd = new FileDialog(GUI.getShell(), SWT.SAVE);
 		fd.setText(Settings.i18n().tr("Select Filename for Document"));
@@ -223,10 +231,11 @@ public class GenerateOdfDocument implements Action {
 
 		StringBuilder suggestedFilename = new StringBuilder();
 		for (char c : contractName.toCharArray()) {
-			if (c=='.' || Character.isLetterOrDigit(c))
+			if (c=='.' || Character.isLetterOrDigit(c)) {
 				suggestedFilename.append(c);
-			else 
+			} else {
 				suggestedFilename.append('_');
+			}
 		}
 
 		fd.setFileName(MessageFormat.format(templateBaseName + "-{0}-{1}.odt",
@@ -238,8 +247,9 @@ public class GenerateOdfDocument implements Action {
 
 		final String filename = fd.open();
 
-		if (filename == null || filename.length() == 0)
+		if (filename == null || filename.length() == 0) {
 			return;
+		}
 
 		try {
 			// retrieve variable values
@@ -278,10 +288,10 @@ public class GenerateOdfDocument implements Action {
 				cal.add(Calendar.DAY_OF_YEAR, -1);
 				values.put("CANCELLATION_DATE",
 						Settings.dateformat(cal.getTime()));
-			}
-			else
+			} else {
 				values.put("CANCELLATION_DATE",
 						Settings.dateformat(new Date()));
+			}
 
 			Date endDate = p.getEndDate();
 			if (endDate != null) {
@@ -320,7 +330,7 @@ public class GenerateOdfDocument implements Action {
 			Logger.error("error with invalid template >>" + selectedTemplate.getFileName() + "<<", e);
 			throw new ApplicationException(Settings.i18n().tr(
 					"Error invalid template"), e);
-			
+
 		} catch (Exception e) {
 			throw new ApplicationException(Settings.i18n().tr(
 					"Error while storing document"), e);

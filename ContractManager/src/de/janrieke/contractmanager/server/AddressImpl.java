@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -41,7 +41,7 @@ public class AddressImpl extends AbstractDBObject implements Address {
 
 	/**
 	 * We have to return the name of the sql table here.
-	 * 
+	 *
 	 * @see de.willuhn.datasource.db.AbstractDBObject#getTableName()
 	 */
 	@Override
@@ -53,7 +53,7 @@ public class AddressImpl extends AbstractDBObject implements Address {
 	 * Sometimes you can display only one of the projects attributes (in combo
 	 * boxes). Here you can define the name of this field. Please don't confuse
 	 * this with the "primary KEY".
-	 * 
+	 *
 	 * @see de.willuhn.datasource.GenericObject#getPrimaryAttribute()
 	 */
 	@Override
@@ -61,14 +61,14 @@ public class AddressImpl extends AbstractDBObject implements Address {
 		// we choose the contract's name as primary field.
 		return "name";
 	}
-	
+
 	/**
 	 * This method will be called before delete() is executed. Here you can make
 	 * some dependency checks. If you don't want to delete the project (in case
 	 * of failed dependencies) you have to throw an ApplicationException. The
 	 * message of this one will be shown in users UI. So please translate the
 	 * text into the users language.
-	 * 
+	 *
 	 * @see de.willuhn.datasource.db.AbstractDBObject#deleteCheck()
 	 */
 	@Override
@@ -78,15 +78,16 @@ public class AddressImpl extends AbstractDBObject implements Address {
 	/**
 	 * This method is invoked before executing insert(). So lets check the
 	 * entered data.
-	 * 
+	 *
 	 * @see de.willuhn.datasource.db.AbstractDBObject#insertCheck()
 	 */
 	@Override
 	protected void insertCheck() throws ApplicationException {
 		try {
-			if (getName() == null || getName().length() == 0)
+			if (getName() == null || getName().length() == 0) {
 				throw new ApplicationException(Settings.i18n().tr(
 						"Please enter a name for the address."));
+			}
 
 		} catch (RemoteException e) {
 			Logger.error("insert check of contract failed", e);
@@ -97,7 +98,7 @@ public class AddressImpl extends AbstractDBObject implements Address {
 
 	/**
 	 * This method is invoked before every update().
-	 * 
+	 *
 	 * @see de.willuhn.datasource.db.AbstractDBObject#updateCheck()
 	 */
 	@Override
@@ -117,15 +118,16 @@ public class AddressImpl extends AbstractDBObject implements Address {
 		// if ("summary".equals(fieldName)) {
 		// return new Double(getPrice() * getEfforts());
 		// }
-		if (CONTRACT_COUNT.equals(fieldName))
+		if (CONTRACT_COUNT.equals(fieldName)) {
 			return getContractCount();
+		}
 
 		return super.getAttribute(fieldName);
 	}
 
-	
+
 	//FIELD DATA ACCESS
-	
+
 	@Override
 	public String getName() throws RemoteException {
 		return (String) getAttribute("name");
@@ -208,7 +210,7 @@ public class AddressImpl extends AbstractDBObject implements Address {
 
 	@Override
 	public int getContractCount() throws RemoteException {
-		DBIterator contractIterator = null;
+		DBIterator<Contract> contractIterator = null;
 		try {
 			DBService service = this.getService();
 			contractIterator = service.createList(Contract.class);

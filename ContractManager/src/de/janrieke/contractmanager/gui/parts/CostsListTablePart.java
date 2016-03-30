@@ -13,8 +13,8 @@ import de.willuhn.jameica.gui.Action;
 
 public class CostsListTablePart extends SizeableTablePart {
 
-	public CostsListTablePart(GenericIterator list, Action action) {
-		// We use the double-click action to insert a new cost entry. 
+	public CostsListTablePart(GenericIterator<Costs> list, Action action) {
+		// We use the double-click action to insert a new cost entry.
 		super(list, action);
 	}
 
@@ -22,8 +22,9 @@ public class CostsListTablePart extends SizeableTablePart {
 	protected String getControlValue(Control control) {
 		if (control instanceof CCombo) {
 			return ((CCombo) control).getText();
-		} else
+		} else {
 			return super.getControlValue(control);
+		}
 	}
 
 	@Override
@@ -42,11 +43,11 @@ public class CostsListTablePart extends SizeableTablePart {
 			newText.selectAll();
 			newText.setFocus();
 			return newText;
-		}
-		else 
+		} else {
 			return super.getEditorControl(row, item, oldValue);
+		}
 	}
-	
+
 	@Override
 	public Object getSelection() {
 		Object selection = super.getSelection();

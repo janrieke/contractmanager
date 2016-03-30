@@ -185,7 +185,7 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 	static boolean isAssigned(Umsatz u) throws Exception
 	{
 		DBService service = Settings.getDBService();
-		DBIterator transactions = service.createList(Transaction.class);
+		DBIterator<Transaction> transactions = service.createList(Transaction.class);
 		transactions.addFilter("transaction_id = ?",new Object[]{u.getID()});
 		return transactions.hasNext();
 	}
