@@ -1,0 +1,6 @@
+{
+  "name": "ContractManager",
+  "tagline": "All your contracts under control",
+  "body": "ContractManager is a contract management software for the Jameica platform (http://willuhn.de/products/jameica/). It allows you to enter details of your contracts, e.g., financial information, runtime, or cancellation deadlines. It notifies you about upcoming cancellation deadlines.\r\n\r\nFor installation instruction, see http://janrieke.de/contractmanager/.\r\n\r\n[ContractManager Web Site](http://janrieke.de/contractmanager/)",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
