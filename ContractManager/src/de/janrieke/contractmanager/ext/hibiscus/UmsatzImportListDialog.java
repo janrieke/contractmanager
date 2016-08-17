@@ -101,7 +101,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 
 		this.setTitle(Settings.i18n().tr("Select contract"));
 		this.setPanelText(Settings.i18n().tr("Select contract to assign transaction to."));
-		this.setSize(370, 500);
+		this.setSize(500, 600);
 	}
 
 	/**
