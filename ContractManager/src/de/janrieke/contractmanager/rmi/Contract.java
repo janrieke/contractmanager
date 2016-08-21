@@ -247,4 +247,5 @@ public interface Contract extends DBObject {
 	public boolean isNextDeadlineWithinNoticeTime() throws RemoteException;
 	public boolean isNextDeadlineWithinWarningTime() throws RemoteException;
 	public abstract boolean hasValidRuntimeInformation() throws RemoteException;
+	public Date getNextTermBeginAfter(Date startDate) throws RemoteException;
 }

@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -47,11 +47,12 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	private boolean activationState;
 	private Button deleteButton;
 	private ContractControl control;
-	private SimpleContainer right; 
-			
+	private SimpleContainer right;
+
 	/**
 	 * @see de.willuhn.jameica.gui.AbstractView#bind()
 	 */
+	@Override
 	public void bind() throws Exception {
 		// draw the title
 		GUI.getView().setTitle(Settings.i18n().tr("Contract Details"));
@@ -60,7 +61,7 @@ public class ContractDetailView extends AbstractView implements Extendable {
 		control = new ContractControl(this);
 
 	    ScrolledContainer scroller = new ScrolledContainer(getParent());
-		
+
 	    ColumnLayout columns = new ColumnLayout(scroller.getComposite(), 2, true);
 	    SimpleContainer left = new SimpleContainer(columns.getComposite());
 
@@ -74,12 +75,12 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    left.addLabelPair(Settings.i18n().tr("Contract number"), control.getContractNumber());
 	    left.addLabelPair(Settings.i18n().tr("Customer number"), control.getCustomerNumber());
     	left.addPart(new Button(Settings.i18n().tr("Open document storage..."), new ShowDocumentStorage(), this.getCurrentObject()));
-    	
+
 	    left.addHeadline(Settings.i18n().tr("Financial Details"));
 	    left.addPart(control.getCostsList());
 	    left.addLabelPair(Settings.i18n().tr("Money per term"), control.getCostsPerTerm());
 	    left.addLabelPair(Settings.i18n().tr("Money per month"), control.getCostsPerMonth());
-	    
+
 	    left.addHeadline(Settings.i18n().tr("Runtime"));
 	    left.addLabelPair(Settings.i18n().tr("Start date"),	control.getStartDate());
 	    left.addLabelPair(Settings.i18n().tr("End date"), control.getEndDate());
@@ -100,10 +101,10 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    right.addLabelPair(Settings.i18n().tr("Zipcode"), control.getPartnerZipcodeCity());
 	    right.addLabelPair(Settings.i18n().tr("State"), control.getPartnerState());
 	    right.addLabelPair(Settings.i18n().tr("Country"), control.getPartnerCountry());
-	    
+
 	    right.addHeadline(Settings.i18n().tr("Comment"));
 	    right.addPart(control.getComment());
-	    
+
 		// add some buttons
 		ButtonArea buttons = new ButtonArea(getParent(), 4);
 		buttons.addButton(Settings.i18n().tr("Generate Letter..."), new GenerateOdfDocument(), control.getCurrentObject(), false, "document-print.png");
@@ -115,6 +116,7 @@ public class ContractDetailView extends AbstractView implements Extendable {
 		restoreButton.setEnabled(activationState);
 		buttons.addButton(restoreButton);
 		buttons.addButton(Settings.i18n().tr("Store Contract"), new Action() {
+			@Override
 			public void handleAction(Object context)
 					throws ApplicationException {
 				control.handleStore();
@@ -125,17 +127,20 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	/**
 	 * @see de.willuhn.jameica.gui.AbstractView#unbind()
 	 */
+	@Override
 	public void unbind() throws ApplicationException {
 		// this method will be invoked when leaving the dialog.
 		// You are able to interrupt the unbind by throwing an
 		// ApplicationException.
 	}
-	
+
 	public void setButtonActivationState(boolean active) {
-		if (restoreButton != null)
+		if (restoreButton != null) {
 			restoreButton.setEnabled(active);
-		if (deleteButton != null)
+		}
+		if (deleteButton != null) {
 			deleteButton.setEnabled(active);
+		}
 		activationState = active;
 	}
 
@@ -144,8 +149,9 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	}
 
 	public void addExtensionInput(String headline, List<String> labels, List<Input> inputs) {
-		if (labels.size() != inputs.size())
+		if (labels.size() != inputs.size()) {
 			throw new IllegalArgumentException("Number of labels must be equal to number of inputs.");
+		}
 	    right.addHeadline(headline);
 	    for (int i = 0; i<labels.size(); i++) {
 		    right.addLabelPair(labels.get(i), inputs.get(i));
@@ -157,7 +163,7 @@ public class ContractDetailView extends AbstractView implements Extendable {
 		container.addHeadline(headline);
 		container.addPart(part);
 	}
-	
+
 	@Override
 	public String getExtendableID() {
 		return this.getClass().getName();

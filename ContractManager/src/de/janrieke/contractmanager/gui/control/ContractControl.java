@@ -21,9 +21,12 @@ import java.rmi.RemoteException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -32,6 +35,7 @@ import org.eclipse.swt.widgets.TableItem;
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.CreateNewCostEntry;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion;
+import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion.ValidationProvider;
 import de.janrieke.contractmanager.gui.input.PositiveIntegerInput;
 import de.janrieke.contractmanager.gui.menu.ContractListMenu;
 import de.janrieke.contractmanager.gui.menu.CostsListMenu;
@@ -126,14 +130,14 @@ public class ContractControl extends AbstractControl {
 	// this is the currently opened contract
 	private Contract contract;
 
-	private LabelInput nextCancellationDeadline;
+	private LabelInput nextCancellationDeadlineLabel;
 
 	private CostsListTablePart costsList;
 	private LabelInput costsPerTerm;
 	private LabelInput costsPerMonth;
 
-	private List<Costs> newCosts = new ArrayList<Costs>();
-	private List<Costs> deletedCosts = new ArrayList<Costs>();
+	private final List<Costs> newCosts = new ArrayList<Costs>();
+	private final List<Costs> deletedCosts = new ArrayList<Costs>();
 
 	// holds the current Hibiscus category of the selection box (used for
 	// storing to DB on store button click)
@@ -150,8 +154,8 @@ public class ContractControl extends AbstractControl {
 		super(view);
 		if (view instanceof ContractDetailView) {
 			((ContractDetailView) view)
-					.setButtonActivationState(!((Contract) view
-							.getCurrentObject()).isNewObject());
+			.setButtonActivationState(!((Contract) view
+					.getCurrentObject()).isNewObject());
 		}
 	}
 
@@ -304,8 +308,40 @@ public class ContractControl extends AbstractControl {
 		String s = initial == null ? "YYYY-MM-DD" : Settings
 				.dateformat(initial);
 
+		// Show a warning if the end date is within the very first cancellation deadline.
+		// Reason: Many users confuse the end date with the end of the first runtime.
+		ValidationProvider validationProvider = new DateDialogInputAutoCompletion.ValidationProvider() {
+			@Override
+			public Optional<ValidationMessage> validate(Date time) {
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(time);
+				calendar.add(Calendar.DAY_OF_MONTH, -2); // a little tolerance
+				try {
+					Date startDate = getContract().getStartDate();
+					if (startDate == null) {
+						return Optional.empty();
+					}
+					Date nextTermBegin = getContract().getNextTermBeginAfter(startDate);
+					if (nextTermBegin == null) {
+						return Optional.empty();
+					}
+					// TODO: If users are still confused, increase the warning time, like this:
+					// nextTermBegin = getContract().getNextTermBeginAfter(nextTermBegin);
+					if (nextTermBegin.after(calendar.getTime())) {
+						return Optional
+								.of(new ValidationMessage(
+										Settings.i18n().tr("You have entered an end date close to the contract's start date. Are you sure this is correct?\nOnly enter an end date if the contract will definitely terminate on that date without any explicit cancellation.\nAfter the end date, you will not be reminded of cancellation deadlines any more."),
+										FieldDecorationRegistry.DEC_WARNING));
+					}
+				} catch (RemoteException e) {
+					Logger.error("Error while getting contract's dates.", e);
+				}
+				return Optional.empty();
+			}
+		};
+
 		// Dialog-Input is an Input field that gets its data from a dialog.
-		endDate = new DateDialogInputAutoCompletion(s, initial, d);
+		endDate = new DateDialogInputAutoCompletion(s, initial, d, validationProvider);
 
 		// we store the initial value
 		endDate.setValue(initial);
@@ -327,7 +363,7 @@ public class ContractControl extends AbstractControl {
 		Date nte = getContract().getNextCancelableTermEnd();
 		if (ntb != null && nte != null) {
 			return Settings.dateformat(ntb) + " " + Settings.i18n().tr("to")
-							+ " " + Settings.dateformat(nte);
+					+ " " + Settings.dateformat(nte);
 		} else {
 			if (getContract().hasValidRuntimeInformation()) {
 				return Settings.i18n().tr("Not cancellable before contract ends");
@@ -338,14 +374,14 @@ public class ContractControl extends AbstractControl {
 	}
 
 	public LabelInput getNextCancellationDeadline() throws RemoteException {
-		if (nextCancellationDeadline != null) {
-			return nextCancellationDeadline;
+		if (nextCancellationDeadlineLabel != null) {
+			return nextCancellationDeadlineLabel;
 		}
 
 		Date ne = getContract().getNextCancellationDeadline();
-		nextCancellationDeadline = new LabelInput(ne == null ? ""
+		nextCancellationDeadlineLabel = new LabelInput(ne == null ? ""
 				: Settings.dateformat(ne));
-		return nextCancellationDeadline;
+		return nextCancellationDeadlineLabel;
 	}
 
 	public LabelInput getCostsPerTerm() throws RemoteException {
@@ -684,7 +720,7 @@ public class ContractControl extends AbstractControl {
 		contractList.addColumn(Settings.i18n().tr("Money per Term"),
 				Contract.MONEY_PER_TERM, new CurrencyFormatter(
 						Settings.CURRENCY, Settings.DECIMALFORMAT), false,
-				Column.ALIGN_RIGHT);
+						Column.ALIGN_RIGHT);
 		contractList.addColumn(Settings.i18n().tr("Money per Month"),
 				Contract.MONEY_PER_MONTH, new CurrencyFormatter(
 						Settings.CURRENCY, Settings.DECIMALFORMAT));
@@ -1153,7 +1189,7 @@ public class ContractControl extends AbstractControl {
 		costsPerMonth.setValue(Settings.DECIMALFORMAT.format(costs));
 
 		Date ne = getContract().getNextCancellationDeadline();
-		nextCancellationDeadline.setValue(ne == null ? "" : Settings
+		nextCancellationDeadlineLabel.setValue(ne == null ? "" : Settings
 				.dateformat(ne));
 
 		nextExtension.setValue(getNextTermValueString());
