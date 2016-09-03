@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.SWT;
@@ -37,9 +38,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.TableItem;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.ShowContractDetailView;
@@ -49,12 +48,12 @@ import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
 import de.janrieke.contractmanager.rmi.Costs;
+import de.janrieke.contractmanager.rmi.Transaction;
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.dialogs.AbstractDialog;
-import de.willuhn.jameica.gui.formatter.TableFormatter;
 import de.willuhn.jameica.gui.input.CheckboxInput;
 import de.willuhn.jameica.gui.input.TextInput;
 import de.willuhn.jameica.gui.parts.Button;
@@ -65,6 +64,7 @@ import de.willuhn.jameica.gui.util.DelayedListener;
 import de.willuhn.jameica.gui.util.SimpleContainer;
 import de.willuhn.jameica.hbci.rmi.Umsatz;
 import de.willuhn.jameica.hbci.server.VerwendungszweckUtil;
+import de.willuhn.jameica.hbci.server.VerwendungszweckUtil.Tag;
 import de.willuhn.jameica.system.OperationCanceledException;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
@@ -146,13 +146,9 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		ButtonArea buttons = new ButtonArea();
 		buttons.addButton(getAssignButton());
 		buttons.addButton(getCreateContractButton());
-		buttons.addButton(Settings.i18n().tr("Cancel"), new Action() {
-			@Override
-			public void handleAction(Object context)
-					throws ApplicationException {
-				throw new OperationCanceledException();
-			}
-		}, null, false, "process-stop.png");
+		buttons.addButton(Settings.i18n().tr("Cancel"),
+				context -> {throw new OperationCanceledException();},
+				null, false, "process-stop.png");
 
 		group.addButtonArea(buttons);
 
@@ -226,18 +222,14 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		}
 
 		applyForAll = new CheckboxInput(false);
-		applyForAll.addListener(new Listener() {
-
-			@Override
-			public void handleEvent(Event event) {
-				if (event == null || event.type != SWT.Selection) {
-					return;
-				}
-				if (Boolean.TRUE.equals(applyForAll.getValue())) {
-					getAssignButton().setText(Settings.i18n().tr("Assign all"));
-				} else {
-					getAssignButton().setText(Settings.i18n().tr("Assign"));
-				}
+		applyForAll.addListener(event -> {
+			if (event == null || event.type != SWT.Selection) {
+				return;
+			}
+			if (Boolean.TRUE.equals(applyForAll.getValue())) {
+				getAssignButton().setText(Settings.i18n().tr("Assign all"));
+			} else {
+				getAssignButton().setText(Settings.i18n().tr("Assign"));
 			}
 		});
 		return applyForAll;
@@ -262,44 +254,33 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		this.table.addColumn(Settings.i18n().tr("Name of Contract"), "name");
 		this.table.addColumn(Settings.i18n().tr("Contract Partner"),
 				Contract.PARTNER_NAME);
-		this.table.setFormatter(new TableFormatter() {
-			/**
-			 * @see de.willuhn.jameica.gui.formatter.TableFormatter#format(org.eclipse.swt.widgets.TableItem)
-			 */
-			@Override
-			public void format(TableItem item) {
-				if (item == null) {
+		this.table.setFormatter(item -> {
+			if (item == null) {
+				return;
+			}
+
+			try {
+				Contract c = (Contract) item.getData();
+				if (c == null) {
 					return;
 				}
 
-				try {
-					Contract c = (Contract) item.getData();
-					if (c == null) {
-						return;
-					}
+				Color col = null;
 
-					Color col = null;
-
-					boolean t = c.isActiveInMonth(new Date());
-					if (!t) {
-						col = Settings.getNotActiveForegroundColor();
-					} else {
-						col = de.willuhn.jameica.gui.util.Color.FOREGROUND
-								.getSWTColor();
-					}
-					item.setForeground(col);
-				} catch (Exception e) {
-					Logger.error("unable to apply color", e);
+				boolean t = c.isActiveInMonth(new Date());
+				if (!t) {
+					col = Settings.getNotActiveForegroundColor();
+				} else {
+					col = de.willuhn.jameica.gui.util.Color.FOREGROUND
+							.getSWTColor();
 				}
+				item.setForeground(col);
+			} catch (Exception e) {
+				Logger.error("unable to apply color", e);
 			}
 		});
 
-		this.table.addSelectionListener(new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				getAssignButton().setEnabled(event.data != null);
-			}
-		});
+		this.table.addSelectionListener(event -> getAssignButton().setEnabled(event.data != null));
 		this.getAssignButton().setEnabled(this.chosen != null);
 		return this.table;
 	}
@@ -328,8 +309,25 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 			try {
 				Contract c = (Contract) Settings.getDBService().createObject(
 						Contract.class, null);
+
+				// Set SEPA infos.
+				Map<Tag, String> sepaTags = VerwendungszweckUtil.parse(umsatz);
+				String mref = sepaTags.get(Tag.MREF);
+				if (StringUtils.isNotBlank(mref)) {
+					c.setSepaCustomerRef(mref);
+				}
+				String cred = sepaTags.get(Tag.CRED);
+				if (StringUtils.isNotBlank(cred)) {
+					c.setSepaCreditorRef(cred);
+				}
+
+				if (umsatz.getUmsatzTyp() != null) {
+					c.setHibiscusCategoryID(umsatz.getUmsatzTyp().getID());
+				}
+
 				c.setStartDate(umsatz.getDatum());
 				c.setComment(VerwendungszweckUtil.toString(umsatz));
+				// Set some defaults on the runtime.
 				c.setCancelationPeriodType(IntervalType.MONTHS);
 				c.setFirstMinRuntimeType(IntervalType.MONTHS);
 				c.setFollowingMinRuntimeType(IntervalType.MONTHS);
@@ -341,18 +339,31 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 					c.setAddress(a);
 				}
 
+				// The ID for the new contract will only be available upon save.
+				// Thus, we have to delay storing the n-to-n references for the
+				// Costs and Transactions tables. To do so, we them as temporary data.
+
+				// Use the financial data from this transaction as a cost entry.
 				Costs costs = (Costs) Settings.getDBService().createObject(
 						Costs.class, null);
 				costs.setContract(c);
 				costs.setMoney(umsatz.getBetrag());
 				costs.setPeriod(IntervalType.MONTHS);
 
+				// Create a new Transaction assignment.
+				Transaction trans = (Transaction) Settings.getDBService().createObject(
+						Transaction.class, null);
+				trans.setContract(c);
+				trans.setTransactionID(Integer.parseInt(umsatz.getID()));
+
 				chosen = null;
 				close();
 				showContractDetailView.handleAction(c);
+
 				AbstractView currentView = GUI.getCurrentView();
 				if (currentView instanceof ContractDetailView) {
 					((ContractDetailView)currentView).getControl().addTemporaryCostEntry(costs);
+					((ContractDetailView)currentView).getControl().addTemporaryTransactionAssignment(trans);
 				}
 			} catch (RemoteException e) {
 				throw new ApplicationException(Settings.i18n().tr(
@@ -422,34 +433,27 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 	 * verwenden zu koennen
 	 */
 	private class DelayedAdapter extends KeyAdapter {
-		private Listener forward = new DelayedListener(150, new Listener() {
-			/**
-			 * @see org.eclipse.swt.widgets.Listener#handleEvent(org.eclipse.swt.widgets.Event)
-			 */
-			@Override
-			public void handleEvent(Event event) {
-				TablePart table = getTable();
-				table.removeAll();
+		private Listener forward = new DelayedListener(150, event -> {
+			TablePart table = getTable();
+			table.removeAll();
 
-				String text = (String) getSearch().getValue();
-				text = text.trim().toLowerCase();
-				try {
-					for (Contract t : list) {
-						if (text.length() == 0) {
-							table.addItem(t);
-							continue;
-						}
-
-						if (t.getName().toLowerCase().contains(text)
-								|| t.getPartnerName().toLowerCase().contains(text)) {
-							table.addItem(t);
-						}
+			String text = (String) getSearch().getValue();
+			text = text.trim().toLowerCase();
+			try {
+				for (Contract t : list) {
+					if (text.length() == 0) {
+						table.addItem(t);
+						continue;
 					}
-				} catch (RemoteException re) {
-					Logger.error("error while adding items to table", re);
-				}
-			}
 
+					if (t.getName().toLowerCase().contains(text)
+							|| t.getPartnerName().toLowerCase().contains(text)) {
+						table.addItem(t);
+					}
+				}
+			} catch (RemoteException re) {
+				Logger.error("error while adding items to table", re);
+			}
 		});
 
 		/**
@@ -457,8 +461,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		 */
 		@Override
 		public void keyReleased(KeyEvent e) {
-			forward.handleEvent(null); // Das Event-Objekt interessiert uns eh
-										// nicht
+			forward.handleEvent(null); // Das Event-Objekt interessiert uns eh nicht.
 		}
 	}
 
@@ -474,8 +477,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 						.sqrt((((float) (distance - minDistance)) / ((float) maxDistance))));
 	}
 
-	private static final int MINIMUM_TOKEN_SIZE = 3; // do not count 1 or 2
-														// character tokens
+	private static final int MINIMUM_TOKEN_SIZE = 3; // do not count 1 or 2 character tokens.
 
 	private float calculateSimilarity(Contract c, Umsatz transaction) {
 		try {

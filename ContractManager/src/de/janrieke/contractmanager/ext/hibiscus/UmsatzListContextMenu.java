@@ -34,7 +34,7 @@ import de.willuhn.jameica.gui.parts.ContextMenu;
 import de.willuhn.jameica.gui.parts.ContextMenuItem;
 import de.willuhn.jameica.hbci.gui.action.UmsatzDetail;
 import de.willuhn.jameica.hbci.rmi.Umsatz;
-import de.willuhn.util.ApplicationException;
+import de.willuhn.logging.Logger;
 import de.willuhn.util.I18N;
 
 /**
@@ -44,7 +44,8 @@ import de.willuhn.util.I18N;
 public class UmsatzListContextMenu extends ContextMenu
 {
 
-	private I18N i18n;
+	private final I18N i18n;
+	private final Contract contract;
 
 	/**
 	 * Context menu for the table of hibiscus transactions that are assigned to a contract.
@@ -53,27 +54,22 @@ public class UmsatzListContextMenu extends ContextMenu
 	 */
 	public UmsatzListContextMenu(Contract contr, ContractDetailViewHibiscusCategories extension)
 	{
-		final Contract contract = contr;
+		contract = contr;
 		final ContractDetailViewHibiscusCategories ext = extension;
 		i18n = Settings.i18n();
 
-		addItem(new UmsatzItem(i18n.tr("Unassign this transaction from contract"), new Action() {
-
-			@Override
-			public void handleAction(Object context) throws ApplicationException {
-				if (context instanceof Umsatz) {
-					try {
-						DBIterator<Transaction> transactions = contract.getTransactions();
-						transactions.addFilter("transaction_id = ?",new Object[]{((Umsatz)context).getID()});
-						while (transactions.hasNext()) {
-							Transaction tr = (transactions.next());
-							ext.removeTransactionFromTable(tr);
-							tr.delete();
-						}
-					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+		addItem(new UmsatzItem(i18n.tr("Unassign this transaction from contract"), context -> {
+			if (context instanceof Umsatz) {
+				try {
+					DBIterator<Transaction> transactions = contract.getTransactions();
+					transactions.addFilter("transaction_id = ?",new Object[]{((Umsatz)context).getID()});
+					while (transactions.hasNext()) {
+						Transaction tr = (transactions.next());
+						ext.removeTransactionFromTable(tr);
+						tr.delete();
 					}
+				} catch (RemoteException e) {
+					Logger.error("Error while accessing transactions.", e);
 				}
 			}
 		},"user-trash-full.png"));
@@ -103,6 +99,14 @@ public class UmsatzListContextMenu extends ContextMenu
 		@Override
 		public boolean isEnabledFor(Object o)
 		{
+			try {
+				// No unassigning of transactions for new contracts.
+				if (contract.isNewObject()) {
+					return false;
+				}
+			} catch (RemoteException e) {
+				return false;
+			}
 			if ((o instanceof Umsatz) || (o instanceof Umsatz[])) {
 				return super.isEnabledFor(o);
 			}

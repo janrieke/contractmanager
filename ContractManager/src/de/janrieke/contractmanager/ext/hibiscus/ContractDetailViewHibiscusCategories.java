@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Listener;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.ShowHibiscusSettings;
@@ -123,20 +122,17 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 				// Auswahlfeld hinzufuegen
 				final UmsatzTypInput input = new UmsatzTypInput(typ,UmsatzTyp.TYP_EGAL);
 
-				input.addListener(new Listener() {
-					@Override
-					public void handleEvent(org.eclipse.swt.widgets.Event event) {
-						try
-						{
-							UmsatzTyp t = (UmsatzTyp) input.getValue();
-							//do not immediately write to DB, let the controller do
-							// this when storing everything else
-							control.hibiscusCategoryID = (t != null ? t.getID() : null);
-						}
-						catch (RemoteException e)
-						{
-							Logger.error("unable to apply hibiscus category",e);
-						}
+				input.addListener(event -> {
+					try
+					{
+						UmsatzTyp t = (UmsatzTyp) input.getValue();
+						//do not immediately write to DB, let the controller do
+						// this when storing everything else
+						control.hibiscusCategoryID = (t != null ? t.getID() : null);
+					}
+					catch (RemoteException e)
+					{
+						Logger.error("unable to apply hibiscus category",e);
 					}
 				});
 				labels.add(Settings.i18n().tr("Category"));
@@ -180,12 +176,24 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 				umsatzList.setRememberColWidths(true);
 				umsatzList.orderBy("!id-int");
 
+				control.addTransactionListener(this::transactionAdded);
+
 				view.addExtensionContainer(umsatzList, Settings.i18n().tr("Assigned Hibiscus Transactions"));
 			}
 		}
 		catch (Exception e)
 		{
 			Logger.error("unable to extend ContractDetailView",e);
+		}
+	}
+
+	public void transactionAdded(Transaction transaction) {
+		try {
+			Umsatz umsatz = (Umsatz)
+					de.willuhn.jameica.hbci.Settings.getDBService().createObject(Umsatz.class, transaction.getTransactionID().toString());
+			umsatzList.addItem(umsatz);
+		} catch (RemoteException e) {
+			Logger.error("Unable to add temporary transaction.", e);
 		}
 	}
 
