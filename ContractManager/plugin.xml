@@ -10,7 +10,7 @@
   <homepage>http://janrieke.de/products/contractmanager</homepage>
   <license>GPL 3.0 - http://www.gnu.org/licenses/gpl-3.0.txt</license>
 
-  <requires jameica="2.6+">
+  <requires jameica="2.6.4+">
     <import plugin="hibiscus" version="2.6+" required="false" />
   </requires>
 
