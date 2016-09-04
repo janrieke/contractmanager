@@ -362,8 +362,12 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 
 				AbstractView currentView = GUI.getCurrentView();
 				if (currentView instanceof ContractDetailView) {
-					((ContractDetailView)currentView).getControl().addTemporaryCostEntry(costs);
-					((ContractDetailView)currentView).getControl().addTemporaryTransactionAssignment(trans);
+					ContractControl control = ((ContractDetailView)currentView).getControl();
+					control.addTemporaryCostEntry(costs);
+					control.addTemporaryTransactionAssignment(trans);
+					if (umsatz.getUmsatzTyp() != null) {
+						control.hibiscusCategoryID = umsatz.getUmsatzTyp().getID();
+					}
 				}
 			} catch (RemoteException e) {
 				throw new ApplicationException(Settings.i18n().tr(
