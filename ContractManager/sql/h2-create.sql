@@ -33,6 +33,7 @@ CREATE TABLE contract (
   do_not_remind_before date,
   sepa_creditor varchar(35),
   sepa_customer varchar(35),
+  runtime_snap_to_end int(1),
   UNIQUE (id),
   PRIMARY KEY (id),
   CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES address (id)

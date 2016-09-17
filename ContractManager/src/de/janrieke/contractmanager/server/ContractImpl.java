@@ -459,7 +459,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	@Override
 	public Boolean getDoNotRemind() throws RemoteException {
-		Integer b = ((Integer) getAttribute("ignore_cancellations"));
+		Integer b = (Integer) getAttribute("ignore_cancellations");
 		return b == null ? false : b.equals(1);
 	}
 
@@ -476,6 +476,17 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public void setURI(String uri) throws RemoteException {
 		setAttribute("uri", uri);
+	}
+
+	@Override
+	public Boolean getRuntimeSnapToEnd() throws RemoteException {
+		Integer b = (Integer) getAttribute("runtime_snap_to_end");
+		return b == null ? false : b.equals(1);
+	}
+
+	@Override
+	public void setRuntimeSnapToEnd(Boolean value) throws RemoteException {
+		setAttribute("runtime_snap_to_end", value?1:0);
 	}
 
 	@Override

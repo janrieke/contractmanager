@@ -93,7 +93,8 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 	 *            the preselected contract.
 	 * @throws RemoteException
 	 */
-	public UmsatzImportListDialog(Umsatz u, Contract preSelectedContract, boolean moreImportsFollow) throws RemoteException {
+	public UmsatzImportListDialog(Umsatz u, Contract preSelectedContract, boolean moreImportsFollow)
+			throws RemoteException {
 		super(AbstractDialog.POSITION_CENTER, true);
 		this.umsatz = u;
 		this.chosen = preSelectedContract;
@@ -122,10 +123,17 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		Container group = new SimpleContainer(parent, true);
 
 		group.addText(Settings.i18n().tr("Transaction to assign:"), true);
-		group.addText(Settings.i18n().tr("From/To") + ": " + StringUtils.defaultString(umsatz.getGegenkontoName(), ""), false);
-		group.addText(Settings.i18n().tr("Reference") + ": " + VerwendungszweckUtil.toString(umsatz), true);
-		group.addText(Settings.i18n().tr("Date") + ": " + Settings.dateformat(umsatz.getDatum()), false);
-		group.addText(Settings.i18n().tr("Value") + ": " + Settings.formatAsCurrency(umsatz.getBetrag()), false);
+		group.addText(
+				Settings.i18n().tr("From/To") + ": "
+						+ StringUtils.defaultString(umsatz.getGegenkontoName(), ""), false);
+		group.addText(
+				Settings.i18n().tr("Reference") + ": " + VerwendungszweckUtil.toString(umsatz),
+				true);
+		group.addText(Settings.i18n().tr("Date") + ": " + Settings.dateformat(umsatz.getDatum()),
+				false);
+		group.addText(
+				Settings.i18n().tr("Value") + ": " + Settings.formatAsCurrency(umsatz.getBetrag()),
+				false);
 
 		TextInput text = this.getSearch();
 		group.addInput(text);
@@ -140,15 +148,16 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		text.getControl().addKeyListener(new DelayedAdapter());
 
 		if (moreImportsFollow) {
-			group.addCheckbox(getApplyForAllCheckbox(), Settings.i18n().tr("Also assign all further transactions to this contract"));
+			group.addCheckbox(getApplyForAllCheckbox(),
+					Settings.i18n().tr("Also assign all further transactions to this contract"));
 		}
 
 		ButtonArea buttons = new ButtonArea();
 		buttons.addButton(getAssignButton());
 		buttons.addButton(getCreateContractButton());
-		buttons.addButton(Settings.i18n().tr("Cancel"),
-				context -> {throw new OperationCanceledException();},
-				null, false, "process-stop.png");
+		buttons.addButton(Settings.i18n().tr("Cancel"), context -> {
+			throw new OperationCanceledException();
+		}, null, false, "process-stop.png");
 
 		group.addButtonArea(buttons);
 
@@ -174,8 +183,8 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 
 		// Use the 'wrong', but longer text on the assign button, first.
 		// It will be replaced immediately on the first draw.
-		assignButton = new Button(Settings.i18n().tr("Assign all"), new AssingToContract(),
-				null, true, "ok.png");
+		assignButton = new Button(Settings.i18n().tr("Assign all"), new AssingToContract(), null,
+				true, "ok.png");
 		assignButton.setEnabled(false); // initially disabled
 		return assignButton;
 	}
@@ -190,8 +199,8 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 			return this.createContractButton;
 		}
 
-		this.createContractButton = new Button(Settings.i18n().tr("New Contract from Transaction"), new CreateNewContract(),
-				null, true, "document-new.png");
+		this.createContractButton = new Button(Settings.i18n().tr("New Contract from Transaction"),
+				new CreateNewContract(), null, true, "document-new.png");
 		return this.createContractButton;
 	}
 
@@ -236,7 +245,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 	}
 
 	public boolean isApplyForAll() {
-		return applyForAll != null && (Boolean)applyForAll.getValue();
+		return applyForAll != null && (Boolean) applyForAll.getValue();
 	}
 
 	/**
@@ -252,8 +261,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		this.table = new TablePart(this.list, new AssingToContract());
 		this.table.setSummary(false);
 		this.table.addColumn(Settings.i18n().tr("Name of Contract"), "name");
-		this.table.addColumn(Settings.i18n().tr("Contract Partner"),
-				Contract.PARTNER_NAME);
+		this.table.addColumn(Settings.i18n().tr("Contract Partner"), Contract.PARTNER_NAME);
 		this.table.setFormatter(item -> {
 			if (item == null) {
 				return;
@@ -271,8 +279,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 				if (!t) {
 					col = Settings.getNotActiveForegroundColor();
 				} else {
-					col = de.willuhn.jameica.gui.util.Color.FOREGROUND
-							.getSWTColor();
+					col = de.willuhn.jameica.gui.util.Color.FOREGROUND.getSWTColor();
 				}
 				item.setForeground(col);
 			} catch (Exception e) {
@@ -307,8 +314,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 			// Create a new contract from the data of the transaction
 			ShowContractDetailView showContractDetailView = new ShowContractDetailView();
 			try {
-				Contract c = (Contract) Settings.getDBService().createObject(
-						Contract.class, null);
+				Contract c = (Contract) Settings.getDBService().createObject(Contract.class, null);
 
 				// Set SEPA infos.
 				Map<Tag, String> sepaTags = VerwendungszweckUtil.parse(umsatz);
@@ -333,19 +339,18 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 				c.setFollowingMinRuntimeType(IntervalType.MONTHS);
 
 				if (StringUtils.isNotBlank(umsatz.getGegenkontoName())) {
-					Address a = (Address) Settings.getDBService().createObject(
-							Address.class, null);
+					Address a = (Address) Settings.getDBService().createObject(Address.class, null);
 					a.setName(umsatz.getGegenkontoName());
 					c.setAddress(a);
 				}
 
 				// The ID for the new contract will only be available upon save.
 				// Thus, we have to delay storing the n-to-n references for the
-				// Costs and Transactions tables. To do so, we them as temporary data.
+				// Costs and Transactions tables. To do so, we them as temporary
+				// data.
 
 				// Use the financial data from this transaction as a cost entry.
-				Costs costs = (Costs) Settings.getDBService().createObject(
-						Costs.class, null);
+				Costs costs = (Costs) Settings.getDBService().createObject(Costs.class, null);
 				costs.setContract(c);
 				costs.setMoney(umsatz.getBetrag());
 				costs.setPeriod(IntervalType.MONTHS);
@@ -362,7 +367,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 
 				AbstractView currentView = GUI.getCurrentView();
 				if (currentView instanceof ContractDetailView) {
-					ContractControl control = ((ContractDetailView)currentView).getControl();
+					ContractControl control = ((ContractDetailView) currentView).getControl();
 					control.addTemporaryCostEntry(costs);
 					control.addTemporaryTransactionAssignment(trans);
 					if (umsatz.getUmsatzTyp() != null) {
@@ -388,11 +393,14 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		final class SortedContract implements Comparable<SortedContract> {
 			private float value;
 			private Contract c;
-			public Contract getContract() {return c;}
 
 			public SortedContract(Contract c, float value) {
 				this.value = value;
 				this.c = c;
+			}
+
+			public Contract getContract() {
+				return c;
 			}
 
 			@Override
@@ -402,12 +410,13 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 
 			@Override
 			public int hashCode() {
-				return c.hashCode()+1;
+				return c.hashCode() + 1;
 			}
 
 			@Override
 			public boolean equals(Object obj) {
-				if (obj != null && obj instanceof SortedContract && ((SortedContract)obj).c == this.c) {
+				if (obj != null && obj instanceof SortedContract
+						&& ((SortedContract) obj).c == this.c) {
 					return true;
 				} else {
 					return false;
@@ -415,7 +424,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 			}
 		}
 
-		List<SortedContract> sorted = new ArrayList<SortedContract>();
+		List<SortedContract> sorted = new ArrayList<>();
 		GenericIterator<Contract> contracts = ContractControl.getContracts();
 		while (contracts.hasNext()) {
 			Contract c = contracts.next();
@@ -424,7 +433,7 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		}
 		Collections.sort(sorted);
 
-		List<Contract> l = new LinkedList<Contract>();
+		List<Contract> l = new LinkedList<>();
 		for (SortedContract c : sorted) {
 			l.add(c.getContract());
 		}
@@ -465,23 +474,23 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 		 */
 		@Override
 		public void keyReleased(KeyEvent e) {
-			forward.handleEvent(null); // Das Event-Objekt interessiert uns eh nicht.
+			forward.handleEvent(null); // Das Event-Objekt interessiert uns eh
+										// nicht.
 		}
 	}
 
 	private float getRelativeLevenshteinDistance(String a, String b) {
-		int distance = StringUtils.getLevenshteinDistance(a.toLowerCase(),
-				b.toLowerCase());
+		int distance = StringUtils.getLevenshteinDistance(a.toLowerCase(), b.toLowerCase());
 		int maxLength = Math.max(a.length(), b.length());
 		int minLength = Math.min(a.length(), b.length());
 		int maxDistance = maxLength;
 		int minDistance = maxLength - minLength;
-		return (float) Math
-				.sqrt(Math
-						.sqrt((((float) (distance - minDistance)) / ((float) maxDistance))));
+		return (float) Math.sqrt(Math
+				.sqrt((((float) (distance - minDistance)) / ((float) maxDistance))));
 	}
 
-	private static final int MINIMUM_TOKEN_SIZE = 3; // do not count 1 or 2 character tokens.
+	private static final int MINIMUM_TOKEN_SIZE = 3; // do not count 1 or 2
+														// character tokens.
 
 	private float calculateSimilarity(Contract c, Umsatz transaction) {
 		try {
@@ -490,10 +499,10 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 				trName = transaction.getGegenkontoName();
 			}
 
-			//No separators between lines until we have a working SEPA rewriter -
-			// lines end after 27 chars, but fields may be 35 chars long.
+			// No separators between lines until we have a working SEPA
+			// rewriter. Lines end after 27 chars, but fields may be 35 chars
+			// long.
 			String trUse = VerwendungszweckUtil.toString(transaction, "");
-
 
 			String[] trNameTokens = trName.split("\\s+");
 			String[] trUseTokens = trUse.split("\\s+");
@@ -506,8 +515,8 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 				if (trNameTokens[i].length() < MINIMUM_TOKEN_SIZE) {
 					distanceName[i] = 1; // do not count small tokens
 				} else {
-					distanceName[i] = getRelativeLevenshteinDistance(
-							trNameTokens[i], c.getPartnerName());
+					distanceName[i] = getRelativeLevenshteinDistance(trNameTokens[i],
+							c.getPartnerName());
 				}
 			}
 
@@ -516,37 +525,29 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 				if (trUseTokens[i].length() < MINIMUM_TOKEN_SIZE) {
 					distanceUse[i] = 1; // do not count small tokens
 				} else {
-					distanceUse[i] = getRelativeLevenshteinDistance(
-							trUseTokens[i], c.getName());
+					distanceUse[i] = getRelativeLevenshteinDistance(trUseTokens[i], c.getName());
 				}
 			}
 
-			// try finding the contract numbers or SEPA refs in the reason for payment
+			// try finding the contract numbers or SEPA refs in the reason for
+			// payment
 			String customerNumber = c.getCustomerNumber();
 			String contractNumber = c.getContractNumber();
 			String sepaCreditorRef = c.getSepaCreditorRef();
 			String sepaCustomerRef = c.getSepaCustomerRef();
 
 			int exactHits = 0;
-			if (customerNumber != null && !"".equals(customerNumber)) {
-				if (trUse.toString().contains(customerNumber)) {
-					exactHits++;
-				}
+			if (containsString(trUse, customerNumber)) {
+				exactHits++;
 			}
-			if (contractNumber != null && !"".equals(contractNumber)) {
-				if (trUse.toString().contains(contractNumber)) {
-					exactHits++;
-				}
+			if (containsString(trUse, contractNumber)) {
+				exactHits++;
 			}
-			if (sepaCreditorRef != null && !"".equals(sepaCreditorRef)) {
-				if (trUse.toString().contains(sepaCreditorRef)) {
-					exactHits++;
-				}
+			if (containsString(trUse, sepaCreditorRef)) {
+				exactHits++;
 			}
-			if (sepaCustomerRef != null && !"".equals(sepaCustomerRef)) {
-				if (trUse.toString().contains(sepaCustomerRef)) {
-					exactHits++;
-				}
+			if (containsString(trUse, sepaCustomerRef)) {
+				exactHits++;
 			}
 
 			float result = 1;
@@ -564,7 +565,13 @@ public class UmsatzImportListDialog extends AbstractDialog<Contract> {
 			}
 			return result - exactHits;
 		} catch (RemoteException e) {
+			Logger.error("Error while looking for contracts that match the transaction.", e);
 			return 1;
 		}
+	}
+
+	private boolean containsString(String containingString, String containedString) {
+		return (containedString != null) && (!"".equals(containedString))
+				&& (containingString.contains(containedString));
 	}
 }

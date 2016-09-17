@@ -24,7 +24,6 @@ package de.janrieke.contractmanager.ext.hibiscus;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.eclipse.swt.widgets.Composite;
 
@@ -52,17 +51,20 @@ import de.willuhn.jameica.hbci.rmi.Umsatz;
 import de.willuhn.jameica.hbci.rmi.UmsatzTyp;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
+import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
 /**
  * Erweitert die ContractDetails um die Zuordnung einer Umsatzkategorie aus
- * Hibiscus sowie der zugeordneten Verträge - jedoch nur, insofern Hibiscus installiert ist.
+ * Hibiscus sowie der zugeordneten Verträge - jedoch nur, insofern Hibiscus
+ * installiert ist.
  */
 public class ContractDetailViewHibiscusCategories implements Extension {
 
 	private SizeableTablePart umsatzList;
 
-	private final static I18N hibiscusI18n = Application.getPluginLoader().getPlugin(HBCI.class).getResources().getI18N();
+	private static final I18N hibiscusI18n = Application.getPluginLoader().getPlugin(HBCI.class)
+			.getResources().getI18N();
 
 	/**
 	 * @see de.willuhn.jameica.gui.extension.Extension#extend(de.willuhn.jameica.gui.extension.Extendable)
@@ -81,58 +83,52 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 			return;
 		}
 
-	    PanelButton settings = new PanelButton("document-properties.png", new ShowHibiscusSettings(), Settings.i18n().tr("Settings"));
-	    GUI.getView().addPanelButton(settings);
+		PanelButton settings = new PanelButton("document-properties.png",
+				new ShowHibiscusSettings(), Settings.i18n().tr("Settings"));
+		GUI.getView().addPanelButton(settings);
 
 		final Contract contract = (Contract) view.getCurrentObject();
 
-		ArrayList<String> labels = new ArrayList<String>(3);
-		ArrayList<Input> inputs  = new ArrayList<Input>(3);
+		ArrayList<String> labels = new ArrayList<>(3);
+		ArrayList<Input> inputs = new ArrayList<>(3);
 
-		try
-		{
+		try {
 			// 1) add SEPA fields
-			if(Settings.getShowSEPACreditorInput()) {
-		    	labels.add(Settings.i18n().tr("SEPA Creditor Reference"));
-		    	inputs.add(control.getSEPACreditorReference());
+			if (Settings.getShowSEPACreditorInput()) {
+				labels.add(Settings.i18n().tr("SEPA Creditor Reference"));
+				inputs.add(control.getSEPACreditorReference());
 			}
-		    if(Settings.getShowSEPACustomerInput()) {
-		    	labels.add(Settings.i18n().tr("SEPA Customer Reference"));
-		    	inputs.add(control.getSEPACustomerReference());
-		    }
+			if (Settings.getShowSEPACustomerInput()) {
+				labels.add(Settings.i18n().tr("SEPA Customer Reference"));
+				inputs.add(control.getSEPACustomerReference());
+			}
 
 			// 2) add a category selection input
 			if (Settings.getShowHibiscusCategorySelector()) {
 				// Zugeordnete Kategorie ermitteln
 				UmsatzTyp typ = null;
 				String id = contract.getHibiscusCategoryID();
-				if (id != null)
-				{
-					try
-					{
-						typ = (UmsatzTyp)
-								de.willuhn.jameica.hbci.Settings.getDBService().createObject(UmsatzTyp.class,id);
-					}
-					catch (ObjectNotFoundException e)
-					{
-						// Die Kategorie wurde in Hibiscus zwischenzeitlich geloescht, ignorieren wir
+				if (id != null) {
+					try {
+						typ = (UmsatzTyp) de.willuhn.jameica.hbci.Settings.getDBService()
+								.createObject(UmsatzTyp.class, id);
+					} catch (ObjectNotFoundException e) {
+						// Die Kategorie wurde in Hibiscus zwischenzeitlich
+						// geloescht, ignorieren wir
 					}
 				}
 
 				// Auswahlfeld hinzufuegen
-				final UmsatzTypInput input = new UmsatzTypInput(typ,UmsatzTyp.TYP_EGAL);
+				final UmsatzTypInput input = new UmsatzTypInput(typ, UmsatzTyp.TYP_EGAL);
 
 				input.addListener(event -> {
-					try
-					{
+					try {
 						UmsatzTyp t = (UmsatzTyp) input.getValue();
-						//do not immediately write to DB, let the controller do
+						// do not immediately write to DB, let the controller do
 						// this when storing everything else
-						control.hibiscusCategoryID = (t != null ? t.getID() : null);
-					}
-					catch (RemoteException e)
-					{
-						Logger.error("unable to apply hibiscus category",e);
+						control.hibiscusCategoryID = t != null ? t.getID() : null;
+					} catch (RemoteException e) {
+						Logger.error("unable to apply hibiscus category", e);
 					}
 				});
 				labels.add(Settings.i18n().tr("Category"));
@@ -143,18 +139,17 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 
 			// 3) add a container that holds the list of assigned transactions
 			if (Settings.getShowHibiscusTransactionList()) {
-				List<Umsatz> umsaetze = new Vector<Umsatz>();
+				List<Umsatz> umsaetze = new ArrayList<>();
 				DBIterator<Transaction> transactions = contract.getTransactions();
 				while (transactions.hasNext()) {
 					Transaction transaction = transactions.next();
 					Umsatz umsatz = null;
-					try
-					{
-						umsatz = (Umsatz)
-								de.willuhn.jameica.hbci.Settings.getDBService().createObject(Umsatz.class,transaction.getTransactionID().toString());
-					}
-					catch (ObjectNotFoundException e)
-					{
+					try {
+						umsatz = (Umsatz) de.willuhn.jameica.hbci.Settings.getDBService()
+								.createObject(Umsatz.class,
+										transaction.getTransactionID().toString());
+					} catch (ObjectNotFoundException e) {
+						// Umsatz was delete in the meantime, remove the assignment.
 						transaction.delete();
 					}
 					if (umsatz != null) {
@@ -178,39 +173,36 @@ public class ContractDetailViewHibiscusCategories implements Extension {
 
 				control.addTransactionListener(this::transactionAdded);
 
-				view.addExtensionContainer(umsatzList, Settings.i18n().tr("Assigned Hibiscus Transactions"));
+				view.addExtensionContainer(umsatzList,
+						Settings.i18n().tr("Assigned Hibiscus Transactions"));
 			}
-		}
-		catch (Exception e)
-		{
-			Logger.error("unable to extend ContractDetailView",e);
+		} catch (Exception e) {
+			Logger.error("unable to extend ContractDetailView", e);
 		}
 	}
 
 	public void transactionAdded(Transaction transaction) {
 		try {
-			Umsatz umsatz = (Umsatz)
-					de.willuhn.jameica.hbci.Settings.getDBService().createObject(Umsatz.class, transaction.getTransactionID().toString());
+			Umsatz umsatz = (Umsatz) de.willuhn.jameica.hbci.Settings.getDBService().createObject(
+					Umsatz.class, transaction.getTransactionID().toString());
 			umsatzList.addItem(umsatz);
 		} catch (RemoteException e) {
 			Logger.error("Unable to add temporary transaction.", e);
 		}
 	}
 
-	public void removeTransactionFromTable(Transaction tr) {
+	public void removeTransactionFromTable(Transaction tr) throws RemoteException {
 		Umsatz umsatz = null;
-		try
-		{
-			umsatz = (Umsatz)
-					de.willuhn.jameica.hbci.Settings.getDBService().createObject(Umsatz.class,tr.getTransactionID().toString());
-		}
-		catch (ObjectNotFoundException e)
-		{
+		try {
+			umsatz = (Umsatz) de.willuhn.jameica.hbci.Settings.getDBService().createObject(
+					Umsatz.class, tr.getTransactionID().toString());
+		} catch (ObjectNotFoundException e) {
 			// Der Umsatz wurde in Hibiscus zwischenzeitlich geloescht
-			// TODO: Transaction löschen
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			try {
+				tr.delete();
+			} catch (ApplicationException e1) {
+				Logger.error("Error while deleting transaction.", e1);
+			}
 		}
 		if (umsatz != null) {
 			umsatzList.removeItem(umsatz);

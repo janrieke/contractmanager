@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -38,13 +38,15 @@ public class NewTransactionsListener implements MessageConsumer {
 	/**
 	 * @see de.willuhn.jameica.messaging.MessageConsumer#autoRegister()
 	 */
+	@Override
 	public boolean autoRegister() {
-		return (Application.getPluginLoader().isInstalled(HBCI.class.getName()));
+		return Application.getPluginLoader().isInstalled(HBCI.class.getName());
 	}
 
 	/**
 	 * @see de.willuhn.jameica.messaging.MessageConsumer#getExpectedMessageTypes()
 	 */
+	@Override
 	@SuppressWarnings("rawtypes")
 	public Class[] getExpectedMessageTypes() {
 		return new Class[] { ImportMessage.class };
@@ -53,25 +55,29 @@ public class NewTransactionsListener implements MessageConsumer {
 	/**
 	 * @see de.willuhn.jameica.messaging.MessageConsumer#handleMessage(de.willuhn.jameica.messaging.Message)
 	 */
+	@Override
 	public void handleMessage(Message message) throws Exception {
-		if (!Settings.getHibiscusAutoImportNewTransactions())
+		if (!Settings.getHibiscusAutoImportNewTransactions()) {
 			return;
-		
+		}
+
 		// Ignore non-import messages
-		if (message == null || !(message instanceof ImportMessage))
+		if (message == null || !(message instanceof ImportMessage)) {
 			return;
+		}
 
 		GenericObject o = ((ImportMessage) message).getObject();
 
-		if (o == null || !(o instanceof Umsatz) || o.getID() == null)
+		if (o == null || !(o instanceof Umsatz) || o.getID() == null) {
 			return; // no ID means: not stored in DB
-		
-		if (((Umsatz) o).hasFlag(Umsatz.FLAG_NOTBOOKED))
-			return; // ignore transactions that have not been booked, yet
+		}
 
-		Umsatz[] u = {(Umsatz) o};
+		if (((Umsatz) o).hasFlag(Umsatz.FLAG_NOTBOOKED)) {
+			return; // ignore transactions that have not been booked, yet
+		}
+
+		Umsatz[] u = { (Umsatz) o };
 		UmsatzImportWorker worker = new UmsatzImportWorker(u, true);
-		//Application.getController().start(worker);
 		worker.run(null);
 	}
 }

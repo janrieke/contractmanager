@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.janrieke.contractmanager.rmi.ContractDBService;
-import de.janrieke.contractmanager.server.DBSupportH2Impl;
 import de.janrieke.contractmanager.server.ContractDBUpdateProvider;
+import de.janrieke.contractmanager.server.DBSupportH2Impl;
 import de.willuhn.logging.Logger;
 import de.willuhn.sql.ScriptExecutor;
 import de.willuhn.sql.version.Update;
@@ -31,10 +31,10 @@ import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
 /**
- * Remind me later function
+ * Document storage; SEPA information
  */
 public class update0021 implements Update {
-	private Map<String, String> statements = new HashMap<String, String>();
+	private Map<String, String> statements = new HashMap<>();
 
 	/**
 	 * Default constructor
@@ -59,6 +59,7 @@ public class update0021 implements Update {
 	/**
 	 * @see de.willuhn.sql.version.Update#execute(de.willuhn.sql.version.UpdateProvider)
 	 */
+	@Override
 	public void execute(UpdateProvider provider) throws ApplicationException {
 		ContractDBUpdateProvider myProvider = (ContractDBUpdateProvider) provider;
 		I18N i18n = myProvider.getResources().getI18N();
@@ -66,10 +67,11 @@ public class update0021 implements Update {
 		// Get the SQL dialect
 		String driver = ContractDBService.SETTINGS.getString("database.driver",
 				DBSupportH2Impl.class.getName());
-		String sql = (String) statements.get(driver);
-		if (sql == null)
+		String sql = statements.get(driver);
+		if (sql == null) {
 			throw new ApplicationException(i18n.tr(
 					"Database {0} not supported", driver));
+		}
 
 		try {
 			ScriptExecutor
@@ -88,6 +90,7 @@ public class update0021 implements Update {
 	/**
 	 * @see de.willuhn.sql.version.Update#getName()
 	 */
+	@Override
 	public String getName() {
 		return "Database update v20 to v21 (SEPA fields, document storage)";
 	}

@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,7 +23,6 @@ import de.janrieke.contractmanager.rmi.ContractDBService;
 import de.janrieke.contractmanager.server.ContractDBServiceImpl;
 import de.janrieke.contractmanager.server.DBSupportH2Impl;
 import de.willuhn.jameica.plugin.AbstractPlugin;
-import de.willuhn.jameica.plugin.Version;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
@@ -33,7 +32,7 @@ import de.willuhn.util.I18N;
  * You need to have at least one class which inherits from
  * <code>AbstractPlugin</code>. If so, Jameica will detect your plug-in
  * automatically at startup.
- * 
+ *
  * @author willuhn, jrieke
  */
 public class ContractManagerPlugin extends AbstractPlugin {
@@ -51,111 +50,27 @@ public class ContractManagerPlugin extends AbstractPlugin {
 	 * This method is invoked on every startup. You can make here some stuff to
 	 * init your plug-in. If you get some errors here and you don't want to
 	 * activate the plug-in, simply throw an ApplicationException.
-	 * 
+	 *
 	 * @see de.willuhn.jameica.plugin.AbstractPlugin#init()
 	 */
 	@Override
 	public void init() throws ApplicationException {
 		assert instance == null;
 		instance = this;
-		
-	    call(new ServiceCall()
-	    {
-	      public void call(ContractDBService service) throws ApplicationException, RemoteException
-	      {
-	        service.checkConsistency();
-	      }
-	    });
 
-//		Application.getMessagingFactory().registerMessageConsumer(
-//				new MessageConsumer() {
-//
-//					@Override
-//					public void handleMessage(Message message) throws Exception {
-//						if (((SystemMessage) message).getStatusCode() == SystemMessage.SYSTEM_SHUTDOWN) {
-//							try {
-//								if (Settings.getICalAutoExport()) {
-//									new ExportCancelationReminders()
-//											.handleAction(null);
-//								}
-//							} catch (RemoteException e) {
-//								GUI.getStatusBar()
-//										.setErrorText(
-//												Settings.i18n()
-//														.tr("Error during cancellation reminder export."));
-//							} catch (ApplicationException e) {
-//								GUI.getStatusBar()
-//										.setErrorText(
-//												Settings.i18n()
-//														.tr("Error during cancellation reminder export."));
-//							}
-//						}
-//					}
-//
-//					@Override
-//					public Class<?>[] getExpectedMessageTypes() {
-//						return new Class[] { SystemMessage.class };
-//					}
-//
-//					@Override
-//					public boolean autoRegister() {
-//						return false;
-//					}
-//				});
+	    call(service -> service.checkConsistency());
 	}
 
 	/**
 	 * This method is called only the first time, the plug-in is loaded (before
 	 * executing init()). if your installation procedure was not successful,
 	 * throw an ApplicationException.
-	 * 
+	 *
 	 * @see de.willuhn.jameica.plugin.AbstractPlugin#install()
 	 */
 	@Override
 	public void install() throws ApplicationException {
-
-		call(new ServiceCall() {
-
-			public void call(ContractDBService service)
-					throws ApplicationException, RemoteException {
-				service.install();
-			}
-		});
-	}
-
-	/**
-	 * This method will be executed on every version change.
-	 * 
-	 * @see de.willuhn.jameica.plugin.AbstractPlugin#update(double)
-	 */
-	@Override
-	public void update(Version oldVersion) throws ApplicationException {
-	}
-
-	/**
-	 * Here you can do some cleanup stuff. The method will be called on every
-	 * clean shutdown of Jameica.
-	 * 
-	 * @see de.willuhn.jameica.plugin.AbstractPlugin#shutDown()
-	 */
-	@Override
-	public void shutDown() {
-//		try {
-//			if (Settings.getICalAutoExport()) {
-//				new ExportCancelationReminders()
-//				.handleAction(null);
-//			}
-//		} catch (RemoteException e) {
-//			GUI.getStatusBar()
-//			.setErrorText(
-//					Settings.i18n()
-//					.tr("Error during cancellation reminder export."));
-//		} catch (ApplicationException e) {
-//			GUI.getStatusBar()
-//			.setErrorText(
-//					Settings.i18n()
-//					.tr("Error during cancellation reminder export."));
-//		}
+		call(service -> service.install());
 	}
 
 	public static ContractManagerPlugin getInstance() {
@@ -165,6 +80,7 @@ public class ContractManagerPlugin extends AbstractPlugin {
 	/**
 	 * Hilfsmethode zum bequemen Ausfuehren von Aufrufen auf dem Service.
 	 */
+	@FunctionalInterface
 	private interface ServiceCall {
 		/**
 		 * @param service
@@ -177,7 +93,7 @@ public class ContractManagerPlugin extends AbstractPlugin {
 
 	/**
 	 * Hilfsmethode zum bequemen Ausfuehren von Methoden auf dem Service.
-	 * 
+	 *
 	 * @param call
 	 *            der Call.
 	 * @throws ApplicationException
@@ -188,14 +104,16 @@ public class ContractManagerPlugin extends AbstractPlugin {
 		// Instead of this we will get our objects via RMI from
 		// the server
 		if (Application.inClientMode())
+		 {
 			return; // als Client muessen wir die DB nicht installieren
+		}
 
 		ContractDBService service = null;
 		try {
 			// Da die Service-Factory zu diesem Zeitpunkt noch nicht da ist,
 			// erzeugen wir uns eine lokale Instanz des Services.
 			//Application.getServiceFactory().lookup(ContractManagerPlugin.class, "contract_db");
-			
+
 			service = new ContractDBServiceImpl();
 			service.start();
 			call.call(service);

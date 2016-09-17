@@ -47,8 +47,13 @@ import de.willuhn.datasource.rmi.DBObject;
  *   uri varchar(4096),
  *   hibiscus_category varchar(255) NULL,
  *   ignore_cancellations int(1) NOT NULL,
+ *   do_not_remind_before date,
+ *   sepa_creditor varchar(35),
+ *   sepa_customer varchar(35),
+ *   runtime_snap_to_end int(1) NOT NULL,
  *   UNIQUE (id),
- *   PRIMARY KEY (id)
+ *   PRIMARY KEY (id),
+ *   CONSTRAINT fk_address FOREIGN KEY (address_id) REFERENCES address (id)
  * );
  * </pre>
  *
@@ -203,6 +208,9 @@ public interface Contract extends DBObject {
 
 	public Date getDoNotRemindBefore() throws RemoteException;
 	public void setDoNotRemindBefore(Date date) throws RemoteException;
+
+	public Boolean getRuntimeSnapToEnd() throws RemoteException;
+	public void setRuntimeSnapToEnd(Boolean value) throws RemoteException;
 
 	//derived features
 	public DBIterator<Transaction> getTransactions() throws RemoteException;

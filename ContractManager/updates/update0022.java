@@ -13,10 +13,10 @@ import de.willuhn.util.ApplicationException;
 import de.willuhn.util.I18N;
 
 /**
- * Remind me later function
+ * MySQL support preparations
  */
 public class update0022 implements Update {
-	private Map<String, String> statements = new HashMap<String, String>();
+	private Map<String, String> statements = new HashMap<>();
 
 	/**
 	 * Default constructor
