@@ -209,8 +209,8 @@ public interface Contract extends DBObject {
 	public Date getDoNotRemindBefore() throws RemoteException;
 	public void setDoNotRemindBefore(Date date) throws RemoteException;
 
-	public Boolean getRuntimeSnapToEnd() throws RemoteException;
-	public void setRuntimeSnapToEnd(Boolean value) throws RemoteException;
+	public Boolean getFixedTerms() throws RemoteException;
+	public void setFixedTerms(Boolean value) throws RemoteException;
 
 	//derived features
 	public DBIterator<Transaction> getTransactions() throws RemoteException;

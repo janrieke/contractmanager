@@ -32,6 +32,7 @@ import org.eclipse.swt.SWT;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.CreateNewCostEntry;
+import de.janrieke.contractmanager.gui.input.CheckboxInput;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion.ValidationProvider;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion.ValidationProvider.ValidationMessage;
@@ -58,7 +59,7 @@ import de.willuhn.jameica.gui.Part;
 import de.willuhn.jameica.gui.dialogs.CalendarDialog;
 import de.willuhn.jameica.gui.formatter.CurrencyFormatter;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
-import de.willuhn.jameica.gui.input.CheckboxInput;
+import de.willuhn.jameica.gui.formatter.TableFormatter;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.input.IntegerInput;
 import de.willuhn.jameica.gui.input.LabelInput;
@@ -104,6 +105,8 @@ public class ContractControl extends AbstractControl {
 	private Input nextRuntimeMulti;
 	private IntegerInput nextRuntimeCount;
 	private SelectInput nextRuntimeType;
+	private CheckboxInput fixedTermsInput;
+
 	private CheckboxInput remindCheckbox;
 
 	private SelectInput partnerAddress;
@@ -121,9 +124,6 @@ public class ContractControl extends AbstractControl {
 	// Checkbox for filtering non-active contracts in list
 	private CheckboxInput activeFilterSwitch;
 
-	// list of transactions contained in this contract
-	// private TablePart transactionList;
-
 	// this is the currently opened contract
 	private Contract contract;
 
@@ -133,14 +133,50 @@ public class ContractControl extends AbstractControl {
 	private LabelInput costsPerTerm;
 	private LabelInput costsPerMonth;
 
-	private final List<Costs> newCosts = new ArrayList<Costs>();
-	private final List<Costs> deletedCosts = new ArrayList<Costs>();
+	private final List<Costs> newCosts = new ArrayList<>();
+	private final List<Costs> deletedCosts = new ArrayList<>();
 	private final List<Transaction> newTransactions = new ArrayList<>();
 	private final List<Consumer<Transaction>> transactionListeners = new ArrayList<>();
 
 	// holds the current Hibiscus category of the selection box (used for
 	// storing to DB on store button click)
 	public String hibiscusCategoryID = null;
+
+	private Address currentAddress = null;
+
+	private GenericIterator<Costs> costsIterator;
+
+	/**
+	 * Shows a warning symbol if the end date is close to the start date. This
+	 * should prevent users from misunderstanding the meaning of the end date
+	 * field.
+	 */
+	private final ValidationProvider endDateValidationProvider = time -> {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(time);
+		calendar.add(Calendar.DAY_OF_MONTH, -2); // a little tolerance
+		try {
+			Date startDate = getContract().getStartDate();
+			if (startDate == null) {
+				return Optional.empty();
+			}
+			Date nextTermBegin = getContract().getNextTermBeginAfter(startDate);
+			if (nextTermBegin == null) {
+				return Optional.empty();
+			}
+			// TODO: If users are still confused, increase the warning time, like this:
+			// nextTermBegin = getContract().getNextTermBeginAfter(nextTermBegin);
+			if (nextTermBegin.after(calendar.getTime())) {
+				return Optional
+						.of(new ValidationMessage(
+								Settings.i18n().tr("You have entered an end date close to the contract's start date. Are you sure this is correct?\nOnly enter an end date if the contract will definitely terminate on that date without any explicit cancellation.\nAfter the end date, you will not be reminded of cancellation deadlines any more."),
+								FieldDecorationRegistry.DEC_WARNING));
+			}
+		} catch (RemoteException e) {
+			Logger.error("Error while getting contract's dates.", e);
+		}
+		return Optional.empty();
+	};
 
 	/**
 	 * ct.
@@ -179,8 +215,7 @@ public class ContractControl extends AbstractControl {
 	 */
 	public static DBIterator<Contract> getContracts() throws RemoteException {
 		DBService service = Settings.getDBService();
-		DBIterator<Contract> contracts = service.createList(Contract.class);
-		return contracts;
+		return service.createList(Contract.class);
 	}
 
 	/**
@@ -303,35 +338,9 @@ public class ContractControl extends AbstractControl {
 
 		// Show a warning if the end date is within the very first cancellation deadline.
 		// Reason: Many users confuse the end date with the end of the first runtime.
-		ValidationProvider validationProvider = time -> {
-			Calendar calendar = Calendar.getInstance();
-			calendar.setTime(time);
-			calendar.add(Calendar.DAY_OF_MONTH, -2); // a little tolerance
-			try {
-				Date startDate = getContract().getStartDate();
-				if (startDate == null) {
-					return Optional.empty();
-				}
-				Date nextTermBegin = getContract().getNextTermBeginAfter(startDate);
-				if (nextTermBegin == null) {
-					return Optional.empty();
-				}
-				// TODO: If users are still confused, increase the warning time, like this:
-				// nextTermBegin = getContract().getNextTermBeginAfter(nextTermBegin);
-				if (nextTermBegin.after(calendar.getTime())) {
-					return Optional
-							.of(new ValidationMessage(
-									Settings.i18n().tr("You have entered an end date close to the contract's start date. Are you sure this is correct?\nOnly enter an end date if the contract will definitely terminate on that date without any explicit cancellation.\nAfter the end date, you will not be reminded of cancellation deadlines any more."),
-									FieldDecorationRegistry.DEC_WARNING));
-				}
-			} catch (RemoteException e) {
-				Logger.error("Error while getting contract's dates.", e);
-			}
-			return Optional.empty();
-		};
 
 		// Dialog-Input is an Input field that gets its data from a dialog.
-		endDate = new DateDialogInputAutoCompletion(s, initial, d, validationProvider);
+		endDate = new DateDialogInputAutoCompletion(s, initial, d, endDateValidationProvider);
 
 		// we store the initial value
 		endDate.setValue(initial);
@@ -421,7 +430,7 @@ public class ContractControl extends AbstractControl {
 
 	public SelectInput getCancellationPeriodType() throws RemoteException {
 		if (cancellationPeriodType == null) {
-			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>();
+			List<Contract.IntervalType> list = new ArrayList<>();
 			list.add(Contract.IntervalType.DAYS);
 			list.add(Contract.IntervalType.WEEKS);
 			list.add(Contract.IntervalType.MONTHS);
@@ -453,7 +462,7 @@ public class ContractControl extends AbstractControl {
 
 	public SelectInput getFirstRuntimeType() throws RemoteException {
 		if (firstRuntimeType == null) {
-			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>();
+			List<Contract.IntervalType> list = new ArrayList<>();
 			list.add(Contract.IntervalType.DAYS);
 			list.add(Contract.IntervalType.WEEKS);
 			list.add(Contract.IntervalType.MONTHS);
@@ -482,21 +491,22 @@ public class ContractControl extends AbstractControl {
 
 			// when focusing this input, transfer the values from the first runtime
 			//  as default values if no value is set, yet
-			nextRuntimeCount.addListener(event -> {
-				if (event.type == SWT.FocusIn) {
-					if (((Integer)0).equals(nextRuntimeCount.getValue()) && Contract.IntervalType.MONTHS.equals(nextRuntimeType.getValue())) {
-						nextRuntimeCount.setValue(firstRuntimeCount.getValue());
-						nextRuntimeType.setValue(firstRuntimeType.getValue());
-					}
-				}
-			});
+			nextRuntimeCount
+					.addListener(event -> {
+						if ((event.type == SWT.FocusIn)
+								&& (((Integer) 0).equals(nextRuntimeCount.getValue()) && Contract.IntervalType.MONTHS
+										.equals(nextRuntimeType.getValue()))) {
+							nextRuntimeCount.setValue(firstRuntimeCount.getValue());
+							nextRuntimeType.setValue(firstRuntimeType.getValue());
+						}
+					});
 		}
 		return nextRuntimeCount;
 	}
 
 	public SelectInput getNextRuntimeType() throws RemoteException {
 		if (nextRuntimeType == null) {
-			List<Contract.IntervalType> list = new ArrayList<Contract.IntervalType>();
+			List<Contract.IntervalType> list = new ArrayList<>();
 			list.add(Contract.IntervalType.DAYS);
 			list.add(Contract.IntervalType.WEEKS);
 			list.add(Contract.IntervalType.MONTHS);
@@ -507,14 +517,19 @@ public class ContractControl extends AbstractControl {
 		return nextRuntimeType;
 	}
 
+	public CheckboxInput getFixedTermsInput() throws RemoteException {
+		if (fixedTermsInput == null) {
+			fixedTermsInput = new CheckboxInput(getContract().getFixedTerms());
+		}
+		return fixedTermsInput;
+	}
+
 	public CheckboxInput getRemind() throws RemoteException {
 		if (remindCheckbox == null) {
 			remindCheckbox = new CheckboxInput(!getContract().getDoNotRemind());
 		}
 		return remindCheckbox;
 	}
-
-	private Address currentAddress = null;
 
 	public SelectInput getPartnerAddress() throws RemoteException {
 		if (partnerAddress == null) {
@@ -721,7 +736,7 @@ public class ContractControl extends AbstractControl {
 		// 7) we are adding a context menu
 		contractList.setContextMenu(new ContractListMenu(contractList, true));
 
-		contractList.setFormatter(item -> {
+		TableFormatter formatter = item -> {
 			if (item.getData() instanceof Contract) {
 				Contract contract = (Contract) item.getData();
 				try {
@@ -741,9 +756,11 @@ public class ContractControl extends AbstractControl {
 						item.setBackground(null);
 					}
 				} catch (RemoteException e) {
+					Logger.error("Error while formatting contract list.", e);
 				}
 			}
-		});
+		};
+		contractList.setFormatter(formatter);
 		return contractList;
 	}
 
@@ -787,14 +804,11 @@ public class ContractControl extends AbstractControl {
 					contractList.sort();
 				}
 			} catch (RemoteException e) {
+				Logger.error("Error while repopulating contract table", e);
 			}
 		});
 		return activeFilterSwitch;
 	}
-
-	static int index = 0;
-
-	private GenericIterator<Costs> costsIterator;
 
 	/**
 	 * Creates a table containing all contracts in extension warning or notice
@@ -964,57 +978,15 @@ public class ContractControl extends AbstractControl {
 			//If dates or runtime values have changed, reset the "do not remind before" field
 			// because deadlines may have changed and the user may want to be notified again.
 			boolean resetDoNotRemindBefore = false;
-
-			Object newValue = getStartDate().getValue();
-			Object oldValue = c.getStartDate();
-			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
-				resetDoNotRemindBefore = true;
-				c.setStartDate((Date)newValue);
-			}
-
-			newValue = getEndDate().getValue();
-			oldValue = c.getEndDate();
-			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
-				resetDoNotRemindBefore = true;
-				c.setEndDate((Date)newValue);
-			}
-
-			newValue = getCancellationPeriodCount().getValue();
-			oldValue = c.getCancellationPeriodCount();
-			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
-				resetDoNotRemindBefore = true;
-				c.setCancelationPeriodCount((Integer) newValue);
-			}
-			newValue = getCancellationPeriodType().getValue();
-			oldValue = c.getCancellationPeriodType();
-			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
-				resetDoNotRemindBefore = true;
-				c.setCancelationPeriodType((IntervalType) newValue);
-			}
-			newValue = getFirstRuntimeCount().getValue();
-			oldValue = c.getFirstMinRuntimeCount();
-			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
-				resetDoNotRemindBefore = true;
-				c.setFirstMinRuntimeCount((Integer) newValue);
-			}
-			newValue = getFirstRuntimeType().getValue();
-			oldValue = c.getFirstMinRuntimeType();
-			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
-				resetDoNotRemindBefore = true;
-				c.setFirstMinRuntimeType((IntervalType) newValue);
-			}
-			newValue = getNextRuntimeCount().getValue();
-			oldValue = c.getFollowingMinRuntimeCount();
-			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
-				resetDoNotRemindBefore = true;
-				c.setFollowingMinRuntimeCount((Integer) newValue);
-			}
-			newValue = getNextRuntimeType().getValue();
-			oldValue = c.getFollowingMinRuntimeType();
-			if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
-				resetDoNotRemindBefore = true;
-				c.setFollowingMinRuntimeType((IntervalType) newValue);
-			}
+			resetDoNotRemindBefore |= writeValueToModel(c.getStartDate(), (Date)getStartDate().getValue(), c::setStartDate);
+			resetDoNotRemindBefore |= writeValueToModel(c.getEndDate(), (Date)getEndDate().getValue(), c::setEndDate);
+			resetDoNotRemindBefore |= writeValueToModel(c.getCancellationPeriodCount(), (Integer)getCancellationPeriodCount().getValue(), c::setCancelationPeriodCount);
+			resetDoNotRemindBefore |= writeValueToModel(c.getCancellationPeriodType(), (IntervalType)getCancellationPeriodType().getValue(), c::setCancelationPeriodType);
+			resetDoNotRemindBefore |= writeValueToModel(c.getFirstMinRuntimeCount(), (Integer)getFirstRuntimeCount().getValue(), c::setFirstMinRuntimeCount);
+			resetDoNotRemindBefore |= writeValueToModel(c.getFirstMinRuntimeType(), (IntervalType)getFirstRuntimeType().getValue(), c::setFirstMinRuntimeType);
+			resetDoNotRemindBefore |= writeValueToModel(c.getFollowingMinRuntimeCount(), (Integer)getNextRuntimeCount().getValue(), c::setFollowingMinRuntimeCount);
+			resetDoNotRemindBefore |= writeValueToModel(c.getFollowingMinRuntimeType(), (IntervalType)getNextRuntimeType().getValue(), c::setFollowingMinRuntimeType);
+			resetDoNotRemindBefore |= writeValueToModel(c.getFixedTerms(), (Boolean)getFixedTermsInput().getValue(), c::setFixedTerms);
 
 			c.setDoNotRemind(!(Boolean) getRemind().getValue());
 
@@ -1112,6 +1084,37 @@ public class ContractControl extends AbstractControl {
 			GUI.getStatusBar().setErrorText(
 					Settings.i18n().tr("Error while storing contract"));
 		}
+	}
+
+	@FunctionalInterface
+	public interface ThrowingConsumer<T, E extends Exception> extends Consumer<T> {
+
+	    @Override
+	    default void accept(final T elem) {
+	        try {
+	            acceptThrows(elem);
+	        } catch (final Exception e) {
+	        	Logger.error("Error while storing contract.", e);
+	        }
+	    }
+
+	    void acceptThrows(T elem) throws E;
+	}
+
+	/**
+	 * Passes the newValue to the setter if it is different from the oldValue.
+	 *
+	 * @return <code>true</code> if the value changed and the setter was called,
+	 *         <code>false</code> otherwise.
+	 * @throws RemoteException
+	 */
+	private <T> boolean writeValueToModel(T oldValue, T newValue, ThrowingConsumer<T, RemoteException> setter)
+			throws RemoteException {
+		if (newValue != oldValue && (newValue == null || !newValue.equals(oldValue))) {
+			setter.accept(newValue);
+			return true;
+		}
+		return false;
 	}
 
 	// private boolean equalCheck(Object o1, Object o2) {

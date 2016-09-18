@@ -26,7 +26,6 @@ import de.janrieke.contractmanager.gui.action.ShowDocumentStorage;
 import de.janrieke.contractmanager.gui.button.RestoreButton;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.willuhn.jameica.gui.AbstractView;
-import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.Part;
 import de.willuhn.jameica.gui.extension.Extendable;
@@ -57,7 +56,7 @@ public class ContractDetailView extends AbstractView implements Extendable {
 		// draw the title
 		GUI.getView().setTitle(Settings.i18n().tr("Contract Details"));
 
-		// instanciate controller
+		// instantiate controller
 		control = new ContractControl(this);
 
 	    ScrolledContainer scroller = new ScrolledContainer(getParent());
@@ -66,9 +65,6 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    SimpleContainer left = new SimpleContainer(columns.getComposite());
 
 	    left.addHeadline(Settings.i18n().tr("Contract Information"));
-		// create a bordered group
-		//LabelGroup group = new LabelGroup(getParent(), Settings.i18n().tr(
-		//		"Contract details"));
 
 		// all all input fields to the group.
 	    left.addLabelPair(Settings.i18n().tr("Name of contract"), control.getName());
@@ -84,10 +80,14 @@ public class ContractDetailView extends AbstractView implements Extendable {
 	    left.addHeadline(Settings.i18n().tr("Runtime"));
 	    left.addLabelPair(Settings.i18n().tr("Start date"),	control.getStartDate());
 	    left.addLabelPair(Settings.i18n().tr("End date"), control.getEndDate());
-	    //TODO: Show how long the contract is already running
 	    left.addLabelPair(Settings.i18n().tr("Cancellation period"), control.getCancellationPeriod());
 	    left.addLabelPair(Settings.i18n().tr("Minimum term"), control.getFirstRuntime());
 	    left.addLabelPair(Settings.i18n().tr("Following terms"), control.getNextRuntime());
+	    left.addLabelPair(Settings.i18n().tr("Fixed terms"), control.getFixedTermsInput());
+		String tooltip = Settings
+				.i18n()
+				.tr("Adjusts the terms of this contract such that match weeks/months/years (dependent on what is selected in the term fields above.");
+		control.getFixedTermsInput().setTooltip(tooltip);
 	    left.addLabelPair(Settings.i18n().tr("Next cancelable term"), control.getNextTerm());
 	    left.addLabelPair(Settings.i18n().tr("Next cancellation deadline"), control.getNextCancellationDeadline());
 	    left.addLabelPair(Settings.i18n().tr("Remind about cancellations?"), control.getRemind());
@@ -115,13 +115,9 @@ public class ContractDetailView extends AbstractView implements Extendable {
 		restoreButton = new RestoreButton(this, control.getCurrentObject(), false);
 		restoreButton.setEnabled(activationState);
 		buttons.addButton(restoreButton);
-		buttons.addButton(Settings.i18n().tr("Store Contract"), new Action() {
-			@Override
-			public void handleAction(Object context)
-					throws ApplicationException {
-				control.handleStore();
-			}
-		}, null, true, "document-save.png"); // "true" defines this button as the default button
+		buttons.addButton(Settings.i18n().tr("Store Contract"), context -> control.handleStore(),
+				null, true, "document-save.png"); // "true" defines this button
+													// as the default button
 	}
 
 	/**

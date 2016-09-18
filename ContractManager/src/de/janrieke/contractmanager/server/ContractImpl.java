@@ -479,13 +479,13 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	@Override
-	public Boolean getRuntimeSnapToEnd() throws RemoteException {
+	public Boolean getFixedTerms() throws RemoteException {
 		Integer b = (Integer) getAttribute("runtime_snap_to_end");
 		return b == null ? false : b.equals(1);
 	}
 
 	@Override
-	public void setRuntimeSnapToEnd(Boolean value) throws RemoteException {
+	public void setFixedTerms(Boolean value) throws RemoteException {
 		setAttribute("runtime_snap_to_end", value?1:0);
 	}
 
