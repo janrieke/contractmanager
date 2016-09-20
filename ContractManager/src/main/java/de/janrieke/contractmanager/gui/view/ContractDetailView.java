@@ -19,6 +19,8 @@ package de.janrieke.contractmanager.gui.view;
 
 import java.util.List;
 
+import org.eclipse.swt.widgets.Label;
+
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.DeleteContract;
 import de.janrieke.contractmanager.gui.action.GenerateOdfDocument;
@@ -59,57 +61,64 @@ public class ContractDetailView extends AbstractView implements Extendable {
 		// instantiate controller
 		control = new ContractControl(this);
 
-	    ScrolledContainer scroller = new ScrolledContainer(getParent());
+		ScrolledContainer scroller = new ScrolledContainer(getParent());
 
-	    ColumnLayout columns = new ColumnLayout(scroller.getComposite(), 2, true);
-	    SimpleContainer left = new SimpleContainer(columns.getComposite());
+		ColumnLayout columns = new ColumnLayout(scroller.getComposite(), 2, true);
+		SimpleContainer left = new SimpleContainer(columns.getComposite());
 
-	    left.addHeadline(Settings.i18n().tr("Contract Information"));
+		left.addHeadline(Settings.i18n().tr("Contract Information"));
 
 		// all all input fields to the group.
-	    left.addLabelPair(Settings.i18n().tr("Name of contract"), control.getName());
-	    left.addLabelPair(Settings.i18n().tr("Contract number"), control.getContractNumber());
-	    left.addLabelPair(Settings.i18n().tr("Customer number"), control.getCustomerNumber());
-    	left.addPart(new Button(Settings.i18n().tr("Open document storage..."), new ShowDocumentStorage(), this.getCurrentObject()));
+		left.addLabelPair(Settings.i18n().tr("Name of contract"), control.getName());
+		left.addLabelPair(Settings.i18n().tr("Contract number"), control.getContractNumber());
+		left.addLabelPair(Settings.i18n().tr("Customer number"), control.getCustomerNumber());
+		left.addPart(new Button(Settings.i18n().tr("Open document storage..."),
+				new ShowDocumentStorage(), this.getCurrentObject()));
 
-	    left.addHeadline(Settings.i18n().tr("Financial Details"));
-	    left.addPart(control.getCostsList());
-	    left.addLabelPair(Settings.i18n().tr("Money per term"), control.getCostsPerTerm());
-	    left.addLabelPair(Settings.i18n().tr("Money per month"), control.getCostsPerMonth());
+		left.addHeadline(Settings.i18n().tr("Financial Details"));
+		left.addPart(control.getCostsList());
+		left.addLabelPair(Settings.i18n().tr("Money per term"), control.getCostsPerTerm());
+		left.addLabelPair(Settings.i18n().tr("Money per month"), control.getCostsPerMonth());
 
-	    left.addHeadline(Settings.i18n().tr("Runtime"));
-	    left.addLabelPair(Settings.i18n().tr("Start date"),	control.getStartDate());
-	    left.addLabelPair(Settings.i18n().tr("End date"), control.getEndDate());
-	    left.addLabelPair(Settings.i18n().tr("Cancellation period"), control.getCancellationPeriod());
-	    left.addLabelPair(Settings.i18n().tr("Minimum term"), control.getFirstRuntime());
-	    left.addLabelPair(Settings.i18n().tr("Following terms"), control.getNextRuntime());
-	    left.addLabelPair(Settings.i18n().tr("Fixed terms"), control.getFixedTermsInput());
-		String tooltip = Settings
-				.i18n()
-				.tr("Adjusts the terms of this contract such that match weeks/months/years (dependent on what is selected in the term fields above.");
-		control.getFixedTermsInput().setTooltip(tooltip);
-	    left.addLabelPair(Settings.i18n().tr("Next cancelable term"), control.getNextTerm());
-	    left.addLabelPair(Settings.i18n().tr("Next cancellation deadline"), control.getNextCancellationDeadline());
-	    left.addLabelPair(Settings.i18n().tr("Remind about cancellations?"), control.getRemind());
+		left.addHeadline(Settings.i18n().tr("Runtime"));
+		left.addLabelPair(Settings.i18n().tr("Start date"), control.getStartDate());
+		left.addLabelPair(Settings.i18n().tr("End date"), control.getEndDate());
+		left.addLabelPair(Settings.i18n().tr("Cancellation period"),
+				control.getCancellationPeriod());
+		left.addLabelPair(Settings.i18n().tr("Minimum term"), control.getFirstRuntime());
+		left.addLabelPair(Settings.i18n().tr("Following terms"), control.getNextRuntime());
+		String tooltip = Settings.i18n().tr(
+				"Adjusts the terms of this contract such that match weeks/months/years (dependent on what is selected in the term fields above.");
+		control.getFixedTermsInput().setData(Input.DATAKEY_TOOLTIP, tooltip);
+		left.addLabelPair(Settings.i18n().tr("Fixed terms"), control.getFixedTermsInput());
+		Object label = control.getFixedTermsInput().getData("jameica.label");
+		if (label instanceof Label) {
+			((Label) label).setToolTipText(tooltip);
+		}
+		left.addLabelPair(Settings.i18n().tr("Next cancelable term"), control.getNextTerm());
+		left.addLabelPair(Settings.i18n().tr("Next cancellation deadline"),
+				control.getNextCancellationDeadline());
+		left.addLabelPair(Settings.i18n().tr("Remind about cancellations?"), control.getRemind());
 
-	    right = new SimpleContainer(columns.getComposite(), true);
-	    right.addHeadline(Settings.i18n().tr("Contractual Partner Address"));
-	    right.addLabelPair(Settings.i18n().tr("Address"), control.getPartnerAddress());
-	    right.addLabelPair(Settings.i18n().tr("Name/Company"), control.getPartnerName());
-	    right.addLabelPair(Settings.i18n().tr("Street"), control.getPartnerStreetNumber());
-	    right.addLabelPair(Settings.i18n().tr("Extra"), control.getPartnerExtra());
-	    right.addLabelPair(Settings.i18n().tr("Zipcode"), control.getPartnerZipcodeCity());
-	    right.addLabelPair(Settings.i18n().tr("State"), control.getPartnerState());
-	    right.addLabelPair(Settings.i18n().tr("Country"), control.getPartnerCountry());
+		right = new SimpleContainer(columns.getComposite(), true);
+		right.addHeadline(Settings.i18n().tr("Contractual Partner Address"));
+		right.addLabelPair(Settings.i18n().tr("Address"), control.getPartnerAddress());
+		right.addLabelPair(Settings.i18n().tr("Name/Company"), control.getPartnerName());
+		right.addLabelPair(Settings.i18n().tr("Street"), control.getPartnerStreetNumber());
+		right.addLabelPair(Settings.i18n().tr("Extra"), control.getPartnerExtra());
+		right.addLabelPair(Settings.i18n().tr("Zipcode"), control.getPartnerZipcodeCity());
+		right.addLabelPair(Settings.i18n().tr("State"), control.getPartnerState());
+		right.addLabelPair(Settings.i18n().tr("Country"), control.getPartnerCountry());
 
-	    right.addHeadline(Settings.i18n().tr("Comment"));
-	    right.addPart(control.getComment());
+		right.addHeadline(Settings.i18n().tr("Comment"));
+		right.addPart(control.getComment());
 
 		// add some buttons
 		ButtonArea buttons = new ButtonArea(getParent(), 4);
-		buttons.addButton(Settings.i18n().tr("Generate Letter..."), new GenerateOdfDocument(), control.getCurrentObject(), false, "document-print.png");
-		deleteButton = new Button(Settings.i18n().tr("Delete Contract..."),
-				new DeleteContract(), control.getCurrentObject(), false, "window-close.png");
+		buttons.addButton(Settings.i18n().tr("Generate Letter..."), new GenerateOdfDocument(),
+				control.getCurrentObject(), false, "document-print.png");
+		deleteButton = new Button(Settings.i18n().tr("Delete Contract..."), new DeleteContract(),
+				control.getCurrentObject(), false, "window-close.png");
 		deleteButton.setEnabled(activationState);
 		buttons.addButton(deleteButton);
 		restoreButton = new RestoreButton(this, control.getCurrentObject(), false);
@@ -146,12 +155,13 @@ public class ContractDetailView extends AbstractView implements Extendable {
 
 	public void addExtensionInput(String headline, List<String> labels, List<Input> inputs) {
 		if (labels.size() != inputs.size()) {
-			throw new IllegalArgumentException("Number of labels must be equal to number of inputs.");
+			throw new IllegalArgumentException(
+					"Number of labels must be equal to number of inputs.");
 		}
-	    right.addHeadline(headline);
-	    for (int i = 0; i<labels.size(); i++) {
-		    right.addLabelPair(labels.get(i), inputs.get(i));
-	    }
+		right.addHeadline(headline);
+		for (int i = 0; i < labels.size(); i++) {
+			right.addLabelPair(labels.get(i), inputs.get(i));
+		}
 	}
 
 	public void addExtensionContainer(Part part, String headline) {

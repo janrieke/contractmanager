@@ -32,7 +32,6 @@ import org.eclipse.swt.SWT;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.CreateNewCostEntry;
-import de.janrieke.contractmanager.gui.input.CheckboxInput;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion.ValidationProvider;
 import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion.ValidationProvider.ValidationMessage;
@@ -60,6 +59,7 @@ import de.willuhn.jameica.gui.dialogs.CalendarDialog;
 import de.willuhn.jameica.gui.formatter.CurrencyFormatter;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
 import de.willuhn.jameica.gui.formatter.TableFormatter;
+import de.willuhn.jameica.gui.input.CheckboxInput;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.input.IntegerInput;
 import de.willuhn.jameica.gui.input.LabelInput;
@@ -831,7 +831,7 @@ public class ContractControl extends AbstractControl {
 		// all classes an finds the right implementation automatically. ;)
 		DBIterator<Contract> contracts = service.createList(Contract.class);
 
-		ArrayList<Contract> filteredContracts = new ArrayList<Contract>();
+		ArrayList<Contract> filteredContracts = new ArrayList<>();
 
 		// Iterate through the list and filter
 		while (contracts.hasNext()) {
