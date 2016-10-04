@@ -1,22 +1,20 @@
 package de.janrieke.contractmanager.server;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.rmi.RemoteException;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -39,8 +37,9 @@ public class ContractControlTest {
 	@Mock(name = "types")
 	private HashMap<String, String> types;
 
+	// Otherwise, Mockito gets confused in which field to inject.
 	@Mock
-	private HashMap<String, String> whatever; // Otherwise, Mockito gets confused in which field to inject.
+	private HashMap<String, String> whatever;
 
 	@Before
 	public void init() throws Exception {
@@ -54,7 +53,7 @@ public class ContractControlTest {
 	}
 
 	@Test
-	public void testGetNextTermBegin() throws RemoteException, ParseException {
+	public void testGetNextTermBegin() throws RemoteException {
 		Date startDate = Date.from(ZonedDateTime
 				.ofLocal(LocalDate.of(2016, 9, 23).atStartOfDay(), ZoneId.systemDefault(), null)
 				.toInstant());
@@ -71,7 +70,7 @@ public class ContractControlTest {
 	}
 
 	@Test
-	public void testGetNextTermBeginAfter() throws RemoteException, ParseException {
+	public void testGetNextTermBeginAfter() throws RemoteException {
 		Date startDate = Date.from(ZonedDateTime
 				.ofLocal(LocalDate.of(2016, 9, 23).atStartOfDay(), ZoneId.systemDefault(), null)
 				.toInstant());
@@ -89,8 +88,44 @@ public class ContractControlTest {
 	}
 
 	@Test
-	@Ignore
-	public void testGetNextCancellationDeadline() {
-		fail("Not yet implemented");
+	public void testGetNextCancellationDeadline() throws RemoteException {
+		Date startDate = Date.from(ZonedDateTime
+				.ofLocal(LocalDate.of(2016, 9, 23).atStartOfDay(), ZoneId.systemDefault(), null)
+				.toInstant());
+		contract.setStartDate(startDate);
+		contract.setFirstMinRuntimeCount(6);
+		contract.setFirstMinRuntimeType(IntervalType.MONTHS);
+		contract.setFollowingMinRuntimeCount(3);
+		contract.setFollowingMinRuntimeType(IntervalType.MONTHS);
+		contract.setCancelationPeriodCount(3);
+		contract.setCancelationPeriodType(IntervalType.DAYS);
+		Date actual = contract.getNextCancellationDeadline();
+		Date expected = Date.from(ZonedDateTime
+				.ofLocal(LocalDate.of(2017, 3, 19).atStartOfDay(), ZoneId.systemDefault(), null)
+				.toInstant());
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testGetNextCancellationDeadlineAfter() throws RemoteException {
+		Date startDate = Date.from(ZonedDateTime
+				.ofLocal(LocalDate.of(2016, 9, 23).atStartOfDay(), ZoneId.systemDefault(), null)
+				.toInstant());
+		contract.setStartDate(startDate);
+		contract.setFirstMinRuntimeCount(6);
+		contract.setFirstMinRuntimeType(IntervalType.MONTHS);
+		contract.setFollowingMinRuntimeCount(3);
+		contract.setFollowingMinRuntimeType(IntervalType.MONTHS);
+		contract.setCancelationPeriodCount(3);
+		contract.setCancelationPeriodType(IntervalType.DAYS);
+		Date actual = contract.getNextCancellationDeadline();
+		// getNextCancellationDeadline() uses a "not before" logic, not "after".
+		// Thus, we have to add one day.
+		actual = Date.from(actual.toInstant().plus(1, ChronoUnit.DAYS));
+		actual = contract.getNextCancellationDeadline(actual);
+		Date expected = Date.from(ZonedDateTime
+				.ofLocal(LocalDate.of(2017, 6, 19).atStartOfDay(), ZoneId.systemDefault(), null)
+				.toInstant());
+		assertEquals(expected, actual);
 	}
 }

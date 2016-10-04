@@ -616,17 +616,19 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	/**
-	 * Calculates the next cancellation deadline after the given date.
+	 * Calculates the next cancellation deadline that is <i>not before</i> the
+	 * given date.
 	 *
-	 * @param after
-	 * @return The cancellation deadline or null if no deadline exists after the given date.
+	 * @param notBefore
+	 *            The returned deadline will not be before this date.
+	 * @return The cancellation deadline or null if no deadline exists after the
+	 *         given date.
 	 * @throws RemoteException
 	 */
-	private Date calculateNextCancellationDeadline(Date after)
-			throws RemoteException {
+	private Date calculateNextCancellationDeadline(Date notBefore) throws RemoteException {
 
 		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(DateUtil.endOfDay(after));
+		calendar.setTime(DateUtil.endOfDay(notBefore));
 
 		IntervalType cancellationPeriodType = getCancellationPeriodType();
 		Integer cancellationPeriodCount = getCancellationPeriodCount();
@@ -642,7 +644,8 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 		addToCalendar(calendar, cancellationPeriodType, -cancellationPeriodCount);
 
-		calendar.add(Calendar.DAY_OF_YEAR, -1); //term end is one day before next term's start
+		// Term end is one day before next term's start.
+		calendar.add(Calendar.DAY_OF_YEAR, -1);
 
 		return calendar.getTime();
 	}
@@ -695,8 +698,8 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	}
 
 	@Override
-	public Date getNextCancellationDeadline(Date after) throws RemoteException {
-		return calculateNextCancellationDeadline(after);
+	public Date getNextCancellationDeadline(Date notBefore) throws RemoteException {
+		return calculateNextCancellationDeadline(notBefore);
 	}
 
 
