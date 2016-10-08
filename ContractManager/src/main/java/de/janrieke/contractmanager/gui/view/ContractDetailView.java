@@ -88,7 +88,7 @@ public class ContractDetailView extends AbstractView implements Extendable {
 		left.addLabelPair(Settings.i18n().tr("Minimum term"), control.getFirstRuntime());
 		left.addLabelPair(Settings.i18n().tr("Following terms"), control.getNextRuntime());
 		String tooltip = Settings.i18n().tr(
-				"Adjusts the terms of this contract such that match weeks/months/years (dependent on what is selected in the term fields above.");
+				"Adjusts the terms of this contract such that match weeks/months/years (dependent on what is selected in the minimum term field above).");
 		control.getFixedTermsInput().setData(Input.DATAKEY_TOOLTIP, tooltip);
 		left.addLabelPair(Settings.i18n().tr("Fixed terms"), control.getFixedTermsInput());
 		Object label = control.getFixedTermsInput().getData("jameica.label");

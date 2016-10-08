@@ -59,7 +59,13 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 * The UID.
 	 */
 	private static final long serialVersionUID = 1296427502015363939L;
-//	private DBIterator costsIterator;
+
+	class CalendarBuilder {
+		Calendar getInstance() {
+			return Calendar.getInstance();
+		}
+	}
+	private CalendarBuilder calendarBuilder = new CalendarBuilder();
 
 	/**
 	 * @throws RemoteException
@@ -523,6 +529,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		Integer firstMinRuntimeCount;
 		IntervalType followingMinRuntimeType;
 		Integer followingMinRuntimeCount;
+		Boolean fixedTerms;
 	}
 
 	@Override
@@ -544,13 +551,14 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 		Date startDate = DateUtil.startOfDay(getStartDate());
 
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = calendarBuilder.getInstance();
 		calendar.setTime(startDate);
 
 		result.firstMinRuntimeType = getFirstMinRuntimeType();
 		result.firstMinRuntimeCount = getFirstMinRuntimeCount();
 		result.followingMinRuntimeType = getFollowingMinRuntimeType();
 		result.followingMinRuntimeCount = getFollowingMinRuntimeCount();
+		result.fixedTerms = getFixedTerms();
 
 		// if one of the runtime definition is invalid, use the other one
 		if (result.firstMinRuntimeType == null || result.firstMinRuntimeCount == null
@@ -576,10 +584,11 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 * Calculates the next contractual term's end after the given date.
 	 *
 	 * @param after
+	 * @param excludeFirstTerm If true, never return the start of the first term.
 	 * @return The end of the term.
 	 * @throws RemoteException
 	 */
-	private Date calculateNextTermBegin(Date after)
+	private Date calculateNextTermBegin(Date after, boolean excludeFirstTerm)
 			throws RemoteException {
 		if (after == null) {
 			return null;
@@ -590,15 +599,35 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		}
 
 		Date startDate = DateUtil.startOfDay(getStartDate());
-		Calendar afterCal = Calendar.getInstance();
+		Calendar afterCal = calendarBuilder.getInstance();
 		afterCal.setTime(DateUtil.endOfDay(after));
 
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = calendarBuilder.getInstance();
 		calendar.setTime(startDate);
+
+		// If fixed terms is true, virtually delay the start of the contract to the next period.
+		if (rt.fixedTerms) {
+			switch (rt.firstMinRuntimeType) {
+				case WEEKS:
+					calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+					calendar.add(Calendar.WEEK_OF_YEAR, 1);
+					break;
+				case MONTHS:
+					calendar.set(Calendar.DAY_OF_MONTH, 1);
+					calendar.add(Calendar.MONTH, 1);
+					break;
+				case YEARS:
+					calendar.set(Calendar.DAY_OF_YEAR, 1);
+					calendar.add(Calendar.YEAR, 1);
+					break;
+				default:
+			}
+
+		}
 
 		boolean first = true;
 
-		while (!calendar.after(afterCal)) {
+		while (!calendar.after(afterCal) || (first && excludeFirstTerm)) {
 			if (first) {
 				addToCalendar(calendar, rt.firstMinRuntimeType, rt.firstMinRuntimeCount);
 				first = false;
@@ -627,7 +656,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 */
 	private Date calculateNextCancellationDeadline(Date notBefore) throws RemoteException {
 
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = calendarBuilder.getInstance();
 		calendar.setTime(DateUtil.endOfDay(notBefore));
 
 		IntervalType cancellationPeriodType = getCancellationPeriodType();
@@ -635,7 +664,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 		addToCalendar(calendar, cancellationPeriodType, cancellationPeriodCount);
 
-		Date termEnd = calculateNextTermBegin(calendar.getTime());
+		Date termEnd = calculateNextTermBegin(calendar.getTime(), true);
 		if (termEnd == null) {
 			return null;
 		}
@@ -652,7 +681,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	@Override
 	public Date getNextTermBegin() throws RemoteException {
-		return getNextTermBeginAfter(Calendar.getInstance().getTime());
+		return getNextTermBeginAfter(calendarBuilder.getInstance().getTime());
 	}
 
 	@Override
@@ -661,7 +690,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		if (begin == null) {
 			return null;
 		}
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = calendarBuilder.getInstance();
 		calendar.setTime(begin);
 		addToCalendar(calendar, getFollowingMinRuntimeType(), getFollowingMinRuntimeCount());
 		calendar.add(Calendar.DAY_OF_YEAR, -1); //term end is one day before next term's start
@@ -671,10 +700,10 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	@Override
 	public Date getNextCancelableTermBegin() throws RemoteException {
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = calendarBuilder.getInstance();
 		addToCalendar(calendar, getCancellationPeriodType(), getCancellationPeriodCount());
 
-		return calculateNextTermBegin(calendar.getTime());
+		return calculateNextTermBegin(calendar.getTime(), true);
 	}
 
 	@Override
@@ -683,7 +712,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		if (begin == null) {
 			return null;
 		}
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = calendarBuilder.getInstance();
 		calendar.setTime(begin);
 		addToCalendar(calendar, getFollowingMinRuntimeType(), getFollowingMinRuntimeCount());
 		calendar.add(Calendar.DAY_OF_YEAR, -1); //term end is one day before next term's start
@@ -693,7 +722,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	@Override
 	public Date getNextCancellationDeadline() throws RemoteException {
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = calendarBuilder.getInstance();
 		return calculateNextCancellationDeadline(calendar.getTime());
 	}
 
@@ -840,7 +869,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	@Override
 	public boolean isActiveInMonth(Date month) throws RemoteException {
-		Calendar monthBegin = Calendar.getInstance();
+		Calendar monthBegin = calendarBuilder.getInstance();
 		monthBegin.setTime(month);
 		monthBegin.set(Calendar.DAY_OF_MONTH, 1);
 		monthBegin.set(Calendar.HOUR_OF_DAY, 0);
@@ -849,7 +878,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		monthBegin.set(Calendar.MILLISECOND, 0);
 		monthBegin.add(Calendar.MILLISECOND, -1);
 
-		Calendar monthEnd = Calendar.getInstance();
+		Calendar monthEnd = calendarBuilder.getInstance();
 		monthEnd.setTime(month);
 		monthEnd.add(Calendar.MONTH, 1);
 		monthEnd.set(Calendar.DAY_OF_MONTH, 1);
@@ -918,7 +947,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	public void doNotRemindAboutNextCancellation() throws RemoteException {
 		Date nextDeadline = getNextCancellationDeadline();
 		if (nextDeadline != null) {
-			Calendar cal = Calendar.getInstance();
+			Calendar cal = calendarBuilder.getInstance();
 			cal.setTime(nextDeadline);
 			cal.add(Calendar.DAY_OF_YEAR, 1);
 			setDoNotRemindBefore(cal.getTime());
@@ -948,8 +977,8 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			return false;
 		}
 
-		final Calendar today = Calendar.getInstance();
-		Calendar calendar = Calendar.getInstance();
+		final Calendar today = calendarBuilder.getInstance();
+		Calendar calendar = calendarBuilder.getInstance();
 
 		calendar.setTime(deadline);
 		calendar.add(Calendar.DAY_OF_YEAR,
@@ -959,6 +988,6 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	@Override
 	public Date getNextTermBeginAfter(Date startDate) throws RemoteException {
-		return calculateNextTermBegin(startDate);
+		return calculateNextTermBegin(startDate, false);
 	}
 }
