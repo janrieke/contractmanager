@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -54,9 +54,8 @@ public class SettingsControl extends AbstractControl {
 
 	private IntegerInput warningTime;
 	private IntegerInput noticeTime;
-//	private CheckboxInput iCalAutoExport;
 	private CheckboxInput anonICalExport;
-	
+
 	private DirectoryInput templateFolderInput;
 
 	private CheckboxInput showSEPACreditorInput;
@@ -65,10 +64,11 @@ public class SettingsControl extends AbstractControl {
 	private CheckboxInput showHibiscusTransactionList;
 	private IntegerInput hibiscusTransactionListHeight;
 	private CheckboxInput autoImport;
+	private CheckboxInput showFixedTermsInput;
 
 	/**
 	 * ct.
-	 * 
+	 *
 	 * @param view
 	 *            this is our view.
 	 */
@@ -78,31 +78,35 @@ public class SettingsControl extends AbstractControl {
 
 	/**
 	 * Returns the input field for the name.
-	 * 
+	 *
 	 * @return input field.
 	 * @throws RemoteException
 	 */
 	public Input getName() throws RemoteException {
-		if (name == null)
+		if (name == null) {
 			name = new TextInput(SettingsUtil.get("name", ""), 255);
+		}
 		return name;
 	}
 
 	public Input getStreet() throws RemoteException {
-		if (street == null)
+		if (street == null) {
 			street = new TextInput(SettingsUtil.get("street", ""), 255);
+		}
 		return street;
 	}
 
 	public Input getNumber() throws RemoteException {
-		if (number == null)
+		if (number == null) {
 			number = new TextInput(SettingsUtil.get("number", ""));
+		}
 		return number;
 	}
 
 	public Input getStreetNumber() throws RemoteException {
-		if (streetNumber != null)
+		if (streetNumber != null) {
 			return streetNumber;
+		}
 
 		streetNumber = new MultiInput(getStreet(), getNumber());
 
@@ -110,26 +114,30 @@ public class SettingsControl extends AbstractControl {
 	}
 
 	public Input getExtra() throws RemoteException {
-		if (extra == null)
+		if (extra == null) {
 			extra = new TextInput(SettingsUtil.get("extra", ""), 255);
+		}
 		return extra;
 	}
 
 	public Input getZipcode() throws RemoteException {
-		if (zipcode == null)
+		if (zipcode == null) {
 			zipcode = new TextInput(SettingsUtil.get("zipcode", ""), 255);
+		}
 		return zipcode;
 	}
 
 	public Input getCity() throws RemoteException {
-		if (city == null)
+		if (city == null) {
 			city = new TextInput(SettingsUtil.get("city", ""), 255);
+		}
 		return city;
 	}
 
 	public Input getZipcodeCity() throws RemoteException {
-		if (zipcodeCity != null)
+		if (zipcodeCity != null) {
 			return zipcodeCity;
+		}
 
 		zipcodeCity = new MultiInput(getZipcode(), getCity());
 
@@ -137,26 +145,30 @@ public class SettingsControl extends AbstractControl {
 	}
 
 	public Input getState() throws RemoteException {
-		if (state == null)
+		if (state == null) {
 			state = new TextInput(SettingsUtil.get("state", ""), 255);
+		}
 		return state;
 	}
 
 	public Input getCountry() throws RemoteException {
-		if (country == null)
+		if (country == null) {
 			country = new TextInput(SettingsUtil.get("country", ""), 255);
+		}
 		return country;
 	}
 
 	public Input getEmail() throws RemoteException {
-		if (email == null)
+		if (email == null) {
 			email = new TextInput(SettingsUtil.get("email", ""), 255);
+		}
 		return email;
 	}
 
 	public Input getPhone() throws RemoteException {
-		if (phone == null)
+		if (phone == null) {
 			phone = new TextInput(SettingsUtil.get("phone", ""), 255);
+		}
 		return phone;
 	}
 
@@ -170,25 +182,28 @@ public class SettingsControl extends AbstractControl {
 
 	public CheckboxInput getShowHibiscusCategorySelector() throws RemoteException {
 		if (showHibiscusCategorySelector == null) {
-			showHibiscusCategorySelector = new CheckboxInput(Settings.getShowHibiscusCategorySelector());
+			showHibiscusCategorySelector = new CheckboxInput(
+					Settings.getShowHibiscusCategorySelector());
 		}
 		return showHibiscusCategorySelector;
 	}
 
 	public CheckboxInput getShowHibiscusTransactionList() throws RemoteException {
 		if (showHibiscusTransactionList == null) {
-			showHibiscusTransactionList = new CheckboxInput(Settings.getShowHibiscusTransactionList());
+			showHibiscusTransactionList = new CheckboxInput(
+					Settings.getShowHibiscusTransactionList());
 		}
 		return showHibiscusTransactionList;
 	}
 
 	public IntegerInput getHibiscusTransactionListHeight() throws RemoteException {
 		if (hibiscusTransactionListHeight == null) {
-			hibiscusTransactionListHeight = new IntegerInput(Settings.getHibiscusTransactionListHeight());
+			hibiscusTransactionListHeight = new IntegerInput(
+					Settings.getHibiscusTransactionListHeight());
 		}
 		return hibiscusTransactionListHeight;
 	}
-	
+
 	public CheckboxInput getShowSEPACreditorInput() throws RemoteException {
 		if (showSEPACreditorInput == null) {
 			showSEPACreditorInput = new CheckboxInput(Settings.getShowSEPACreditorInput());
@@ -203,13 +218,12 @@ public class SettingsControl extends AbstractControl {
 		return showSEPACustomerInput;
 	}
 
-
-//	public CheckboxInput getICalAutoExport() throws RemoteException {
-//		if (iCalAutoExport == null) {
-//			iCalAutoExport = new CheckboxInput(Settings.getICalAutoExport());
-//		}
-//		return iCalAutoExport;
-//	}
+	public CheckboxInput getShowFixedTermsInput() throws RemoteException {
+		if (showFixedTermsInput == null) {
+			showFixedTermsInput = new CheckboxInput(Settings.getShowFixedTermsInput());
+		}
+		return showFixedTermsInput;
+	}
 
 	public CheckboxInput getNamedICalExport() throws RemoteException {
 		if (anonICalExport == null) {
@@ -217,7 +231,6 @@ public class SettingsControl extends AbstractControl {
 		}
 		return anonICalExport;
 	}
-
 
 	public IntegerInput getNoticeTime() throws RemoteException {
 		if (noticeTime == null) {
@@ -234,30 +247,28 @@ public class SettingsControl extends AbstractControl {
 		return templateFolderInput;
 	}
 
-
 	public Input getHibiscusAutoImportNewTransactions() throws RemoteException {
 		if (autoImport == null) {
 			autoImport = new CheckboxInput(Settings.getHibiscusAutoImportNewTransactions());
 		}
 		return autoImport;
 	}
-	
+
 	/**
 	 * This method stores the contract using the current values.
 	 */
 	public void handleStore() {
 		try {
-			Integer noticeTime = (Integer)getNoticeTime().getValue();
-			Integer warningTime = (Integer)getWarningTime().getValue();
-			
+			Integer noticeTime = (Integer) getNoticeTime().getValue();
+			Integer warningTime = (Integer) getWarningTime().getValue();
+
 			if (noticeTime == null) {
 				noticeTime = 30;
 			}
 			if (warningTime == null) {
 				warningTime = 7;
 			}
-			if (noticeTime != null && warningTime != null &&
-					noticeTime < warningTime) {
+			if (noticeTime != null && warningTime != null && noticeTime < warningTime) {
 				getNoticeTime().setValue(warningTime);
 				noticeTime = warningTime;
 			}
@@ -275,18 +286,17 @@ public class SettingsControl extends AbstractControl {
 			Settings.setExtensionNoticeTime(noticeTime);
 			Settings.setExtensionWarningTime(warningTime);
 			Settings.setNamedICalExport((Boolean) getNamedICalExport().getValue());
-			Settings.setTemplateFolder((String)templateFolderInput.getValue());
-			Settings.setHibiscusAutoImportNewTransactions((Boolean) getHibiscusAutoImportNewTransactions().getValue());
+			Settings.setTemplateFolder((String) templateFolderInput.getValue());
+			Settings.setHibiscusAutoImportNewTransactions(
+					(Boolean) getHibiscusAutoImportNewTransactions().getValue());
 
-			GUI.getStatusBar().setSuccessText(
-					Settings.i18n().tr("Settings saved."));
+			GUI.getStatusBar().setSuccessText(Settings.i18n().tr("Settings saved."));
 		} catch (ApplicationException e) {
 			GUI.getView().setErrorText(e.getMessage());
 
 		} catch (RemoteException e) {
 			Logger.error("Error while storing settings", e);
-			GUI.getStatusBar().setErrorText(
-					Settings.i18n().tr("Error while storing settings"));
+			GUI.getStatusBar().setErrorText(Settings.i18n().tr("Error while storing settings"));
 		}
 	}
 
@@ -295,21 +305,23 @@ public class SettingsControl extends AbstractControl {
 	 */
 	public void handleContractDetailsSettingsStore() {
 		try {
+			Settings.setShowFixedTermsInput((Boolean) getShowFixedTermsInput().getValue());
 			Settings.setShowSEPACreditorInput((Boolean) getShowSEPACreditorInput().getValue());
 			Settings.setShowSEPADebitorInput((Boolean) getShowSEPACustomerInput().getValue());
-			Settings.setShowHibiscusCategorySelector((Boolean) getShowHibiscusCategorySelector().getValue());
-			Settings.setShowHibiscusTransactionList((Boolean) getShowHibiscusTransactionList().getValue());
-			Settings.setHibiscusTransactionListHeight((Integer) getHibiscusTransactionListHeight().getValue());
+			Settings.setShowHibiscusCategorySelector(
+					(Boolean) getShowHibiscusCategorySelector().getValue());
+			Settings.setShowHibiscusTransactionList(
+					(Boolean) getShowHibiscusTransactionList().getValue());
+			Settings.setHibiscusTransactionListHeight(
+					(Integer) getHibiscusTransactionListHeight().getValue());
 
-			GUI.getStatusBar().setSuccessText(
-					Settings.i18n().tr("Settings saved."));
+			GUI.getStatusBar().setSuccessText(Settings.i18n().tr("Settings saved."));
 		} catch (ApplicationException e) {
 			GUI.getView().setErrorText(e.getMessage());
 
 		} catch (RemoteException e) {
 			Logger.error("Error while storing settings", e);
-			GUI.getStatusBar().setErrorText(
-					Settings.i18n().tr("Error while storing settings"));
+			GUI.getStatusBar().setErrorText(Settings.i18n().tr("Error while storing settings"));
 		}
 	}
 
@@ -330,19 +342,16 @@ public class SettingsControl extends AbstractControl {
 			SettingsUtil.set("phone", "");
 			Settings.setExtensionNoticeTime(30);
 			Settings.setExtensionWarningTime(7);
-//			Settings.setICalAutoExport(true);
 			Settings.setNamedICalExport(true);
 			Settings.setHibiscusAutoImportNewTransactions(false);
-			
-			GUI.getStatusBar().setSuccessText(
-					Settings.i18n().tr("Settings reset to default."));
+
+			GUI.getStatusBar().setSuccessText(Settings.i18n().tr("Settings reset to default."));
 		} catch (ApplicationException e) {
 			GUI.getView().setErrorText(e.getMessage());
 
 		} catch (RemoteException e) {
 			Logger.error("Error while resetting settings", e);
-			GUI.getStatusBar().setErrorText(
-					Settings.i18n().tr("Error while resetting settings"));
+			GUI.getStatusBar().setErrorText(Settings.i18n().tr("Error while resetting settings"));
 		}
 	}
 }

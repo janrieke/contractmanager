@@ -87,13 +87,17 @@ public class ContractDetailView extends AbstractView implements Extendable {
 				control.getCancellationPeriod());
 		left.addLabelPair(Settings.i18n().tr("Minimum term"), control.getFirstRuntime());
 		left.addLabelPair(Settings.i18n().tr("Following terms"), control.getNextRuntime());
-		String tooltip = Settings.i18n().tr(
-				"Adjusts the terms of this contract such that match weeks/months/years (dependent on what is selected in the minimum term field above).");
-		control.getFixedTermsInput().setData(Input.DATAKEY_TOOLTIP, tooltip);
-		left.addLabelPair(Settings.i18n().tr("Fixed terms"), control.getFixedTermsInput());
-		Object label = control.getFixedTermsInput().getData("jameica.label");
-		if (label instanceof Label) {
-			((Label) label).setToolTipText(tooltip);
+
+		// Only show the 'Fixed Terms' field if configured or if the value is set.
+		if (Settings.getShowFixedTermsInput() || control.getContract().getFixedTerms()) {
+			String tooltip = Settings.i18n().tr(
+					"Adjusts the terms of this contract such that match weeks/months/years (dependent on what is selected in the minimum term field above).");
+			control.getFixedTermsInput().setData(Input.DATAKEY_TOOLTIP, tooltip);
+			left.addLabelPair(Settings.i18n().tr("Fixed terms"), control.getFixedTermsInput());
+			Object label = control.getFixedTermsInput().getData("jameica.label");
+			if (label instanceof Label) {
+				((Label) label).setToolTipText(tooltip);
+			}
 		}
 		left.addLabelPair(Settings.i18n().tr("Next cancelable term"), control.getNextTerm());
 		left.addLabelPair(Settings.i18n().tr("Next cancellation deadline"),

@@ -199,7 +199,7 @@ public class ContractControl extends AbstractControl {
 	 *
 	 * @return
 	 */
-	private Contract getContract() {
+	public Contract getContract() {
 		if (contract != null) {
 			return contract;
 		}
