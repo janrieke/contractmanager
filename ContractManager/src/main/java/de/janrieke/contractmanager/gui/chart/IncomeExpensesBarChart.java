@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,24 +26,22 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.swtchartx.IAxis;
-import org.swtchartx.IAxisTick;
-import org.swtchartx.IBarSeries;
-import org.swtchartx.IGrid;
-import org.swtchartx.ISeries.SeriesType;
-import org.swtchartx.ISeriesLabel;
-import org.swtchartx.ITitle;
-import org.swtchartx.LineStyle;
-import org.swtchartx.ext.InteractiveChart;
-import org.swtchartx.internal.series.SeriesLabel;
-import org.swtchartx.internal.series.BarSeries;
+import org.swtchart.IAxis;
+import org.swtchart.IAxisTick;
+import org.swtchart.IBarSeries;
+import org.swtchart.IGrid;
+import org.swtchart.ISeries.SeriesType;
+import org.swtchart.ISeriesLabel;
+import org.swtchart.ITitle;
+import org.swtchart.LineStyle;
+import org.swtchart.ext.InteractiveChart;
+import org.swtchart.internal.series.BarSeries;
+import org.swtchart.internal.series.SeriesLabel;
 
 import de.janrieke.contractmanager.Settings;
 import de.willuhn.datasource.BeanUtil;
@@ -63,11 +61,13 @@ public class IncomeExpensesBarChart extends AbstractChart<ChartData>
 	/**
 	 * @see de.willuhn.jameica.hbci.gui.chart.Chart#redraw()
 	 */
+	@Override
 	public void redraw() throws RemoteException
 	{
 		// redraw ohne paint() Weia ;)
-		if (this.comp == null || this.comp.isDisposed())
+		if (this.comp == null || this.comp.isDisposed()) {
 			return;
+		}
 
 		// Cleanup
 		SWTUtil.disposeChildren(this.comp);
@@ -134,10 +134,10 @@ public class IncomeExpensesBarChart extends AbstractChart<ChartData>
 		List<ChartData> data = getData();
 		for (int i=0;i<data.size();++i)
 		{
-			final List<String> labelLine = new LinkedList<String>();
-			final List<Number> dataLine  = new LinkedList<Number>();
+			final List<String> labelLine = new LinkedList<>();
+			final List<Number> dataLine  = new LinkedList<>();
 
-			ChartData cd          = (ChartData) data.get(i);
+			ChartData cd          = data.get(i);
 			List<?> list             = cd.getData();
 			String dataAttribute  = cd.getDataAttribute();
 			String labelAttribute = cd.getLabelAttribute();
@@ -155,8 +155,9 @@ public class IncomeExpensesBarChart extends AbstractChart<ChartData>
 					Object value = BeanUtil.get(o,dataAttribute);
 					Object label = BeanUtil.get(o,labelAttribute);
 
-					if (label == null || value == null || !(value instanceof Number))
+					if (label == null || value == null || !(value instanceof Number)) {
 						continue;
+					}
 
 					Number n = (Number) value;
 					//if (Math.abs(n.doubleValue()) < 0.01d)
@@ -166,7 +167,9 @@ public class IncomeExpensesBarChart extends AbstractChart<ChartData>
 				}
 			}
 			if (dataLine.size() == 0)
+			 {
 				continue; // wir haben gar keine Werte
+			}
 
 			IAxis axis = this.chart.getAxisSet().getXAxis(0);
 			axis.setCategorySeries(labelLine.toArray(new String[labelLine.size()]));
@@ -183,8 +186,9 @@ public class IncomeExpensesBarChart extends AbstractChart<ChartData>
 				@Override
 				protected void draw(GC gc, int h, int v, double ySeriesValue,
 						int seriesIndex, int alignment) {
-					if (ySeriesValue > 0.0)
+					if (ySeriesValue > 0.0) {
 						super.draw(gc, h, v, ySeriesValue, seriesIndex, alignment);
+					}
 				}
 
 			};
@@ -212,16 +216,14 @@ public class IncomeExpensesBarChart extends AbstractChart<ChartData>
 			//////////////////////////////////////////////////////////////////////////
 		}
 
-		chart.getPlotArea().addPaintListener(new PaintListener() {
-			public void paintControl(PaintEvent e) {
-				String sumLabel1 = Settings.i18n().tr("Summe") + ":";
-				String sumLabel2 = Settings.DECIMALFORMAT.format(Math.round(sum*100)/100d);
-				sumLabel2 = sumLabel2 + " \u20AC";
-				int width1 = e.gc.textExtent(sumLabel1).x;
-				int width2 = e.gc.textExtent(sumLabel2).x;
-				e.gc.drawText(sumLabel1, (e.width-width1)/2, 5);
-				e.gc.drawText(sumLabel2, (e.width-width2)/2, 20);
-			}
+		chart.getPlotArea().addPaintListener(e -> {
+			String sumLabel1 = Settings.i18n().tr("Summe") + ":";
+			String sumLabel2 = Settings.DECIMALFORMAT.format(Math.round(sum*100)/100d);
+			sumLabel2 = sumLabel2 + " \u20AC";
+			int width1 = e.gc.textExtent(sumLabel1).x;
+			int width2 = e.gc.textExtent(sumLabel2).x;
+			e.gc.drawText(sumLabel1, (e.width-width1)/2, 5);
+			e.gc.drawText(sumLabel2, (e.width-width2)/2, 20);
 		});
 
 
@@ -236,10 +238,12 @@ public class IncomeExpensesBarChart extends AbstractChart<ChartData>
 	/**
 	 * @see de.willuhn.jameica.gui.Part#paint(org.eclipse.swt.widgets.Composite)
 	 */
+	@Override
 	public void paint(Composite parent) throws RemoteException
 	{
-		if (this.comp != null)
+		if (this.comp != null) {
 			return;
+		}
 
 		this.comp = new Composite(parent,SWT.NONE);
 		this.comp.setLayoutData(new GridData(GridData.FILL_BOTH));

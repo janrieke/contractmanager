@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,13 +28,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MenuItem;
-import org.swtchartx.ext.Messages;
+import org.swtchart.ext.Messages;
 
 import de.willuhn.jameica.gui.GUI;
 
@@ -45,24 +43,27 @@ import de.willuhn.jameica.gui.GUI;
 public abstract class AbstractChart<T extends ChartData> implements Chart<T>
 {
   private String title             = null;
-  private Map<RGB,Color> colors    = new HashMap<RGB,Color>();
-  private List<T> data             = new ArrayList<T>();
-  org.swtchartx.Chart chart         = null;
+  private Map<RGB,Color> colors    = new HashMap<>();
+  private List<T> data             = new ArrayList<>();
+  org.swtchart.Chart chart         = null;
 
   /**
    * @see de.willuhn.jameica.hbci.gui.chart.Chart#setTitle(java.lang.String)
    */
-  public void setTitle(String title)
+  @Override
+public void setTitle(String title)
   {
     this.title = title;
-    if (this.chart != null && !this.chart.isDisposed())
-      this.chart.getTitle().setText(this.title);
+    if (this.chart != null && !this.chart.isDisposed()) {
+		this.chart.getTitle().setText(this.title);
+	}
   }
 
   /**
    * @see de.willuhn.jameica.hbci.gui.chart.Chart#getTitle()
    */
-  public String getTitle()
+  @Override
+public String getTitle()
   {
     return this.title;
   }
@@ -70,28 +71,34 @@ public abstract class AbstractChart<T extends ChartData> implements Chart<T>
   /**
    * @see de.willuhn.jameica.hbci.gui.chart.Chart#addData(de.willuhn.jameica.hbci.gui.chart.ChartData)
    */
-  public void addData(T data)
+  @Override
+public void addData(T data)
   {
-    if (data != null)
-      this.data.add(data);
+    if (data != null) {
+		this.data.add(data);
+	}
   }
 
   /**
    * @see de.willuhn.jameica.hbci.gui.chart.Chart#removeData(de.willuhn.jameica.hbci.gui.chart.ChartData)
    */
-  public void removeData(T data)
+  @Override
+public void removeData(T data)
   {
-    if (data != null)
-      this.data.remove(data);
+    if (data != null) {
+		this.data.remove(data);
+	}
   }
 
   /**
    * @see de.willuhn.jameica.hbci.gui.chart.Chart#removeAllData()
    */
-  public void removeAllData()
+  @Override
+public void removeAllData()
   {
-    if (this.data != null)
-      this.data.clear();
+    if (this.data != null) {
+		this.data.clear();
+	}
   }
 
   /**
@@ -102,7 +109,7 @@ public abstract class AbstractChart<T extends ChartData> implements Chart<T>
   {
     return this.data;
   }
-  
+
   /**
    * Erzeugt eine Farbe, die automatisch disposed wird.
    * Die Funktion hat einen internen Cache. Wenn die Farbe schon im Cache
@@ -114,14 +121,15 @@ public abstract class AbstractChart<T extends ChartData> implements Chart<T>
   {
     // Schon im Cache?
     Color c = this.colors.get(rgb);
-    if (c != null && !c.isDisposed())
-      return c;
-    
+    if (c != null && !c.isDisposed()) {
+		return c;
+	}
+
     c = new Color(GUI.getDisplay(),rgb);
     this.colors.put(rgb,c);
     return c;
   }
-  
+
   /**
    * Entfernt den Menu-Eintrag "Properties" aus dem InteractiveChart,
    * weil das nur in Eclipse funktioniert. In Jameica wuerde das
@@ -132,21 +140,25 @@ public abstract class AbstractChart<T extends ChartData> implements Chart<T>
     try
     {
       MenuItem[] items = this.chart.getPlotArea().getMenu().getItems();
-      if (items == null || items.length == 0)
-        return;
+      if (items == null || items.length == 0) {
+		return;
+	}
 
       for (int i=0;i<items.length;++i)
       {
         MenuItem mi = items[i];
         String text = mi.getText();
-        if (text == null)
-          continue;
+        if (text == null) {
+			continue;
+		}
         if (text.equals(Messages.PROPERTIES))
         {
           mi.dispose();
-          
+
           // Den Separator davor gleich noch entfernen
-          if (i > 0) items[i-1].dispose();
+          if (i > 0) {
+			items[i-1].dispose();
+		}
           return;
         }
       }
@@ -156,35 +168,31 @@ public abstract class AbstractChart<T extends ChartData> implements Chart<T>
       // Dann halt nicht ;)
     }
   }
-  
+
 
   /**
    * @see de.willuhn.jameica.gui.Part#paint(org.eclipse.swt.widgets.Composite)
    */
-  public void paint(Composite parent) throws RemoteException
+  @Override
+public void paint(Composite parent) throws RemoteException
   {
-    parent.addDisposeListener(new DisposeListener() {
-      /**
-       * @see org.eclipse.swt.events.DisposeListener#widgetDisposed(org.eclipse.swt.events.DisposeEvent)
-       */
-      public void widgetDisposed(DisposeEvent e)
-      {
+    parent.addDisposeListener(e -> {
         try
         {
           Iterator<Color> i = colors.values().iterator();
           while (i.hasNext())
           {
             Color c = i.next();
-            if (c != null && !c.isDisposed())
-              c.dispose();
+            if (c != null && !c.isDisposed()) {
+				c.dispose();
+			}
           }
         }
         finally
         {
           colors.clear();
         }
-      }
-    });
+      });
     cleanMenu();
   }
 }

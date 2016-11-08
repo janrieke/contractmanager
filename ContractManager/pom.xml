@@ -9,6 +9,19 @@
 	<properties>
 		<powermock.version>1.6.5</powermock.version>
 	</properties>
+	<repositories>
+		<repository>
+			<id>repo</id>
+			<releases>
+				<enabled>true</enabled>
+				<checksumPolicy>ignore</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<url>file://${project.basedir}/repo</url>
+		</repository>
+	</repositories>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
 		<testSourceDirectory>src/test/java</testSourceDirectory>
@@ -45,6 +58,27 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.4.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<relocations>
+								<relocation>
+									<pattern>org.swtchart</pattern>
+									<shadedPattern>de.janrieke.contractmanager.shaded.org.swtchart</shadedPattern>
+								</relocation>
+							</relocations>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
@@ -71,6 +105,68 @@
 			<artifactId>powermock-api-mockito</artifactId>
 			<version>${powermock.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse</groupId>
+			<artifactId>swt</artifactId>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/../../jameica/lib/swt/win64/swt.jar</systemPath>
+			<version>4.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>de.willuhn</groupId>
+			<artifactId>jameica</artifactId>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/../jameica.jar</systemPath>
+			<version>2.6.4</version>
+		</dependency>
+		<dependency>
+			<groupId>de.willuhn</groupId>
+			<artifactId>util</artifactId>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/../de_willuhn_util.jar</systemPath>
+			<version>2.6.4</version>
+		</dependency>
+		<dependency>
+			<groupId>de.willuhn</groupId>
+			<artifactId>datasource</artifactId>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/../de_willuhn_ds.jar</systemPath>
+			<version>2.6.4</version>
+		</dependency>
+		<dependency>
+			<groupId>de.willuhn</groupId>
+			<artifactId>hibiscus</artifactId>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/../hibiscus.jar</systemPath>
+			<version>2.6.18</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse</groupId>
+			<artifactId>jface</artifactId>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/../../jameica/lib/swt/org.eclipse.jface_3.10.1.v20140813-1009.jar</systemPath>
+			<version>3.10.1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.swtchart</groupId>
+			<artifactId>ext</artifactId>
+			<version>0.10.0.v20160212</version>
+		</dependency>
+		<dependency>
+			<groupId>org</groupId>
+			<artifactId>swtchart</artifactId>
+			<version>0.10.0.v20160212</version>
+		</dependency>
+		<dependency>
+			<groupId>org.odftoolkit</groupId>
+			<artifactId>odfdom</artifactId>
+			<version>0.8.9</version>
 		</dependency>
 	</dependencies>
 </project>

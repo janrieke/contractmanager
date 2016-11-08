@@ -1,10 +1,10 @@
 /*******************************************************************************
- * Copyright (c) 2008-2014 SWTChart project. All rights reserved.
+ * Copyright (c) 2008-2016 SWTChart project. All rights reserved.
  *
  * This code is distributed under the terms of the Eclipse Public License v1.0
  * which is available at http://www.eclipse.org/legal/epl-v10.html
  *******************************************************************************/
-package org.swtchartx.internal.series;
+package org.swtchart.internal.series;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -12,14 +12,13 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
-import org.swtchartx.internal.series.SeriesLabel;
-import org.swtchartx.Chart;
-import org.swtchartx.IBarSeries;
-import org.swtchartx.Range;
-import org.swtchartx.IAxis.Direction;
-import org.swtchartx.internal.axis.Axis;
-import org.swtchartx.internal.compress.CompressBarSeries;
-import org.swtchartx.internal.compress.CompressScatterSeries;
+import org.swtchart.Chart;
+import org.swtchart.IAxis.Direction;
+import org.swtchart.IBarSeries;
+import org.swtchart.Range;
+import org.swtchart.internal.axis.Axis;
+import org.swtchart.internal.compress.CompressBarSeries;
+import org.swtchart.internal.compress.CompressScatterSeries;
 
 /**
  * Bar series.
@@ -79,28 +78,32 @@ public class BarSeries extends Series implements IBarSeries {
     /*
      * @see IBarSeries#getBarWidthStyle(BarWidthStyle)
      */
-    public BarWidthStyle getBarWidthStyle(BarWidthStyle style) {
+    @Override
+	public BarWidthStyle getBarWidthStyle(BarWidthStyle style) {
         return barWidthStyle;
     }
 
     /*
      * @see IBarSeries#setBarWidthStyle(BarWidthStyle)
      */
-    public void setBarWidthStyle(BarWidthStyle style) {
+    @Override
+	public void setBarWidthStyle(BarWidthStyle style) {
         this.barWidthStyle = style;
     }
 
     /*
      * @see IBarSeries#getBarWidth()
      */
-    public int getBarWidth() {
+    @Override
+	public int getBarWidth() {
         return barWidth;
     }
 
     /*
      * @see IBarSeries#setBarWidth(int)
      */
-    public void setBarWidth(int width) {
+    @Override
+	public void setBarWidth(int width) {
         if (padding <= 0) {
             SWT.error(SWT.ERROR_INVALID_ARGUMENT);
         }
@@ -110,14 +113,16 @@ public class BarSeries extends Series implements IBarSeries {
     /*
      * @see IBarSeries#getBarPadding()
      */
-    public int getBarPadding() {
+    @Override
+	public int getBarPadding() {
         return padding;
     }
 
     /*
      * @see IBarSeries#setBarPadding(int)
      */
-    public void setBarPadding(int padding) {
+    @Override
+	public void setBarPadding(int padding) {
         if (padding < 0 || padding > 100) {
             SWT.error(SWT.ERROR_INVALID_ARGUMENT);
         }
@@ -127,7 +132,8 @@ public class BarSeries extends Series implements IBarSeries {
     /*
      * @see IBarSeries#getBarColor()
      */
-    public Color getBarColor() {
+    @Override
+	public Color getBarColor() {
         if (barColor.isDisposed()) {
             barColor = Display.getDefault().getSystemColor(DEFAULT_BAR_COLOR);
         }
@@ -137,7 +143,8 @@ public class BarSeries extends Series implements IBarSeries {
     /*
      * @see IBarSeries#setBarColor(Color)
      */
-    public void setBarColor(Color color) {
+    @Override
+	public void setBarColor(Color color) {
         if (color != null && color.isDisposed()) {
             SWT.error(SWT.ERROR_INVALID_ARGUMENT);
         }
@@ -153,7 +160,8 @@ public class BarSeries extends Series implements IBarSeries {
     /*
      * @see IBarSeries#getBounds()
      */
-    public Rectangle[] getBounds() {
+    @Override
+	public Rectangle[] getBounds() {
         Rectangle[] compressedBounds = getBoundsForCompressedSeries();
         if (((Axis) chart.getAxisSet().getXAxis(xAxisId)).isValidCategoryAxis()) {
             return compressedBounds;
@@ -163,12 +171,12 @@ public class BarSeries extends Series implements IBarSeries {
         double[] comporessedXSeries = compressor.getCompressedXSeries();
         int cnt = 0;
         for (int i = 0; i < xSeries.length; i++) {
-            if (cnt < comporessedXSeries.length
-                    && comporessedXSeries[cnt] == xSeries[i]
-                    && compressedBounds[cnt].width != 0
-                    && compressedBounds[cnt].height != 0) {
-                rs[i] = compressedBounds[cnt++];
-            }
+			if (cnt < comporessedXSeries.length && comporessedXSeries[cnt] == xSeries[i]) {
+				if (compressedBounds[cnt].width != 0 && compressedBounds[cnt].height != 0) {
+					rs[i] = compressedBounds[cnt];
+				}
+				cnt++;
+			}
         }
         return rs;
     }
@@ -392,7 +400,7 @@ public class BarSeries extends Series implements IBarSeries {
         }
 
         if (barWidthStyle == BarWidthStyle.STRETCHED) {
-            
+
             // get riser width without padding
             int width = Math.abs(xAxis.getPixelCoordinate(upper, min, max)
                     - xAxis.getPixelCoordinate(lower, min, max));
@@ -441,8 +449,8 @@ public class BarSeries extends Series implements IBarSeries {
 
         // draw riser
         Rectangle[] rs = getBoundsForCompressedSeries();
-        for (int i = 0; i < rs.length; i++) {
-            drawRiser(gc, rs[i].x, rs[i].y, rs[i].width, rs[i].height);
+        for (Rectangle element : rs) {
+            drawRiser(gc, element.x, element.y, element.width, element.height);
         }
 
         // draw label and error bars
@@ -457,10 +465,18 @@ public class BarSeries extends Series implements IBarSeries {
 
                 int h, v;
                 if (xAxis.isHorizontalAxis()) {
-                    h = xAxis.getPixelCoordinate(xSeries[indexes[i]]);
+                    if (xAxis.isCategoryEnabled()) {
+                        h = rs[i].x + rs[i].width / 2;
+                    } else {
+                        h = xAxis.getPixelCoordinate(xSeries[indexes[i]]);
+                    }
                     v = yAxis.getPixelCoordinate(ySeries[indexes[i]]);
                 } else {
-                    v = xAxis.getPixelCoordinate(xSeries[indexes[i]]);
+                    if (xAxis.isCategoryEnabled()) {
+                        v = rs[i].y + rs[i].height / 2;
+                    } else {
+                        v = xAxis.getPixelCoordinate(xSeries[indexes[i]]);
+                    }
                     h = yAxis.getPixelCoordinate(ySeries[indexes[i]]);
                 }
                 xErrorBar.draw(gc, h, v, xAxis, indexes[i]);
@@ -496,7 +512,7 @@ public class BarSeries extends Series implements IBarSeries {
         Color frameColor = getFrameColor(getBarColor());
         Color oldForeground = gc.getForeground();
         gc.setForeground(frameColor);
-        
+
         gc.drawRectangle(h, v, width, height);
         frameColor.dispose();
 

@@ -44,6 +44,8 @@ import de.willuhn.util.ApplicationException;
  */
 public class ContractDetailView extends AbstractView implements Extendable {
 
+	private final static String DATAKEY_TOOLTIP = "datakey.tooltip";
+
 	private RestoreButton restoreButton;
 	private boolean activationState;
 	private Button deleteButton;
@@ -92,7 +94,7 @@ public class ContractDetailView extends AbstractView implements Extendable {
 		if (Settings.getShowFixedTermsInput() || control.getContract().getFixedTerms()) {
 			String tooltip = Settings.i18n().tr(
 					"Adjusts the terms of this contract such that match weeks/months/years (dependent on what is selected in the minimum term field above).");
-			control.getFixedTermsInput().setData(Input.DATAKEY_TOOLTIP, tooltip);
+			control.getFixedTermsInput().setData(DATAKEY_TOOLTIP, tooltip);
 			left.addLabelPair(Settings.i18n().tr("Fixed terms"), control.getFixedTermsInput());
 			Object label = control.getFixedTermsInput().getData("jameica.label");
 			if (label instanceof Label) {

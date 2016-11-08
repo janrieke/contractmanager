@@ -28,13 +28,9 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/odfdom-java-0.8.9-incubating-jar-with-dependencies.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/hibiscus"/>
 	<classpathentry kind="lib" path="/jameica/lib/swt/win64/swt.jar" sourcepath="/jameica/lib.src/swt/linux/swt.src.zip"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jameica"/>
-	<classpathentry kind="lib" path="lib/org.swtchartx_0.9.0.v20140219.jar"/>
-	<classpathentry kind="lib" path="lib/org.swtchartx.ext_0.9.0.v20140219.jar"/>
-	<classpathentry kind="lib" path="/jameica/lib/jakarta_commons/commons-lang-2.6.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>

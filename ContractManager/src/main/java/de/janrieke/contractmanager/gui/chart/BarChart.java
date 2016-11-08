@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -33,18 +33,18 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.swtchartx.IAxis;
-import org.swtchartx.IAxisTick;
-import org.swtchartx.IBarSeries;
-import org.swtchartx.IGrid;
-import org.swtchartx.ISeries.SeriesType;
-import org.swtchartx.ISeriesLabel;
-import org.swtchartx.ITitle;
-import org.swtchartx.LineStyle;
-import org.swtchartx.ext.InteractiveChart;
-import org.swtchartx.internal.Util;
-import org.swtchartx.internal.series.SeriesLabel;
-import org.swtchartx.internal.series.BarSeries;
+import org.swtchart.IAxis;
+import org.swtchart.IAxisTick;
+import org.swtchart.IBarSeries;
+import org.swtchart.IGrid;
+import org.swtchart.ISeries.SeriesType;
+import org.swtchart.ISeriesLabel;
+import org.swtchart.ITitle;
+import org.swtchart.LineStyle;
+import org.swtchart.ext.InteractiveChart;
+import org.swtchart.internal.Util;
+import org.swtchart.internal.series.BarSeries;
+import org.swtchart.internal.series.SeriesLabel;
 
 import de.janrieke.contractmanager.Settings;
 import de.willuhn.datasource.BeanUtil;
@@ -60,15 +60,17 @@ import de.willuhn.util.ColorGenerator;
 public class BarChart extends AbstractChart<ChartData>
 {
   private Composite comp = null;
-  
+
   /**
    * @see de.willuhn.jameica.hbci.gui.chart.Chart#redraw()
    */
-  public void redraw() throws RemoteException
+  @Override
+public void redraw() throws RemoteException
   {
     // redraw ohne paint() Weia ;)
-    if (this.comp == null || this.comp.isDisposed())
-      return;
+    if (this.comp == null || this.comp.isDisposed()) {
+		return;
+	}
 
     // Cleanup
     SWTUtil.disposeChildren(this.comp);
@@ -85,7 +87,7 @@ public class BarChart extends AbstractChart<ChartData>
     this.chart.setBackgroundInPlotArea(GUI.getDisplay().getSystemColor(SWT.COLOR_WHITE));
     //
     ////////////////////////////////////////////////////////////////////////////
-    
+
     ////////////////////////////////////////////////////////////////////////////
     // Titel des Charts
     {
@@ -96,11 +98,11 @@ public class BarChart extends AbstractChart<ChartData>
     }
     //
     ////////////////////////////////////////////////////////////////////////////
-    
+
     ////////////////////////////////////////////////////////////////////////////
     // Layout der Achsen
     Color gray = getColor(new RGB(230,230,230));
-    
+
     // X-Achse
     {
       IAxis axis = this.chart.getAxisSet().getXAxis(0);
@@ -112,7 +114,7 @@ public class BarChart extends AbstractChart<ChartData>
 
       axis.getTick().setForeground(GUI.getDisplay().getSystemColor(SWT.COLOR_BLACK));
     }
-    
+
     // Y-Achse
     {
       IAxis axis = this.chart.getAxisSet().getYAxis(0);
@@ -121,7 +123,7 @@ public class BarChart extends AbstractChart<ChartData>
       IGrid grid = axis.getGrid();
       grid.setStyle(LineStyle.DOT);
       grid.setForeground(gray);
-      
+
       IAxisTick tick = axis.getTick();
       tick.setFormat(Settings.DECIMALFORMAT);
       tick.setForeground(GUI.getDisplay().getSystemColor(SWT.COLOR_BLACK));
@@ -129,17 +131,17 @@ public class BarChart extends AbstractChart<ChartData>
     //
     ////////////////////////////////////////////////////////////////////////////
 
-    
+
     ////////////////////////////////////////////////////////////////////////////
     // Neu zeichnen
     List<ChartData> data = getData();
     final int[][] cValues = new int[data.size()][];
     for (int i=0;i<data.size();++i)
     {
-      final List<String> labelLine = new LinkedList<String>();
-      final List<Number> dataLine  = new LinkedList<Number>();
-      
-      ChartData cd          = (ChartData) data.get(i);
+      final List<String> labelLine = new LinkedList<>();
+      final List<Number> dataLine  = new LinkedList<>();
+
+      ChartData cd          = data.get(i);
       List<?> list             = cd.getData();
       String dataAttribute  = cd.getDataAttribute();
       String labelAttribute = cd.getLabelAttribute();
@@ -156,9 +158,10 @@ public class BarChart extends AbstractChart<ChartData>
         {
           Object value = BeanUtil.get(o,dataAttribute);
           Object label = BeanUtil.get(o,labelAttribute);
-          
-          if (label == null || value == null || !(value instanceof Number))
-            continue;
+
+          if (label == null || value == null || !(value instanceof Number)) {
+			continue;
+		}
 
           Number n = (Number) value;
           //if (Math.abs(n.doubleValue()) < 0.01d)
@@ -168,7 +171,9 @@ public class BarChart extends AbstractChart<ChartData>
         }
       }
       if (dataLine.size() == 0)
-        continue; // wir haben gar keine Werte
+	 {
+		continue; // wir haben gar keine Werte
+	}
 
       IAxis axis = this.chart.getAxisSet().getXAxis(0);
       axis.getTick().setVisible(false);
@@ -209,7 +214,7 @@ public class BarChart extends AbstractChart<ChartData>
 				}
 			}
 		}
-    	  
+
       };
       label.setFont(Font.SMALL.getSWTFont());
       label.setFormat("'"+cd.getLabel()+": '"+Settings.DECIMALFORMAT.toPattern()+" ¤");
@@ -244,18 +249,20 @@ public class BarChart extends AbstractChart<ChartData>
   /**
    * @see de.willuhn.jameica.gui.Part#paint(org.eclipse.swt.widgets.Composite)
    */
-  public void paint(Composite parent) throws RemoteException
+  @Override
+public void paint(Composite parent) throws RemoteException
   {
-    if (this.comp != null)
-      return;
-    
+    if (this.comp != null) {
+		return;
+	}
+
     this.comp = new Composite(parent,SWT.NONE);
     this.comp.setLayoutData(new GridData(GridData.FILL_BOTH));
-    
+
     redraw();
     super.paint(parent);
   }
-  
+
   /**
    * Wandelt die Liste in ein Array von doubles um.
    * @param list die Liste.
