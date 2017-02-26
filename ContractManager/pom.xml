@@ -170,6 +170,8 @@
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 			<version>2.6</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/../../jameica/lib/jakarta_commons/commons-lang-2.6.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.swtchart</groupId>
