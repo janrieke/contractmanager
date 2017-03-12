@@ -9,6 +9,7 @@
   <url>http://janrieke.de/products/jameica/updates/contractmanager/snapshot/0.5.3-SNAPSHOT/contractmanager.zip</url>
   <homepage>http://janrieke.de/products/contractmanager</homepage>
   <license>GPL 3.0 - http://www.gnu.org/licenses/gpl-3.0.txt</license>
+  <icon>contractmanager-icon-64x64.png</icon>
 
   <requires jameica="2.6.4+">
     <import plugin="hibiscus" version="2.6+" required="false" />
