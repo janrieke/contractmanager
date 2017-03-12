@@ -1,0 +1,44 @@
+Release instructions, exemplary for version 0.5.2
+
+Currently, version 0.5.2-SNAPSHOT is in development.
+
+ 1. Change plugin.xml:
+    - <plugin version="0.5.2">
+    - <url>http://janrieke.de/products/jameica/updates/contractmanager/release/0.5.2/contractmanager.zip</url>
+      (Note the "/release/" instead of "/snapshot/" in the URL!)
+
+ 2. Change pom.xml:
+    - <version>0.5.2</version>
+
+ 3. If not already done, describe the changes since the last release in VERSION_HISTORY.
+
+ 4. Set the years in LICENSE and README to the current year.
+
+ 5. Execute "mvn clean package"
+
+ 6. If sucessful, there will be a "contractmanager-0.5.2-bin.zip" in the target folder. This is the complete release. Copy this file to "ContractManager Releases/0.5.2/contractmanager.zip". 
+
+ 7. Verify that the release works (check both for updates and fresh installations)!
+    - Use .jameica-installation-test und then a real installation for this.
+    
+ 8. git commit, git push.
+
+ 9. Upload contractmanager.zip to http://janrieke.de/products/jameica/updates/contractmanager/release/0.5.2/contractmanager.zip.
+
+10. Upload plugin.xml to both http://janrieke.de/products/jameica/updates/contractmanager/release/ und http://janrieke.de/products/jameica/updates/contractmanager/release/0.5.2/.
+
+Now, the release is live.
+
+11. Verify that an update via the updatesite works (use ".jameica-installation-test").
+ 
+12. Close the ".jameica-installation-test" Jameica instance. Use the last backup of ".jameica-installation-test" and copy it to "ContractManager Releases".
+
+Now, we finally have to set the new development version:
+
+13. Change plugin.xml:
+    - <plugin version="0.5.3-SNAPSHOT">
+    - <url>http://janrieke.de/products/jameica/updates/contractmanager/snapshot/0.5.3-SNAPSHOT/contractmanager.zip</url>
+      (Note the "/snapshot/" instead of "/release/" in the URL!)
+
+14. Change pom.xml:
+    - <version>0.5.3-SNAPSHOT</version>
