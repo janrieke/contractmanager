@@ -38,6 +38,13 @@ VERSION HISTORY:
 	- Dialog with database login data
 	- Import/Export
 
+0.5.2:
+	- Hide inactive contracts from contract list
+	- More templates for document generation
+ 	- Improved assignment of Hibiscus transactions
+	- "Snap to end" feature to fix the end date of a contract to, e.g., the end of month
+	- Preparations for MySQL support (thx Harald)
+
 
 ROADMAP:
 
