@@ -6,7 +6,7 @@
  
    <plugins name="ContractManager">
      <plugin url="http://janrieke.de/products/jameica/updates/contractmanager/release" />
-     <!-- <plugin url="http://janrieke.de/products/jameica/updates/contractmanager/developer" />  -->
+     <!-- <plugin url="http://janrieke.de/products/jameica/updates/contractmanager/snapshot" />  -->
    </plugins>
  
 </repository>
