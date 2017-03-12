@@ -84,4 +84,4 @@ CREATE TABLE version (
   PRIMARY KEY (id)
 );
 
-INSERT INTO version (name,version) values ('contract_db',22);
+INSERT INTO version (name,version) values ('contract_db',23);
