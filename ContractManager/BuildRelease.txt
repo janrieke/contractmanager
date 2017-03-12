@@ -12,7 +12,7 @@ Currently, version 0.5.2-SNAPSHOT is in development.
 
  3. If not already done, describe the changes since the last release in VERSION_HISTORY.
 
- 4. Set the years in LICENSE and README to the current year.
+ 4. Set the year in LICENSE, README, and src/main/java/de/janrieke/contractmanager/gui/dialog/AboutDialog.java to the current year.
 
  5. Execute "mvn clean package"
 

@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Composite;
 
 import de.janrieke.contractmanager.ContractManagerPlugin;
 import de.janrieke.contractmanager.Settings;
-import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.dialogs.AbstractDialog;
 import de.willuhn.jameica.gui.input.LabelInput;
 import de.willuhn.jameica.gui.parts.ButtonArea;
@@ -33,7 +32,6 @@ import de.willuhn.jameica.plugin.Manifest;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.system.OperationCanceledException;
 import de.willuhn.logging.Logger;
-import de.willuhn.util.ApplicationException;
 
 /**
  * Our "About..." dialog.
@@ -42,6 +40,7 @@ public class AboutDialog extends AbstractDialog<Object> {
 
 	int WINDOW_WIDTH = 550;
 	int WINDOW_HEIGHT = 350;
+
 	/**
 	 * ct.
 	 *
@@ -58,19 +57,13 @@ public class AboutDialog extends AbstractDialog<Object> {
 	 */
 	@Override
 	protected void paint(Composite parent) throws Exception {
-		Manifest manifest = Application.getPluginLoader().getManifest(
-				ContractManagerPlugin.class);
+		Manifest manifest = Application.getPluginLoader().getManifest(ContractManagerPlugin.class);
 
 		FormTextPart text = new FormTextPart();
-		text.setText("<form>"
-				+ "<p><b>"
-				+ manifest.getDescription()
-				+ "</b></p>"
+		text.setText("<form>" + "<p><b>" + manifest.getDescription() + "</b></p>"
 				+ "<br/>Licence: GPL 3.0 (http://www.gnu.org/licenses/gpl-3.0.txt)"
-				+ "<br/><p>Copyright by Jan Rieke [it@janrieke.de] 2010-2015</p>"
-				+ "<p>"
-				+ manifest.getHomepage()
-				+ "</p>"
+				+ "<br/><p>Copyright by Jan Rieke [it@janrieke.de] 2010-2017</p>" + "<p>"
+				+ manifest.getHomepage() + "</p>"
 				+ "<br/><p>Contains code from Jameica, Jameica Example Plugin, Hibiscus, and Syntax; copyright by Olaf Willuhn [info@jameica.org], GPL</p>"
 				+ "<p>http://www.jameica.org</p>" + "</form>");
 
@@ -78,42 +71,30 @@ public class AboutDialog extends AbstractDialog<Object> {
 
 		LabelGroup group = new LabelGroup(parent, " Information ");
 
-		AbstractPlugin p = Application.getPluginLoader().getPlugin(
-				ContractManagerPlugin.class);
+		AbstractPlugin p = Application.getPluginLoader().getPlugin(ContractManagerPlugin.class);
 
-		group.addLabelPair(Settings.i18n().tr("Version"), new LabelInput(""
-				+ manifest.getVersion()));
+		group.addLabelPair(Settings.i18n().tr("Version"),
+				new LabelInput("" + manifest.getVersion()));
 		group.addLabelPair(Settings.i18n().tr("Working directory"),
 				new LabelInput("" + p.getResources().getWorkPath()));
 
 		ButtonArea buttons = new ButtonArea();
-		buttons.addButton(Settings.i18n().tr("Database Information"), new Action() {
-			@Override
-			public void handleAction(Object context)
-					throws ApplicationException {
-				try {
-					new DebugDialog(DebugDialog.POSITION_CENTER).open();
-				} catch (OperationCanceledException oce) {
-					Logger.info(oce.getMessage());
-					return;
-				} catch (Exception e) {
-					Logger.error("unable to display debug dialog", e);
-					Application
-							.getMessagingFactory()
-							.sendMessage(
-									new StatusBarMessage(
-											Settings.i18n().tr("Error while showing database information"),
-											StatusBarMessage.TYPE_ERROR));
-				}
+		buttons.addButton(Settings.i18n().tr("Database Information"), context -> {
+			try {
+				new DebugDialog(DebugDialog.POSITION_CENTER).open();
+			} catch (OperationCanceledException oce) {
+				Logger.info(oce.getMessage());
+				return;
+			} catch (Exception e) {
+				Logger.error("unable to display debug dialog", e);
+				Application.getMessagingFactory()
+						.sendMessage(new StatusBarMessage(
+								Settings.i18n().tr("Error while showing database information"),
+								StatusBarMessage.TYPE_ERROR));
 			}
 		}, null, false, "dialog-information.png");
-		buttons.addButton(Settings.i18n().tr("Close"), new Action() {
-			@Override
-			public void handleAction(Object context)
-					throws ApplicationException {
-				close();
-			}
-		}, null, true, "window-close.png");
+		buttons.addButton(Settings.i18n().tr("Close"), context -> close(), null, true,
+				"window-close.png");
 		group.addButtonArea(buttons);
 	}
 
