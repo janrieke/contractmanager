@@ -34,11 +34,11 @@
   </menu>
 
   <navigation>
-    <item name="ContractManager" icon-close="folder.gif" icon-open="folderopen.gif" action="de.janrieke.contractmanager.gui.action.ShowWelcomeView">
+    <item name="ContractManager" icon-close="cm-folder.png" icon-open="cm-folder-open.png" action="de.janrieke.contractmanager.gui.action.ShowWelcomeView">
       <item name="Contracts" icon-close="edit-copy.png" icon-open="edit-copy.png" action="de.janrieke.contractmanager.gui.action.ShowContractListView" />
       <item name="Addresses" icon-close="address-book-new.png" icon-open="address-book-new.png" action="de.janrieke.contractmanager.gui.action.ShowAddressListView" />
       <item name="Settings" icon-close="document-properties.png" icon-open="document-properties.png" action="de.janrieke.contractmanager.gui.action.ShowSettingsView" />
-	  <item name="Analyses" icon-close="folder.gif" icon-open="folderopen.gif">
+	  <item name="Analyses" icon-close="folder.png" icon-open="folder-open.png">
         <item name="Income/Expenses" icon-close="chart.png" icon-open="chart.png" action="de.janrieke.contractmanager.gui.action.ShowIncomeExpensesAnalysisView" />
         <item name="Expenses" icon-close="chart.png" icon-open="chart.png" action="de.janrieke.contractmanager.gui.action.ShowExpensesAnalysisView" />
       </item>
