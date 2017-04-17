@@ -184,7 +184,10 @@ public class GenerateOdfDocument implements Action {
 
 		TemplateListEntry selectedTemplate;
 		if (templates.size() == 0) {
+			GUI.getStatusBar().setErrorText(
+					Settings.i18n().tr("No *.odt templates found. Check whether the template folder is set correctly in your configuration."));
 			Logger.error("No *.odt templates found in template folder " + templateFolderString);
+
 			return;
 		} else if (templates.size() > 1) {
 			ListDialog templateSelectionDialog = new ListDialog(templates, 0);
@@ -253,7 +256,7 @@ public class GenerateOdfDocument implements Action {
 
 		try {
 			// retrieve variable values
-			Map<String, String> values = new HashMap<String, String>();
+			Map<String, String> values = new HashMap<>();
 
 			values.put("NAME", p.getAddress().getName());
 			values.put("STREET", p.getAddress().getStreet());
