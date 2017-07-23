@@ -11,13 +11,14 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.janrieke.contractmanager.server;
 
 import java.rmi.RemoteException;
+import java.util.Date;
 
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
@@ -39,7 +40,7 @@ public class CostsImpl extends AbstractDBObject implements Costs {
 
 	/**
 	 * We have to return the name of the sql table here.
-	 * 
+	 *
 	 * @see de.willuhn.datasource.db.AbstractDBObject#getTableName()
 	 */
 	@Override
@@ -51,7 +52,7 @@ public class CostsImpl extends AbstractDBObject implements Costs {
 	 * Sometimes you can display only one of the projects attributes (in combo
 	 * boxes). Here you can define the name of this field. Please don't confuse
 	 * this with the "primary KEY".
-	 * 
+	 *
 	 * @see de.willuhn.datasource.GenericObject#getPrimaryAttribute()
 	 */
 	@Override
@@ -59,24 +60,25 @@ public class CostsImpl extends AbstractDBObject implements Costs {
 		// we choose the contract's name as primary field.
 		return "description";
 	}
-	
+
 	/**
 	 * @see de.willuhn.datasource.db.AbstractDBObject#getForeignObject(java.lang.String)
 	 */
 	@Override
 	protected Class<?> getForeignObject(String field) throws RemoteException {
-		if ("contract_id".equals(field))
+		if ("contract_id".equals(field)) {
 			return Contract.class;
+		}
 		return null;
 	}
-	
+
 	/**
 	 * This method will be called before delete() is executed. Here you can make
 	 * some dependency checks. If you don't want to delete the project (in case
 	 * of failed dependencies) you have to throw an ApplicationException. The
 	 * message of this one will be shown in users UI. So please translate the
 	 * text into the users language.
-	 * 
+	 *
 	 * @see de.willuhn.datasource.db.AbstractDBObject#deleteCheck()
 	 */
 	@Override
@@ -86,7 +88,7 @@ public class CostsImpl extends AbstractDBObject implements Costs {
 	/**
 	 * This method is invoked before executing insert(). So lets check the
 	 * entered data.
-	 * 
+	 *
 	 * @see de.willuhn.datasource.db.AbstractDBObject#insertCheck()
 	 */
 	@Override
@@ -95,14 +97,14 @@ public class CostsImpl extends AbstractDBObject implements Costs {
 
 	/**
 	 * This method is invoked before every update().
-	 * 
+	 *
 	 * @see de.willuhn.datasource.db.AbstractDBObject#updateCheck()
 	 */
 	@Override
 	protected void updateCheck() throws ApplicationException {
 		insertCheck();
 	}
-	
+
 	//FIELD DATA ACCESS
 	@Override
 	public Contract getContract() throws RemoteException {
@@ -152,5 +154,15 @@ public class CostsImpl extends AbstractDBObject implements Costs {
 	public void setPeriod(IntervalType period)
 			throws RemoteException {
 		setAttribute("period", period.getValue());
+	}
+
+	@Override
+	public Date getPayday() throws RemoteException {
+		return (Date) getAttribute("payday");
+	}
+
+	@Override
+	public void setPayday(Date payday) throws RemoteException {
+		setAttribute("payday", payday);
 	}
 }

@@ -1,15 +1,23 @@
 package de.janrieke.contractmanager.gui.parts;
 
+import java.rmi.RemoteException;
+import java.util.Calendar;
+import java.util.Date;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Costs;
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.jameica.gui.Action;
+import de.willuhn.jameica.system.Application;
+import de.willuhn.logging.Logger;
 
 public class CostsListTablePart extends SizeableTablePart {
 
@@ -22,6 +30,11 @@ public class CostsListTablePart extends SizeableTablePart {
 	protected String getControlValue(Control control) {
 		if (control instanceof CCombo) {
 			return ((CCombo) control).getText();
+		} else if (control instanceof DateTime) {
+			DateTime cal = ((DateTime) control);
+			Calendar c = Calendar.getInstance(Application.getConfig().getLocale());
+			c.set(cal.getYear(), cal.getMonth(), cal.getDay());
+			return Settings.dateformat(c.getTime());
 		} else {
 			return super.getControlValue(control);
 		}
@@ -29,20 +42,40 @@ public class CostsListTablePart extends SizeableTablePart {
 
 	@Override
 	protected Control getEditorControl(int row, TableItem item, String oldValue) {
-		if (item.getData() instanceof Costs && row == 2) {
+		// Row 0 is a normal text input for the description.
+		if (item.getData() instanceof Costs && row == 1) {
+			// Input for the money (" €" will be stripped)
+			Text newText = new Text(item.getParent(), SWT.NONE);
+			String doubleString = oldValue.substring(0, oldValue.length() - 2);
+			newText.setText(doubleString);
+			newText.selectAll();
+			newText.setFocus();
+			return newText;
+		} else if (item.getData() instanceof Costs && row == 2) {
+			// Interval select value
 			CCombo newCombo = new CCombo(item.getParent(), SWT.FLAT | SWT.READ_ONLY);
 			newCombo.setItems(Contract.IntervalType.getAdjectives());
 			newCombo.setText(oldValue);
 			newCombo.setFocus();
 			return newCombo;
-		}
-		else if (item.getData() instanceof Costs && row == 1) {
-			Text newText = new Text(item.getParent(), SWT.NONE);
-			String doubleString = oldValue.substring(0, oldValue.length()-2);
-			newText.setText(doubleString);
-			newText.selectAll();
-			newText.setFocus();
-			return newText;
+		} else if (item.getData() instanceof Costs && row == 3) {
+			// Input for the payday
+
+			Date date = null;
+			try {
+				date = ((Costs) item.getData()).getPayday();
+			} catch (RemoteException e) {
+				Logger.error("Error while reading costs item.", e);
+			}
+
+			final DateTime cal = new DateTime(item.getParent(), SWT.DATE | SWT.DROP_DOWN);
+			if (date != null) {
+				Calendar c = Calendar.getInstance(Application.getConfig().getLocale());
+				c.setTime(date);
+				cal.setDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH),
+						c.get(Calendar.DAY_OF_MONTH));
+			}
+			return cal;
 		} else {
 			return super.getEditorControl(row, item, oldValue);
 		}
@@ -52,11 +85,11 @@ public class CostsListTablePart extends SizeableTablePart {
 	public Object getSelection() {
 		Object selection = super.getSelection();
 		if (selection == null) {
-			// Don't return null when no element is selected, because the action will not be called when double-clicking.
+			// Don't return null when no element is selected, because the action
+			// will not be called when double-clicking.
 			// Handling of empty arrays is performed within CreateNewCostEntry.
 			return new Object[0];
-		}
-		else {
+		} else {
 			return selection;
 		}
 	}

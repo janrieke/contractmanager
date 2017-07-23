@@ -45,6 +45,7 @@ CREATE TABLE costs (
   description varchar(255),
   money double,
   period int(1),
+  payday date,
   UNIQUE (id),
   PRIMARY KEY (id),
   CONSTRAINT fk_costs_contract FOREIGN KEY (contract_id) REFERENCES contract (id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -84,4 +85,4 @@ CREATE TABLE version (
   PRIMARY KEY (id)
 ) ENGINE=InnoDB;
 
-INSERT INTO version (name,version) values ('contract_db',23);
+INSERT INTO version (name,version) values ('contract_db',24);

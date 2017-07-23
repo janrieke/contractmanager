@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -20,6 +20,7 @@ package de.janrieke.contractmanager.gui.menu;
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.action.CreateNewCostEntry;
 import de.janrieke.contractmanager.gui.action.DeleteCostEntry;
+import de.janrieke.contractmanager.gui.action.RemovePaydayFromCostEntry;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
 import de.willuhn.jameica.gui.parts.ContextMenu;
@@ -35,6 +36,8 @@ public class CostsListMenu extends ContextMenu {
 		"document-new.png"));
 
 		addItem(ContextMenuItem.SEPARATOR);
+		addItem(new CheckedContextMenuItem(Settings.i18n().tr(
+				"Remove payday..."), new RemovePaydayFromCostEntry(contractControl), null));
 		addItem(new CheckedContextMenuItem(Settings.i18n().tr(
 				"Delete cost entry..."), new DeleteCostEntry(contractControl), "window-close.png"));
 	}

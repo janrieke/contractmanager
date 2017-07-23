@@ -11,13 +11,13 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**********************************************************************
  * Kopie aus Hibiscus
- * 
+ *
  * $Source: /cvsroot/hibiscus/hibiscus/src/de/willuhn/jameica/hbci/server/HBCIUpdateProvider.java,v $
  * $Revision: 1.3 $
  * $Date: 2009-03-10 23:51:31 $
@@ -90,7 +90,7 @@ public class ContractDBUpdateProvider implements UpdateProvider
 		try
 		{
 			return this.version.getVersion();
-			//return 15; //to test the db update  
+			//return 15; //to test the db update
 		}
 		catch (RemoteException re)
 		{
@@ -146,8 +146,9 @@ public class ContractDBUpdateProvider implements UpdateProvider
 				// Werfen wir nicht, weil es sonst die eigentliche Exception verdecken wuerde
 			}
 
-			if (e instanceof ApplicationException)
+			if (e instanceof ApplicationException) {
 				throw (ApplicationException) e;
+			}
 
 			Logger.error("unable to read current version number",e);
 			throw new ApplicationException(res.getI18N().tr("Unable to read current version number"));

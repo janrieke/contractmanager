@@ -54,7 +54,6 @@ import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
-import de.willuhn.jameica.gui.Part;
 import de.willuhn.jameica.gui.dialogs.CalendarDialog;
 import de.willuhn.jameica.gui.formatter.CurrencyFormatter;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
@@ -910,7 +909,7 @@ public class ContractControl extends AbstractControl {
 	 * @return list of costs in this contract
 	 * @throws RemoteException
 	 */
-	public Part getCostsList() throws RemoteException {
+	public CostsListTablePart getCostsList() throws RemoteException {
 		if (costsList != null) {
 			return costsList;
 		}
@@ -933,6 +932,7 @@ public class ContractControl extends AbstractControl {
 				null, true);
 		costsList.addColumn(Settings.i18n().tr("Money"), "money", null, true);
 		costsList.addColumn(Settings.i18n().tr("Period"), "period", null, true);
+		costsList.addColumn(Settings.i18n().tr("Payday"), "payday", null, true);
 		CostsListMenu clm = new CostsListMenu(this);
 		costsList.setContextMenu(clm);
 		costsList.setSummary(false);
@@ -951,6 +951,14 @@ public class ContractControl extends AbstractControl {
 					}
 				} else if ("period".equals(attribute)) {
 					((Costs) object).setPeriod(Contract.IntervalType.valueOfAdjective(newValue));
+				} else if ("payday".equals(attribute)) {
+					Date payday = null;
+					try {
+						payday = Settings.getNewDateFormat().parse(newValue);
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+					((Costs) object).setPayday(payday);
 				} else {
 					assert false;
 				}

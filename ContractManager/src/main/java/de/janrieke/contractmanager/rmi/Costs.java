@@ -11,13 +11,14 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.janrieke.contractmanager.rmi;
 
 import java.rmi.RemoteException;
+import java.util.Date;
 
 import de.willuhn.datasource.rmi.DBObject;
 /*
@@ -27,6 +28,7 @@ import de.willuhn.datasource.rmi.DBObject;
  *   description varchar(255),
  *   money double,
  *   period int(1),
+ *   payday date,
  *   UNIQUE (id),
  *   PRIMARY KEY (id)
  * );
@@ -43,4 +45,7 @@ public interface Costs extends DBObject {
 
 	public Contract.IntervalType getPeriod() throws RemoteException;
 	public void setPeriod(Contract.IntervalType period) throws RemoteException;
+
+	public Date getPayday() throws RemoteException;
+	public void setPayday(Date payday) throws RemoteException;
 }
