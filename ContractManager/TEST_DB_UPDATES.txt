@@ -1,0 +1,3 @@
+In order to test database updates (located at src/updates/java/), execute "mvn validate".
+This will copy the compiled update*.class files to the "updates" folder, where the update
+will find and execute them.

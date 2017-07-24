@@ -16,7 +16,7 @@ Currently, version 0.5.2-SNAPSHOT is in development.
 
  5. Execute "mvn clean package"
 
- 6. If sucessful, there will be a "contractmanager-0.5.2-bin.zip" in the target folder. This is the complete release. Copy this file to "ContractManager Releases/0.5.2/contractmanager.zip". 
+ 6. If successful, there will be a "contractmanager-0.5.2-bin.zip" in the target folder. This is the complete release. Copy this file to "ContractManager Releases/0.5.2/contractmanager.zip". 
 
  7. Verify that the release works (check both for updates and fresh installations)!
     - Use .jameica-installation-test und then a real installation for this.
