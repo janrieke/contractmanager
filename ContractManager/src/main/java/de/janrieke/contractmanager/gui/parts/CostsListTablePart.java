@@ -6,6 +6,8 @@ import java.util.Date;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.TableItem;
@@ -32,9 +34,14 @@ public class CostsListTablePart extends SizeableTablePart {
 			return ((CCombo) control).getText();
 		} else if (control instanceof DateTime) {
 			DateTime cal = ((DateTime) control);
-			Calendar c = Calendar.getInstance(Application.getConfig().getLocale());
-			c.set(cal.getYear(), cal.getMonth(), cal.getDay());
-			return Settings.dateformat(c.getTime());
+			Object dateSet = cal.getData("dateSet");
+			if (dateSet != null && dateSet instanceof Boolean && ((Boolean)dateSet) == true) {
+				Calendar c = Calendar.getInstance(Application.getConfig().getLocale());
+				c.set(cal.getYear(), cal.getMonth(), cal.getDay());
+				return Settings.dateformat(c.getTime());
+			} else {
+				return "";
+			}
 		} else {
 			return super.getControlValue(control);
 		}
@@ -60,7 +67,6 @@ public class CostsListTablePart extends SizeableTablePart {
 			return newCombo;
 		} else if (item.getData() instanceof Costs && row == 3) {
 			// Input for the payday
-
 			Date date = null;
 			try {
 				date = ((Costs) item.getData()).getPayday();
@@ -74,7 +80,21 @@ public class CostsListTablePart extends SizeableTablePart {
 				c.setTime(date);
 				cal.setDate(c.get(Calendar.YEAR), c.get(Calendar.MONTH),
 						c.get(Calendar.DAY_OF_MONTH));
+				cal.setData("dateSet", true);
 			}
+			cal.addSelectionListener(new SelectionListener() {
+
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					// The user actively selected a date. Then we should treat it like a "set value".
+					cal.setData("dateSet", true);
+				}
+
+				@Override
+				public void widgetDefaultSelected(SelectionEvent e) {
+				}
+			});
+			cal.setFocus();
 			return cal;
 		} else {
 			return super.getEditorControl(row, item, oldValue);
