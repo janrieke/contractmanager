@@ -64,7 +64,7 @@ public class VersionUtil
 			throw new ApplicationException(i18n.tr("No name for version"));
 		}
 		DBIterator<Version> list = service.createList(Version.class);
-		list.addFilter("name = ?", (Object)new String[]{name});
+		list.addFilter("name = ?", name);
 		if (list.hasNext()) {
 			return list.next();
 		}
