@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import de.janrieke.contractmanager.gui.input.CheckboxInput;
 import de.janrieke.contractmanager.gui.parts.IncomeExpensesAnalysisChartPart;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
@@ -43,7 +44,7 @@ public class IncomeExpensesAnalysisControl extends AbstractControl {
 	Map<String, Integer> monthNames;
 	/**
 	 * ct.
-	 * 
+	 *
 	 * @param view
 	 */
 	public IncomeExpensesAnalysisControl(AbstractView view) {
@@ -51,7 +52,7 @@ public class IncomeExpensesAnalysisControl extends AbstractControl {
 		Calendar cal = Calendar.getInstance();
 		monthNames = cal.getDisplayNames(Calendar.MONTH, Calendar.LONG, Locale.getDefault());
 	}
-	
+
 	public int getMonthNumber (String name) {
 		return monthNames.get(name);
 	}
@@ -60,23 +61,27 @@ public class IncomeExpensesAnalysisControl extends AbstractControl {
 	private SelectInput monthSelector;
 	private SpinnerInput yearSelector;
 	private MultiInput monthYearSelector;
-	
+	private CheckboxInput usePayDayCheckbox;
+
 	public Part getChartPart() {
-		if (chart == null)
+		if (chart == null) {
 			chart = new IncomeExpensesAnalysisChartPart(this);
+		}
 		return chart;
 	}
 
 	public void redrawChart() {
-		if (chart == null)
+		if (chart == null) {
 			getChartPart();
+		}
 		chart.redraw();
 	}
 
 	public MultiInput getMonthYearSelector() {
-		if (monthYearSelector == null)
+		if (monthYearSelector == null) {
 			monthYearSelector = new MultiInput(getMonthSelector(),
 					getYearSelector());
+		}
 		return monthYearSelector;
 	}
 
@@ -84,13 +89,14 @@ public class IncomeExpensesAnalysisControl extends AbstractControl {
 		if (monthSelector == null) {
 			int curMonth = Calendar.getInstance().get(Calendar.MONTH);
 			String curMonthName = null;
-			List<String> list = new ArrayList<String>();
+			List<String> list = new ArrayList<>();
 			for (int i = 0; i<12; i++) {
 				outer:
 					for (Map.Entry<String, Integer> entry : monthNames.entrySet()) {
 						if (entry.getValue().equals(i)) {
-							if (curMonth == i)
-								curMonthName = entry.getKey(); 
+							if (curMonth == i) {
+								curMonthName = entry.getKey();
+							}
 							list.add(entry.getKey());
 							continue outer;
 						}
@@ -102,8 +108,16 @@ public class IncomeExpensesAnalysisControl extends AbstractControl {
 	}
 
 	public SpinnerInput getYearSelector() {
-		if (yearSelector == null)
+		if (yearSelector == null) {
 			yearSelector = new SpinnerInput(1900, 3000, Calendar.getInstance().get(Calendar.YEAR));
+		}
 		return yearSelector;
+	}
+
+	public CheckboxInput getPayDayCheckbox() {
+		if (usePayDayCheckbox == null) {
+			usePayDayCheckbox = new CheckboxInput(false);
+		}
+		return usePayDayCheckbox;
 	}
 }

@@ -7,6 +7,11 @@
 		Diese Grafik zeigt alle Ausgaben, berechnet auf Monatsbasis.
 	</p>
 	<li>
+		Die monatlichen Werte werden standardmäßig als Durchschnittswerte berechnet.
+		Aktivieren Sie "Zahltage benutzen", wenn die monatlichen Werte auf Basis der erwarteten Zahltage berechnet werden sollen. In diesem Fall wird beispielsweise eine jährliche Belastung nur in dem Monat berücksichtigt, in dem der Zahltag ist. 
+		Falls bei einem Vertrag keine Zahltage angegeben sind, wird der monatliche Mittelwert verwendet.  
+	</li>
+	<li>
 		Sie können den angezeigten Monat über die Eingabefelder oben einstellen.
 	</li>
 </form>
