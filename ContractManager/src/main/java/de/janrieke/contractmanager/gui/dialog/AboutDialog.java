@@ -1,6 +1,6 @@
 /*
  *   This file is part of ContractManager for Jameica.
- *   Copyright (C) 2010-2011  Jan Rieke
+ *   Copyright (C) 2010-2018  Jan Rieke
  *
  *   ContractManager is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ public class AboutDialog extends AbstractDialog<Object> {
 		FormTextPart text = new FormTextPart();
 		text.setText("<form>" + "<p><b>" + manifest.getDescription() + "</b></p>"
 				+ "<br/>Licence: GPL 3.0 (http://www.gnu.org/licenses/gpl-3.0.txt)"
-				+ "<br/><p>Copyright by Jan Rieke [it@janrieke.de] 2010-2017</p>" + "<p>"
+				+ "<br/><p>Copyright by Jan Rieke [it@janrieke.de] 2010-2018</p>" + "<p>"
 				+ manifest.getHomepage() + "</p>"
 				+ "<br/><p>Contains code from Jameica, Jameica Example Plugin, Hibiscus, and Syntax; copyright by Olaf Willuhn [info@jameica.org], GPL</p>"
 				+ "<p>http://www.jameica.org</p>" + "</form>");

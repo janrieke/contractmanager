@@ -47,6 +47,7 @@ VERSION HISTORY:
 
 0.5.3:
 	- Payment dates
+	- MySQL/MariaDB support
 
 ROADMAP:
 
