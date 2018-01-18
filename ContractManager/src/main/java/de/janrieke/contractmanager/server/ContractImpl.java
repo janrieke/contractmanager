@@ -17,6 +17,9 @@
  */
 package de.janrieke.contractmanager.server;
 
+import static de.janrieke.contractmanager.util.DateUtils.addToCalendar;
+import static de.janrieke.contractmanager.util.DateUtils.calculateNextTermBeginAfter;
+
 import java.rmi.RemoteException;
 import java.util.Calendar;
 import java.util.Date;
@@ -27,6 +30,8 @@ import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Costs;
 import de.janrieke.contractmanager.rmi.Storage;
 import de.janrieke.contractmanager.rmi.Transaction;
+import de.janrieke.contractmanager.util.CalendarBuilder;
+import de.janrieke.contractmanager.util.ValidRuntimes;
 import de.willuhn.datasource.db.AbstractDBObject;
 import de.willuhn.datasource.rmi.DBIterator;
 import de.willuhn.datasource.rmi.DBService;
@@ -60,11 +65,6 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 */
 	private static final long serialVersionUID = 1296427502015363939L;
 
-	class CalendarBuilder {
-		Calendar getInstance() {
-			return Calendar.getInstance();
-		}
-	}
 	private CalendarBuilder calendarBuilder = new CalendarBuilder();
 
 	/**
@@ -521,17 +521,6 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		setAttribute("hibiscus_category", category);
 	}
 
-	/* Instances of this class shall only be returned if all fields are
-	 * set and valid.
-	 */
-	class ValidRuntimes {
-		IntervalType firstMinRuntimeType;
-		Integer firstMinRuntimeCount;
-		IntervalType followingMinRuntimeType;
-		Integer followingMinRuntimeCount;
-		Boolean fixedTerms;
-	}
-
 	@Override
 	public boolean hasValidRuntimeInformation() throws RemoteException {
 		return getValidRuntimes() != null;
@@ -543,16 +532,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 * @return a ValidRuntimes object if all info is available, or null otherwise
 	 */
 	private ValidRuntimes getValidRuntimes() throws RemoteException {
-		if (getStartDate() == null) {
-			return null;
-		}
-
 		ValidRuntimes result = new ValidRuntimes();
-
-		Date startDate = DateUtil.startOfDay(getStartDate());
-
-		Calendar calendar = calendarBuilder.getInstance();
-		calendar.setTime(startDate);
 
 		result.firstMinRuntimeType = getFirstMinRuntimeType();
 		result.firstMinRuntimeCount = getFirstMinRuntimeCount();
@@ -590,58 +570,19 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	 */
 	private Date calculateNextTermBegin(Date after, boolean excludeFirstTerm)
 			throws RemoteException {
-		if (after == null) {
+
+		Date nextTermBegin = calculateNextTermBeginAfter(after, getStartDate(), excludeFirstTerm, getValidRuntimes());
+
+		if (nextTermBegin == null) {
 			return null;
 		}
-		ValidRuntimes rt = getValidRuntimes();
-		if (rt == null) {
+
+		if (getEndDate() != null && DateUtil.endOfDay(getEndDate()).before(nextTermBegin)) {
+			// If the end has already passed, there is no need for further cancellations.
 			return null;
 		}
 
-		Date startDate = DateUtil.startOfDay(getStartDate());
-		Calendar afterCal = calendarBuilder.getInstance();
-		afterCal.setTime(DateUtil.endOfDay(after));
-
-		Calendar calendar = calendarBuilder.getInstance();
-		calendar.setTime(startDate);
-
-		// If fixed terms is true, virtually delay the start of the contract to the next period.
-		if (rt.fixedTerms) {
-			switch (rt.firstMinRuntimeType) {
-				case WEEKS:
-					calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-					calendar.add(Calendar.WEEK_OF_YEAR, 1);
-					break;
-				case MONTHS:
-					calendar.set(Calendar.DAY_OF_MONTH, 1);
-					calendar.add(Calendar.MONTH, 1);
-					break;
-				case YEARS:
-					calendar.set(Calendar.DAY_OF_YEAR, 1);
-					calendar.add(Calendar.YEAR, 1);
-					break;
-				default:
-			}
-
-		}
-
-		boolean first = true;
-
-		while (!calendar.after(afterCal) || (first && excludeFirstTerm)) {
-			if (first) {
-				addToCalendar(calendar, rt.firstMinRuntimeType, rt.firstMinRuntimeCount);
-				first = false;
-			} else {
-				addToCalendar(calendar, rt.followingMinRuntimeType, rt.followingMinRuntimeCount);
-			}
-		}
-
-		if (getEndDate() != null && DateUtil.endOfDay(getEndDate()).before(calendar.getTime())) {
-			return null; // if the end has already passed, there is no need for
-						 // further cancellations
-		}
-
-		return calendar.getTime();
+		return nextTermBegin;
 	}
 
 	/**
@@ -839,32 +780,6 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	@Override
 	public String getContractAndPartnerName() throws RemoteException {
 		return getName() + " [" + getPartnerName() + "]";
-	}
-
-	public static final boolean addToCalendar(Calendar calendar, IntervalType interval, int count) {
-		// if the period is invalid, assume there is none
-		if (interval != null) {
-			switch (interval) {
-			case DAYS:
-				calendar.add(Calendar.DAY_OF_YEAR, count);
-				return true;
-			case WEEKS:
-				calendar.add(Calendar.WEEK_OF_YEAR,
-						count);
-				return true;
-			case MONTHS:
-				calendar.add(Calendar.MONTH, count);
-				return true;
-			case YEARS:
-				calendar.add(Calendar.YEAR, count);
-				return true;
-			case ONCE:
-				return false;
-			default:
-				return false;
-			}
-		}
-		return false;
 	}
 
 	@Override

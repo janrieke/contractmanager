@@ -933,6 +933,7 @@ public class ContractControl extends AbstractControl {
 		costsList.addColumn(Settings.i18n().tr("Money"), "money", null, true);
 		costsList.addColumn(Settings.i18n().tr("Period"), "period", null, true);
 		costsList.addColumn(Settings.i18n().tr("Payday"), "payday", null, true);
+		costsList.addColumn(Settings.i18n().tr("Next Payday"), "next_payday", null, true);
 		CostsListMenu clm = new CostsListMenu(this);
 		costsList.setContextMenu(clm);
 		costsList.setSummary(false);

@@ -18,11 +18,14 @@
 package de.janrieke.contractmanager.server;
 
 import java.rmi.RemoteException;
+import java.time.Clock;
 import java.util.Date;
 
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
 import de.janrieke.contractmanager.rmi.Costs;
+import de.janrieke.contractmanager.util.DateUtils;
+import de.janrieke.contractmanager.util.ValidRuntimes;
 import de.willuhn.datasource.db.AbstractDBObject;
 import de.willuhn.datasource.rmi.ObjectNotFoundException;
 import de.willuhn.util.ApplicationException;
@@ -33,6 +36,9 @@ public class CostsImpl extends AbstractDBObject implements Costs {
 	 * The UID.
 	 */
 	private static final long serialVersionUID = -4963699401317887171L;
+
+
+	private Clock clock = Clock.systemDefaultZone();
 
 	public CostsImpl() throws RemoteException {
 		super();
@@ -106,6 +112,17 @@ public class CostsImpl extends AbstractDBObject implements Costs {
 	}
 
 	//FIELD DATA ACCESS
+
+	@Override
+	public Object getAttribute(String arg0) throws RemoteException {
+		// check derived fields
+		if (NEXT_PAYDAY.equals(arg0)) {
+			return getNextPayday();
+		} else {
+			return super.getAttribute(arg0);
+		}
+	}
+
 	@Override
 	public Contract getContract() throws RemoteException {
 		Contract result;
@@ -164,5 +181,18 @@ public class CostsImpl extends AbstractDBObject implements Costs {
 	@Override
 	public void setPayday(Date payday) throws RemoteException {
 		setAttribute("payday", payday);
+	}
+
+	@Override
+	public Date getNextPayday() throws RemoteException {
+		Date payday = getPayday();
+		if (payday == null) {
+			return null;
+		}
+		// Advance the date so that the cell shows the next payday.
+		ValidRuntimes runtimes = new ValidRuntimes();
+		runtimes.firstMinRuntimeCount = runtimes.followingMinRuntimeCount = 1;
+		runtimes.firstMinRuntimeType = runtimes.followingMinRuntimeType = getPeriod();
+		return DateUtils.calculateNextTermBeginAfter(Date.from(clock.instant()), payday, false, runtimes);
 	}
 }

@@ -48,4 +48,8 @@ public interface Costs extends DBObject {
 
 	public Date getPayday() throws RemoteException;
 	public void setPayday(Date payday) throws RemoteException;
+
+	public static final String NEXT_PAYDAY = "next_payday";
+	public Date getNextPayday() throws RemoteException;
+
 }

@@ -49,8 +49,13 @@ public class CostsListTablePart extends SizeableTablePart {
 
 	@Override
 	protected Control getEditorControl(int row, TableItem item, String oldValue) {
-		// Row 0 is a normal text input for the description.
-		if (item.getData() instanceof Costs && row == 1) {
+		if (!(item.getData() instanceof Costs)) {
+			return super.getEditorControl(row, item, oldValue);
+		}
+		Costs costs = (Costs) item.getData();
+
+		switch (row) {
+		case 1:
 			// Input for the money (" €" will be stripped)
 			Text newText = new Text(item.getParent(), SWT.NONE);
 			String doubleString = oldValue.substring(0, oldValue.length() - 2);
@@ -58,18 +63,20 @@ public class CostsListTablePart extends SizeableTablePart {
 			newText.selectAll();
 			newText.setFocus();
 			return newText;
-		} else if (item.getData() instanceof Costs && row == 2) {
+
+		case 2:
 			// Interval select value
 			CCombo newCombo = new CCombo(item.getParent(), SWT.FLAT | SWT.READ_ONLY);
 			newCombo.setItems(Contract.IntervalType.getAdjectives());
 			newCombo.setText(oldValue);
 			newCombo.setFocus();
 			return newCombo;
-		} else if (item.getData() instanceof Costs && row == 3) {
+
+		case 3:
 			// Input for the payday
 			Date date = null;
 			try {
-				date = ((Costs) item.getData()).getPayday();
+				date = costs.getPayday();
 			} catch (RemoteException e) {
 				Logger.error("Error while reading costs item.", e);
 			}
@@ -96,7 +103,13 @@ public class CostsListTablePart extends SizeableTablePart {
 			});
 			cal.setFocus();
 			return cal;
-		} else {
+
+		case 4:
+			// Read-only field.
+			return null;
+
+		default:
+			// Row 0 is a normal text input for the description.
 			return super.getEditorControl(row, item, oldValue);
 		}
 	}

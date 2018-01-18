@@ -25,7 +25,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
-import de.janrieke.contractmanager.server.ContractImpl.CalendarBuilder;
+import de.janrieke.contractmanager.util.CalendarBuilder;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.jameica.system.Config;
 

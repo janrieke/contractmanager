@@ -53,8 +53,8 @@ import de.janrieke.contractmanager.ContractManagerPlugin;
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Contract.IntervalType;
-import de.janrieke.contractmanager.server.ContractImpl;
 import de.janrieke.contractmanager.server.SettingsUtil;
+import de.janrieke.contractmanager.util.DateUtils;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.dialogs.ListDialog;
@@ -304,7 +304,7 @@ public class GenerateOdfDocument implements Action {
 				Integer followingMinRuntimeCount = p.getFollowingMinRuntimeCount();
 				IntervalType followingMinRuntimeType = p.getFollowingMinRuntimeType();
 				if (followingMinRuntimeCount != null && followingMinRuntimeType != null) {
-					ContractImpl.addToCalendar(until, followingMinRuntimeType, followingMinRuntimeCount);
+					DateUtils.addToCalendar(until, followingMinRuntimeType, followingMinRuntimeCount);
 				}
 				values.put("UNTIL", Settings.dateformat(until.getTime()));
 			}
