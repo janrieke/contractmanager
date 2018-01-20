@@ -918,11 +918,16 @@ public class ContractControl extends AbstractControl {
 		costsList = new CostsListTablePart(costsIterator, new CreateNewCostEntry(this));
 		costsList.setFormatter(item -> {
 			try {
-				double money = ((Costs) item.getData()).getMoney(); // Double.parseDouble(item.getText(1));
+				Costs costs = (Costs) item.getData();
+				double money = costs.getMoney(); // Double.parseDouble(item.getText(1));
 				String text = Settings.formatAsCurrency(money);
 				item.setText(1, text);
-				item.setText(2, ((Costs) item.getData()).getPeriod()
-						.getAdjective());
+				item.setText(2, costs.getPeriod().getAdjective());
+				Date nextPayday = costs.getNextPayday();
+				if (nextPayday != null) {
+					item.setText(4, Settings.dateformat(nextPayday));
+					item.setForeground(4, Color.COMMENT.getSWTColor());
+				}
 			} catch (RemoteException e) {
 			}
 		});
@@ -933,7 +938,7 @@ public class ContractControl extends AbstractControl {
 		costsList.addColumn(Settings.i18n().tr("Money"), "money", null, true);
 		costsList.addColumn(Settings.i18n().tr("Period"), "period", null, true);
 		costsList.addColumn(Settings.i18n().tr("Payday"), "payday", null, true);
-		costsList.addColumn(Settings.i18n().tr("Next Payday"), "next_payday", null, true);
+		costsList.addColumn(Settings.i18n().tr("Next payday"), "next_payday", null, true);
 		CostsListMenu clm = new CostsListMenu(this);
 		costsList.setContextMenu(clm);
 		costsList.setSummary(false);
