@@ -44,8 +44,8 @@ import de.janrieke.contractmanager.gui.parts.SizeableTablePart;
 import de.janrieke.contractmanager.gui.view.ContractDetailView;
 import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
-import de.janrieke.contractmanager.rmi.Contract.IntervalType;
 import de.janrieke.contractmanager.rmi.Costs;
+import de.janrieke.contractmanager.rmi.IntervalType;
 import de.janrieke.contractmanager.rmi.Transaction;
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.datasource.pseudo.PseudoIterator;
@@ -429,11 +429,11 @@ public class ContractControl extends AbstractControl {
 
 	public SelectInput getCancellationPeriodType() throws RemoteException {
 		if (cancellationPeriodType == null) {
-			List<Contract.IntervalType> list = new ArrayList<>();
-			list.add(Contract.IntervalType.DAYS);
-			list.add(Contract.IntervalType.WEEKS);
-			list.add(Contract.IntervalType.MONTHS);
-			list.add(Contract.IntervalType.YEARS);
+			List<IntervalType> list = new ArrayList<>();
+			list.add(IntervalType.DAYS);
+			list.add(IntervalType.WEEKS);
+			list.add(IntervalType.MONTHS);
+			list.add(IntervalType.YEARS);
 			cancellationPeriodType = new SelectInput(list, getContract()
 					.getCancellationPeriodType());
 		}
@@ -461,11 +461,11 @@ public class ContractControl extends AbstractControl {
 
 	public SelectInput getFirstRuntimeType() throws RemoteException {
 		if (firstRuntimeType == null) {
-			List<Contract.IntervalType> list = new ArrayList<>();
-			list.add(Contract.IntervalType.DAYS);
-			list.add(Contract.IntervalType.WEEKS);
-			list.add(Contract.IntervalType.MONTHS);
-			list.add(Contract.IntervalType.YEARS);
+			List<IntervalType> list = new ArrayList<>();
+			list.add(IntervalType.DAYS);
+			list.add(IntervalType.WEEKS);
+			list.add(IntervalType.MONTHS);
+			list.add(IntervalType.YEARS);
 			firstRuntimeType = new SelectInput(list, getContract()
 					.getFirstMinRuntimeType());
 		}
@@ -493,7 +493,7 @@ public class ContractControl extends AbstractControl {
 			nextRuntimeCount
 					.addListener(event -> {
 						if ((event.type == SWT.FocusIn)
-								&& (((Integer) 0).equals(nextRuntimeCount.getValue()) && Contract.IntervalType.MONTHS
+								&& (((Integer) 0).equals(nextRuntimeCount.getValue()) && IntervalType.MONTHS
 										.equals(nextRuntimeType.getValue()))) {
 							nextRuntimeCount.setValue(firstRuntimeCount.getValue());
 							nextRuntimeType.setValue(firstRuntimeType.getValue());
@@ -505,11 +505,11 @@ public class ContractControl extends AbstractControl {
 
 	public SelectInput getNextRuntimeType() throws RemoteException {
 		if (nextRuntimeType == null) {
-			List<Contract.IntervalType> list = new ArrayList<>();
-			list.add(Contract.IntervalType.DAYS);
-			list.add(Contract.IntervalType.WEEKS);
-			list.add(Contract.IntervalType.MONTHS);
-			list.add(Contract.IntervalType.YEARS);
+			List<IntervalType> list = new ArrayList<>();
+			list.add(IntervalType.DAYS);
+			list.add(IntervalType.WEEKS);
+			list.add(IntervalType.MONTHS);
+			list.add(IntervalType.YEARS);
 			nextRuntimeType = new SelectInput(list, getContract()
 					.getFollowingMinRuntimeType());
 		}
@@ -956,7 +956,7 @@ public class ContractControl extends AbstractControl {
 						((Costs) object).setMoney(0d);
 					}
 				} else if ("period".equals(attribute)) {
-					((Costs) object).setPeriod(Contract.IntervalType.valueOfAdjective(newValue));
+					((Costs) object).setPeriod(IntervalType.valueOfAdjective(newValue));
 				} else if ("payday".equals(attribute)) {
 					Date payday = null;
 					try {

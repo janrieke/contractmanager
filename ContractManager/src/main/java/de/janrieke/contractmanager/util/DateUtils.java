@@ -3,11 +3,20 @@ package de.janrieke.contractmanager.util;
 import java.util.Calendar;
 import java.util.Date;
 
-import de.janrieke.contractmanager.rmi.Contract.IntervalType;
+import de.janrieke.contractmanager.rmi.IntervalType;
 import de.willuhn.jameica.util.DateUtil;
 
 public class DateUtils {
 
+	/**
+	 *
+	 * @param calendar
+	 *            the calender to modify
+	 * @param interval
+	 * @param count
+	 * @return true if the operation was performed, false if it was impossible
+	 *         due to invalid interval type.
+	 */
 	public static final boolean addToCalendar(Calendar calendar, IntervalType interval, int count) {
 		// if the period is invalid, assume there is none
 		if (interval != null) {
@@ -21,7 +30,7 @@ public class DateUtils {
 			case MONTHS:
 				calendar.add(Calendar.MONTH, count);
 				return true;
-			case QUARTER_YEAR:
+			case QUARTER_YEARS:
 				calendar.add(Calendar.MONTH, count * 3);
 				return true;
 			case HALF_YEARS:
@@ -92,6 +101,6 @@ public class DateUtils {
 			}
 		}
 
-		return calendar.getTime();
+		return validResult ? calendar.getTime() : null;
 	}
 }

@@ -1,6 +1,6 @@
 package de.janrieke.contractmanager.util;
 
-import de.janrieke.contractmanager.rmi.Contract.IntervalType;
+import de.janrieke.contractmanager.rmi.IntervalType;
 
 /**
  * Instances of this class shall only be returned if all fields are

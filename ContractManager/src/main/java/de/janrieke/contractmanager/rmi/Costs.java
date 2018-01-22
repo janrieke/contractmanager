@@ -43,13 +43,14 @@ public interface Costs extends DBObject {
 	public double getMoney() throws RemoteException;
 	public void setMoney(double money) throws RemoteException;
 
-	public Contract.IntervalType getPeriod() throws RemoteException;
-	public void setPeriod(Contract.IntervalType period) throws RemoteException;
+	public IntervalType getPeriod() throws RemoteException;
+	public void setPeriod(IntervalType period) throws RemoteException;
 
 	public Date getPayday() throws RemoteException;
 	public void setPayday(Date payday) throws RemoteException;
 
 	public static final String NEXT_PAYDAY = "next_payday";
 	public Date getNextPayday() throws RemoteException;
+	public Date getNextPayday(Date after) throws RemoteException;
 
 }

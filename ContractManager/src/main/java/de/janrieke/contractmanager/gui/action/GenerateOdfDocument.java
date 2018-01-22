@@ -52,7 +52,7 @@ import org.w3c.dom.NodeList;
 import de.janrieke.contractmanager.ContractManagerPlugin;
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
-import de.janrieke.contractmanager.rmi.Contract.IntervalType;
+import de.janrieke.contractmanager.rmi.IntervalType;
 import de.janrieke.contractmanager.server.SettingsUtil;
 import de.janrieke.contractmanager.util.DateUtils;
 import de.willuhn.jameica.gui.Action;

@@ -22,8 +22,8 @@ import java.time.Clock;
 import java.util.Date;
 
 import de.janrieke.contractmanager.rmi.Contract;
-import de.janrieke.contractmanager.rmi.Contract.IntervalType;
 import de.janrieke.contractmanager.rmi.Costs;
+import de.janrieke.contractmanager.rmi.IntervalType;
 import de.janrieke.contractmanager.util.DateUtils;
 import de.janrieke.contractmanager.util.ValidRuntimes;
 import de.willuhn.datasource.db.AbstractDBObject;
@@ -185,6 +185,11 @@ public class CostsImpl extends AbstractDBObject implements Costs {
 
 	@Override
 	public Date getNextPayday() throws RemoteException {
+		return getNextPayday(Date.from(clock.instant()));
+	}
+
+	@Override
+	public Date getNextPayday(Date after) throws RemoteException {
 		Date payday = getPayday();
 		if (payday == null) {
 			return null;
@@ -193,6 +198,6 @@ public class CostsImpl extends AbstractDBObject implements Costs {
 		ValidRuntimes runtimes = new ValidRuntimes();
 		runtimes.firstMinRuntimeCount = runtimes.followingMinRuntimeCount = 1;
 		runtimes.firstMinRuntimeType = runtimes.followingMinRuntimeType = getPeriod();
-		return DateUtils.calculateNextTermBeginAfter(Date.from(clock.instant()), payday, false, runtimes);
+		return DateUtils.calculateNextTermBeginAfter(after, payday, false, runtimes);
 	}
 }

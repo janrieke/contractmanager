@@ -21,13 +21,19 @@ import static de.janrieke.contractmanager.util.DateUtils.addToCalendar;
 import static de.janrieke.contractmanager.util.DateUtils.calculateNextTermBeginAfter;
 
 import java.rmi.RemoteException;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import de.janrieke.contractmanager.Settings;
+import de.janrieke.contractmanager.models.MonthlyCosts;
 import de.janrieke.contractmanager.rmi.Address;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Costs;
+import de.janrieke.contractmanager.rmi.IntervalType;
 import de.janrieke.contractmanager.rmi.Storage;
 import de.janrieke.contractmanager.rmi.Transaction;
 import de.janrieke.contractmanager.util.CalendarBuilder;
@@ -511,6 +517,49 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 		return costsIterator;
 	}
 
+	/**
+	 * Returns a list of costs that are due in the given month.
+	 *
+	 * @param month the month to return the costs.
+	 * @param usePaydays whether to use the paydays; if false, the costs are averaged.
+	 * @return
+	 * @throws RemoteException
+	 */
+	@Override
+	public List<MonthlyCosts> getCostsInMonth(YearMonth month, boolean usePaydays) throws RemoteException {
+		DBIterator<Costs> costsIterator = getCosts();
+		ArrayList<MonthlyCosts> result = new ArrayList<>();
+
+		while (costsIterator.hasNext()) {
+			Costs costs = costsIterator.next();
+			Date payday = costs.getPayday();
+			if (usePaydays && payday != null) {
+				// Only include this costs if it has at least one payday in the given month.
+				Date after = Date.from(month.minusMonths(1)
+						.atEndOfMonth()
+						.atStartOfDay(ZoneId.systemDefault()).toInstant());
+				Date until = Date.from(month.atEndOfMonth().plusDays(1)
+						.atStartOfDay(ZoneId.systemDefault()).toInstant());
+				Date next = after;
+				while ((next = costs.getNextPayday(next)) != null) {
+					if (!next.after(after)) {
+						continue;
+					}
+					if (!next.before(until)) {
+						break;
+					}
+					result.add(new MonthlyCosts(costs.getDescription(), costs.getMoney()));
+				}
+			} else {
+				// Average to a month.
+				result.add(MonthlyCosts.averageToMonthlyCosts(costs.getDescription(),
+						costs.getMoney(), costs.getPeriod()));
+			}
+		}
+
+		return result;
+	}
+
 	@Override
 	public String getHibiscusCategoryID() throws RemoteException {
 		return (String) getAttribute("hibiscus_category");
@@ -701,7 +750,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			case HALF_YEARS:
 				costsPerMonth += costEntry.getMoney()/6;
 				break;
-			case QUARTER_YEAR:
+			case QUARTER_YEARS:
 				costsPerMonth += costEntry.getMoney()/3;
 				break;
 
@@ -754,7 +803,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 			case MONTHS:
 				costsPerMonth += costEntry.getMoney();
 				break;
-			case QUARTER_YEAR:
+			case QUARTER_YEARS:
 				costsPerMonth += costEntry.getMoney()/3;
 				break;
 			case HALF_YEARS:

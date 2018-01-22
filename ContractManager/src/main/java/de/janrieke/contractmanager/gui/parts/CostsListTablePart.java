@@ -14,8 +14,8 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import de.janrieke.contractmanager.Settings;
-import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Costs;
+import de.janrieke.contractmanager.rmi.IntervalType;
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.system.Application;
@@ -67,7 +67,7 @@ public class CostsListTablePart extends SizeableTablePart {
 		case 2:
 			// Interval select value
 			CCombo newCombo = new CCombo(item.getParent(), SWT.FLAT | SWT.READ_ONLY);
-			newCombo.setItems(Contract.IntervalType.getAdjectives());
+			newCombo.setItems(IntervalType.getAdjectives());
 			newCombo.setText(oldValue);
 			newCombo.setFocus();
 			return newCombo;

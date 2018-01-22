@@ -18,6 +18,7 @@
 package de.janrieke.contractmanager.gui.parts;
 
 import java.rmi.RemoteException;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -29,6 +30,7 @@ import de.janrieke.contractmanager.gui.chart.ChartData;
 import de.janrieke.contractmanager.gui.chart.IncomeExpensesBarChart;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.janrieke.contractmanager.gui.control.IncomeExpensesAnalysisControl;
+import de.janrieke.contractmanager.models.MonthlyCosts;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.jameica.gui.Part;
@@ -73,9 +75,11 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 	protected void addChartData() throws RemoteException {
 		int month = control.getMonthNumber((String)control.getMonthSelector().getValue());
 		int year = (Integer)control.getYearSelector().getValue();
+		boolean usePaydays = (Boolean) control.getPayDayCheckbox().getValue();
 
 		Calendar monthCal = Calendar.getInstance();
 		monthCal.set(year, month, 1, 0, 0, 0);
+		YearMonth yearMonth = YearMonth.of(year, month+1);
 
 	    sum = 0;
 		GenericIterator<Contract> contracts = ContractControl.getContracts();
@@ -84,7 +88,11 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 			if (!c.isActiveInMonth(monthCal.getTime())) {
 				continue;
 			}
-			sum += c.getMoneyPerMonth();
+
+			List<MonthlyCosts> costsInMonth = c.getCostsInMonth(yearMonth, usePaydays);
+			sum += costsInMonth.stream()
+				.mapToDouble(MonthlyCosts::getMoney)
+				.sum();
 
 			chart.addData(new ChartData() {
 
@@ -105,16 +113,18 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 
 				@Override
 				public List<?> getData() throws RemoteException {
-					List<ContractIncomeExpensesAnalysisData> list = new ArrayList<ContractIncomeExpensesAnalysisData>();
-					float amount = (float)c.getMoneyPerMonth();
-					if (amount > 0) {
-						list.add(new ContractIncomeExpensesAnalysisData(amount, Settings.i18n().tr("Income")));
-						list.add(new ContractIncomeExpensesAnalysisData(0, Settings.i18n().tr("Expenses")));
-					}
-					if (amount < 0) {
-						list.add(new ContractIncomeExpensesAnalysisData(0, Settings.i18n().tr("Income")));
-						list.add(new ContractIncomeExpensesAnalysisData(-amount, Settings.i18n().tr("Expenses")));
-					}
+					List<ContractIncomeExpensesAnalysisData> list = new ArrayList<>();
+					List<MonthlyCosts> costsInMonth = c.getCostsInMonth(yearMonth, usePaydays);
+					float positiveCosts = (float)costsInMonth.stream()
+							.mapToDouble(MonthlyCosts::getMoney)
+							.filter(d -> (d > 0))
+							.sum();
+					float negativeCosts = (float)costsInMonth.stream()
+							.mapToDouble(MonthlyCosts::getMoney)
+							.filter(d -> (d < 0))
+							.sum();
+					list.add(new ContractIncomeExpensesAnalysisData(positiveCosts, Settings.i18n().tr("Income")));
+					list.add(new ContractIncomeExpensesAnalysisData(-negativeCosts, Settings.i18n().tr("Expenses")));
 					return list;
 				}
 			});
