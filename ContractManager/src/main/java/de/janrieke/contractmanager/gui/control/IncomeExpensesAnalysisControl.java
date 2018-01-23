@@ -116,7 +116,7 @@ public class IncomeExpensesAnalysisControl extends AbstractControl {
 
 	public CheckboxInput getPayDayCheckbox() {
 		if (usePayDayCheckbox == null) {
-			usePayDayCheckbox = new CheckboxInput(false);
+			usePayDayCheckbox = new CheckboxInput(true);
 		}
 		return usePayDayCheckbox;
 	}

@@ -18,6 +18,7 @@
 package de.janrieke.contractmanager.gui.parts;
 
 import java.rmi.RemoteException;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -29,6 +30,7 @@ import de.janrieke.contractmanager.gui.chart.BarChart;
 import de.janrieke.contractmanager.gui.chart.ChartData;
 import de.janrieke.contractmanager.gui.control.ContractControl;
 import de.janrieke.contractmanager.gui.control.ExpensesAnalysisControl;
+import de.janrieke.contractmanager.models.MonthlyCosts;
 import de.janrieke.contractmanager.rmi.Contract;
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.jameica.gui.Part;
@@ -72,26 +74,26 @@ public class ExpensesAnalysisChartPart implements Part {
 	protected void addChartData() throws RemoteException {
 		int month = control.getMonthNumber((String)control.getMonthSelector().getValue());
 		int year = (Integer)control.getYearSelector().getValue();
+		boolean usePaydays = (Boolean) control.getPayDayCheckbox().getValue();
 
-		Calendar calBegin = Calendar.getInstance();
-		calBegin.set(year, month, 1, 0, 0, 0);
-		Calendar calEnd = Calendar.getInstance();
-		if (month==11) {
-			calEnd.set(year+1, 0, 1, 23, 59, 59);
-		} else {
-			calEnd.set(year, month+1, 1, 23, 59, 59);
-		}
-		calEnd.add(Calendar.DAY_OF_MONTH, -1);
+		Calendar monthCal = Calendar.getInstance();
+		monthCal.set(year, month, 1, 0, 0, 0);
+		YearMonth yearMonth = YearMonth.of(year, month+1);
 
 		GenericIterator<Contract> contracts = ContractControl.getContracts();
 		while (contracts.hasNext()) {
 			final Contract c = contracts.next();
-			if ((c.getEndDate() != null && c.getEndDate().before(calBegin.getTime())) ||
-					(c.getStartDate() != null && c.getStartDate().after(calEnd.getTime()))) {
+			if (!c.isActiveInMonth(monthCal.getTime())) {
 				continue;
 			}
 
-			if ((float)c.getMoneyPerMonth() < 0 ) {
+			List<MonthlyCosts> costsInMonth = c.getCostsInMonth(yearMonth, usePaydays);
+			float negativeCosts = (float)costsInMonth.stream()
+					.mapToDouble(MonthlyCosts::getMoney)
+					.filter(d -> (d < 0))
+					.sum();
+
+			if (negativeCosts < 0 ) {
 				chart.addData(new ChartData() {
 
 					@Override
@@ -111,8 +113,13 @@ public class ExpensesAnalysisChartPart implements Part {
 
 					@Override
 					public List<?> getData() throws RemoteException {
-						List<ContractExpensesAnalysisData> list = new ArrayList<ContractExpensesAnalysisData>();
-						list.add(new ContractExpensesAnalysisData(-(float)c.getMoneyPerMonth(), c.getName()));
+						List<ContractExpensesAnalysisData> list = new ArrayList<>();
+						List<MonthlyCosts> costsInMonth = c.getCostsInMonth(yearMonth, usePaydays);
+						float negativeCosts = (float)costsInMonth.stream()
+								.mapToDouble(MonthlyCosts::getMoney)
+								.filter(d -> (d < 0))
+								.sum();
+						list.add(new ContractExpensesAnalysisData(-negativeCosts, c.getName()));
 						return list;
 					}
 				});
