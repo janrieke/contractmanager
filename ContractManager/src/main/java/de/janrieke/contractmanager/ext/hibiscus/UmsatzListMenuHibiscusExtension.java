@@ -22,19 +22,18 @@
 package de.janrieke.contractmanager.ext.hibiscus;
 
 
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import de.janrieke.contractmanager.ContractManagerPlugin;
-import de.janrieke.contractmanager.Settings;
-import de.janrieke.contractmanager.rmi.Transaction;
-import de.willuhn.datasource.rmi.DBIterator;
-import de.willuhn.datasource.rmi.DBService;
-import de.willuhn.jameica.gui.Action;
+import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.extension.Extendable;
 import de.willuhn.jameica.gui.extension.Extension;
-import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
 import de.willuhn.jameica.gui.parts.ContextMenu;
 import de.willuhn.jameica.gui.parts.ContextMenuItem;
 import de.willuhn.jameica.hbci.rmi.Umsatz;
-import de.willuhn.jameica.messaging.StatusBarMessage;
 import de.willuhn.jameica.system.Application;
 import de.willuhn.logging.Logger;
 import de.willuhn.util.ApplicationException;
@@ -62,131 +61,85 @@ public class UmsatzListMenuHibiscusExtension implements Extension
 		ContextMenu menu = (ContextMenu) extendable;
 		menu.addItem(ContextMenuItem.SEPARATOR);
 
-		menu.addItem(new MyContextMenuItem(i18n.tr("Import to ContractManager"), new Action() {
+		menu.addItem(new ActiveWhenAssignedContextMenuItem(i18n.tr("Open contract"),
+				this::openContract, true, false));
 
-			@Override
-			public void handleAction(Object context) throws ApplicationException
-			{
-				if (context == null) {
-					return;
-				}
+		menu.addItem(new ActiveWhenAssignedContextMenuItem(i18n.tr("Import to ContractManager"),
+				this::performImport, false, true));
 
-				Umsatz[] umsaetze = null;
-				if (context instanceof Umsatz) {
-					umsaetze = new Umsatz[]{(Umsatz)context};
-				} else if (context instanceof Umsatz[]) {
-					umsaetze = (Umsatz[]) context;
-				}
-
-				if (umsaetze == null || umsaetze.length == 0) {
-					return;
-				}
-
-				// Wenn wir mehr als 1 Buchung haben, fuehren wir das
-				// im Hintergrund aus.
-				UmsatzImportWorker worker = new UmsatzImportWorker(umsaetze, false);
-				if (umsaetze.length > 1) {
-					Application.getController().start(worker);
-				} else {
-					worker.run(null);
-				}
-			}
-		}, false));
-
-		menu.addItem(new MyContextMenuItem(i18n.tr("Remove from ContractManager"), new Action() {
-
-			@Override
-			public void handleAction(Object context) throws ApplicationException
-			{
-				if (context == null) {
-					return;
-				}
-
-				Umsatz[] umsaetze = null;
-				if (context instanceof Umsatz) {
-					umsaetze = new Umsatz[]{(Umsatz)context};
-				} else if (context instanceof Umsatz[]) {
-					umsaetze = (Umsatz[]) context;
-				}
-
-				if (umsaetze == null || umsaetze.length == 0) {
-					return;
-				}
-
-				// Wenn wir mehr als 1 Buchung haben, fuehren wir das
-				// im Hintergrund aus.
-				UmsatzRemoveWorker worker = new UmsatzRemoveWorker(umsaetze);
-				if (umsaetze.length > 1) {
-					Application.getController().start(worker);
-				} else {
-					worker.run(null);
-				}
-			}
-		}, true));
+		menu.addItem(new ActiveWhenAssignedContextMenuItem(i18n.tr("Remove from ContractManager"),
+				this::performRemoval, true, true));
 	}
 
+	private void openContract(Object context) throws ApplicationException {
+		List<Umsatz> transactions = getTransactions(context);
 
-
-	/**
-	 * Helper class to deactivate the menu item if the transaction is already assigned.
-	 */
-	private class MyContextMenuItem extends CheckedContextMenuItem
-	{
-		private boolean activeWhenAssigned;
-
-		/**
-		 * ct.
-		 * @param text
-		 * @param a
-		 */
-		public MyContextMenuItem(String text, Action a, boolean activeWhenAssigned)
-		{
-			super(text, a);
-			this.activeWhenAssigned = activeWhenAssigned;
+		if (transactions.isEmpty()) {
+			return;
 		}
 
-		/**
-		 * @see de.willuhn.jameica.gui.parts.CheckedContextMenuItem#isEnabledFor(java.lang.Object)
-		 */
-		@Override
-		public boolean isEnabledFor(Object o)
-		{
-			if (o == null) {
-				return false;
-			}
-
-			// Wenn wir eine ganze Liste von Buchungen haben, pruefen
-			// wir nicht jede einzeln, ob sie schon in ContractManager vorhanden
-			// ist. Die werden dann beim Import (weiter unten) einfach ausgesiebt.
-			if (o instanceof Umsatz[]) {
-				return super.isEnabledFor(o);
-			}
-
-			if (!(o instanceof Umsatz)) {
-				return false;
-			}
-
-			try {
-				return (activeWhenAssigned ^ !isAssigned((Umsatz) o)) && super.isEnabledFor(o);
-			} catch (Exception e) {
-				Logger.error("unable to detect if buchung is already assigned",e);
-				Application.getMessagingFactory().sendMessage(new StatusBarMessage(i18n.tr("Error while checking for assigned contracts in ContractManager"), StatusBarMessage.TYPE_ERROR));
-			}
-			return false;
+		try {
+			TransactionUtils.getContractFor(transactions.get(0)).ifPresent(contract -> {
+				GUI.startView(de.janrieke.contractmanager.gui.view.ContractDetailView.class
+						.getName(), contract);
+			});
+		} catch (RemoteException e) {
+			Logger.error("Error while accessing transactions.", e);
 		}
 	}
 
-	/**
-	 * Prueft, ob der Umsatz bereits einem Vertrag zugeordnet ist.
-	 * @param u der zu pruefende Umsatz.
-	 * @return true, wenn es bereits einen Vertrag gibt.
-	 * @throws Exception
-	 */
-	static boolean isAssigned(Umsatz u) throws Exception
-	{
-		DBService service = Settings.getDBService();
-		DBIterator<Transaction> transactions = service.createList(Transaction.class);
-		transactions.addFilter("transaction_id = ?",new Object[]{u.getID()});
-		return transactions.hasNext();
+	private void performImport(Object context) throws ApplicationException {
+		List<Umsatz> transactions = getTransactions(context);
+
+		if (transactions.isEmpty()) {
+			return;
+		}
+
+		// Wenn wir mehr als 1 Buchung haben, fuehren wir das
+		// im Hintergrund aus.
+		UmsatzImportWorker worker = new UmsatzImportWorker(transactions.toArray(new Umsatz[transactions.size()]), false);
+		if (transactions.size() > 1) {
+			Application.getController().start(worker);
+		} else {
+			worker.run(null);
+		}
+	}
+
+	private void performRemoval(Object context) throws ApplicationException {
+		List<Umsatz> transactions = getTransactions(context);
+
+		if (transactions.isEmpty()) {
+			return;
+		}
+
+		// Wenn wir mehr als 1 Buchung haben, fuehren wir das
+		// im Hintergrund aus.
+		UmsatzRemoveWorker worker = new UmsatzRemoveWorker(transactions.toArray(new Umsatz[transactions.size()]));
+		if (transactions.size() > 1) {
+			Application.getController().start(worker);
+		} else {
+			worker.run(null);
+		}
+	}
+
+	private List<Umsatz> getTransactions(Object context) {
+		List<Umsatz> result = new ArrayList<>();
+
+		if (context == null) {
+			return result;
+		}
+
+		if (context instanceof Umsatz) {
+			result.add((Umsatz) context);
+		} else if (context instanceof Umsatz[]) {
+			return Arrays.asList((Umsatz[]) context);
+		} else if (context instanceof List) {
+			((List<?>)context).forEach(elem -> {
+				if (elem instanceof Umsatz) {
+					result.add((Umsatz) elem);
+				}
+			});
+		}
+		return result;
 	}
 }

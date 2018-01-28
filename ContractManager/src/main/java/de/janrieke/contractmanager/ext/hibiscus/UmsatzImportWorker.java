@@ -109,7 +109,7 @@ class UmsatzImportWorker implements BackgroundTask
 				try
 				{
 					// Checken, ob der Umsatz schon einer Buchung zugeordnet ist
-					if (UmsatzListMenuHibiscusExtension.isAssigned(list[i])) {
+					if (TransactionUtils.isAssigned(list[i])) {
 						skipped++;
 						continue;
 					}
