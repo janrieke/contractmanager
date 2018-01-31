@@ -17,12 +17,15 @@
  */
 package de.janrieke.contractmanager.gui.view;
 
+import org.eclipse.swt.widgets.Event;
+
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.control.IncomeExpensesAnalysisControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.util.ColumnLayout;
+import de.willuhn.jameica.gui.util.Container;
 import de.willuhn.jameica.gui.util.SimpleContainer;
 
 /**
@@ -30,7 +33,11 @@ import de.willuhn.jameica.gui.util.SimpleContainer;
  */
 public class IncomeExpensesAnalysisView extends AbstractView {
 
-    private IncomeExpensesAnalysisControl control;
+	private IncomeExpensesAnalysisControl control;
+
+	private int selectedYear = -1;
+	private int selectedMonth = -1;
+	private boolean selectedUsePaydays = false;
 
 	/**
 	 * @see de.willuhn.jameica.gui.AbstractView#bind()
@@ -40,27 +47,52 @@ public class IncomeExpensesAnalysisView extends AbstractView {
 		// draw the title
 		GUI.getView().setTitle(Settings.i18n().tr("Income/Expenses Comparison"));
 
-		// instanciate controller
-
 		control = new IncomeExpensesAnalysisControl(this);
 
-	    SimpleContainer container = new SimpleContainer(getParent(), true);
+		// register listeners (must happen before adding the control)
+		control.getPayDayCheckbox().addListener(this::handleReload);
+		control.getMonthYearSelector().addListener(this::handleReload);
+		control.getYearSelector().addListener(this::handleReload);
+		control.getMonthSelector().addListener(this::handleReload);
 
-	    ColumnLayout top = new ColumnLayout(container.getComposite(), 2);
+		SimpleContainer container = new SimpleContainer(getParent(), true);
 
-	    SimpleContainer inner = new SimpleContainer(top.getComposite(), true);
+		ColumnLayout top = new ColumnLayout(container.getComposite(), 4);
+		Container col1 = new SimpleContainer(top.getComposite());
+		Container col2 = new SimpleContainer(top.getComposite());
+		Container col3 = new SimpleContainer(top.getComposite());
 
-	    inner.addCheckbox(control.getPayDayCheckbox(), Settings.i18n().tr("Use paydays"));
-	    inner.addLabelPair(Settings.i18n().tr("Month:"), control.getMonthYearSelector());
+		col1.addCheckbox(control.getPayDayCheckbox(), Settings.i18n().tr("Use paydays"));
+		col2.addLabelPair(Settings.i18n().tr("Month:"), control.getMonthSelector());
+		col3.addLabelPair(Settings.i18n().tr("Year:"), control.getYearSelector());
+		top.add(new Button(Settings.i18n().tr("Current Month"), this::toCurrentMonth));
 
-	    top.add(new Button(Settings.i18n().tr("Update"), context -> handleReload(true),null,true,"view-refresh.png"));
-
-	    //left.addHeadline(Settings.i18n().tr("Chart"));
-	    container.addPart(control.getChartPart());
+		container.addPart(control.getChartPart());
 	}
 
-	private synchronized void handleReload(boolean force)
-	{
-		control.redrawChart();
+	private synchronized void handleReload(Event event) {
+		if (inputsChanged()) {
+			control.redrawChart();
+		}
+	}
+
+	private boolean inputsChanged() {
+		boolean newUsePaydays = (Boolean) control.getPayDayCheckbox().getValue();
+		int newMonth = control.getMonthNumber((String) control.getMonthSelector().getValue());
+		int newYear = (Integer) control.getYearSelector().getValue();
+		if (selectedUsePaydays != newUsePaydays
+				|| selectedMonth != newMonth
+				|| selectedYear != newYear) {
+			selectedUsePaydays = newUsePaydays;
+			selectedMonth = newMonth;
+			selectedYear = newYear;
+			return true;
+		}
+		return false;
+	}
+
+	private void toCurrentMonth(Object context) {
+		control.resetToCurrentMonth();
+		handleReload(null);
 	}
 }

@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.janrieke.contractmanager.gui.input.CheckboxInput;
 import de.janrieke.contractmanager.gui.parts.IncomeExpensesAnalysisChartPart;
@@ -105,6 +106,17 @@ public class IncomeExpensesAnalysisControl extends AbstractControl {
 			monthSelector = new SelectInput(list, curMonthName);
 		}
 		return monthSelector;
+	}
+
+	public void resetToCurrentMonth() {
+		int curMonth = Calendar.getInstance().get(Calendar.MONTH);
+		String currentMonth = monthNames.entrySet().stream()
+				.filter(e -> e.getValue().equals(curMonth))
+				.map(Entry::getKey)
+				.findFirst().orElseGet(monthNames.keySet().iterator()::next);
+		getMonthSelector().setValue(currentMonth);
+
+		getYearSelector().setValue(Calendar.getInstance().get(Calendar.YEAR));
 	}
 
 	public SpinnerInput getYearSelector() {

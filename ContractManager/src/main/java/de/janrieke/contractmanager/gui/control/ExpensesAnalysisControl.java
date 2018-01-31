@@ -78,8 +78,7 @@ public class ExpensesAnalysisControl extends AbstractControl {
 
 	public MultiInput getMonthYearSelector() {
 		if (monthYearSelector == null) {
-			monthYearSelector = new MultiInput(getMonthSelector(),
-					getYearSelector());
+			monthYearSelector = new MultiInput(getMonthSelector(), getYearSelector());
 		}
 		return monthYearSelector;
 	}
