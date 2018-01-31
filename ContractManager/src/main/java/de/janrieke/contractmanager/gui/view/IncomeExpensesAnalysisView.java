@@ -51,7 +51,6 @@ public class IncomeExpensesAnalysisView extends AbstractView {
 
 		// register listeners (must happen before adding the control)
 		control.getPayDayCheckbox().addListener(this::handleReload);
-		control.getMonthYearSelector().addListener(this::handleReload);
 		control.getYearSelector().addListener(this::handleReload);
 		control.getMonthSelector().addListener(this::handleReload);
 

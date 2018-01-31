@@ -17,14 +17,16 @@
  */
 package de.janrieke.contractmanager.gui.view;
 
+import org.eclipse.swt.widgets.Event;
+
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.gui.control.ExpensesAnalysisControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.util.ColumnLayout;
+import de.willuhn.jameica.gui.util.Container;
 import de.willuhn.jameica.gui.util.SimpleContainer;
-import de.willuhn.util.ApplicationException;
 
 /**
  * this is the dialog for the contract details.
@@ -32,6 +34,10 @@ import de.willuhn.util.ApplicationException;
 public class ExpensesAnalysisView extends AbstractView {
 
 	private ExpensesAnalysisControl control;
+
+	private int selectedYear = -1;
+	private int selectedMonth = -1;
+	private boolean selectedUsePaydays = false;
 
     /**
 	 * @see de.willuhn.jameica.gui.AbstractView#bind()
@@ -44,33 +50,48 @@ public class ExpensesAnalysisView extends AbstractView {
 		// instanciate controller
 		control = new ExpensesAnalysisControl(this);
 
+		// register listeners (must happen before adding the control)
+		control.getPayDayCheckbox().addListener(this::handleReload);
+		control.getYearSelector().addListener(this::handleReload);
+		control.getMonthSelector().addListener(this::handleReload);
+
 	    SimpleContainer container = new SimpleContainer(getParent(), true);
 
-	    ColumnLayout top = new ColumnLayout(container.getComposite(), 2);
+	    ColumnLayout top = new ColumnLayout(container.getComposite(), 4);
+		Container col1 = new SimpleContainer(top.getComposite());
+		Container col2 = new SimpleContainer(top.getComposite());
+		Container col3 = new SimpleContainer(top.getComposite());
 
-	    SimpleContainer inner = new SimpleContainer(top.getComposite(), true);
-
-	    inner.addCheckbox(control.getPayDayCheckbox(), Settings.i18n().tr("Use paydays"));
-	    inner.addLabelPair(Settings.i18n().tr("Month:"), control.getMonthYearSelector());
-
-	    top.add(new Button(Settings.i18n().tr("Update"), context -> handleReload(true),null,true,"view-refresh.png"));
+	    col1.addCheckbox(control.getPayDayCheckbox(), Settings.i18n().tr("Use paydays"));
+	    col2.addLabelPair(Settings.i18n().tr("Month:"), control.getMonthSelector());
+	    col3.addLabelPair(Settings.i18n().tr("Year:"), control.getYearSelector());
+		top.add(new Button(Settings.i18n().tr("Current Month"), this::toCurrentMonth));
 
 	    container.addPart(control.getChartPart());
-
+	}
+	private synchronized void handleReload(Event event) {
+		if (inputsChanged()) {
+			control.redrawChart();
+		}
 	}
 
-	/**
-	 * @see de.willuhn.jameica.gui.AbstractView#unbind()
-	 */
-	@Override
-	public void unbind() throws ApplicationException {
-		// this method will be invoked when leaving the dialog.
-		// You are able to interrupt the unbind by throwing an
-		// ApplicationException.
+	private boolean inputsChanged() {
+		boolean newUsePaydays = (Boolean) control.getPayDayCheckbox().getValue();
+		int newMonth = control.getMonthNumber((String) control.getMonthSelector().getValue());
+		int newYear = (Integer) control.getYearSelector().getValue();
+		if (selectedUsePaydays != newUsePaydays
+				|| selectedMonth != newMonth
+				|| selectedYear != newYear) {
+			selectedUsePaydays = newUsePaydays;
+			selectedMonth = newMonth;
+			selectedYear = newYear;
+			return true;
+		}
+		return false;
 	}
 
-	private synchronized void handleReload(boolean force)
-	{
-		control.redrawChart();
+	private void toCurrentMonth(Object context) {
+		control.resetToCurrentMonth();
+		handleReload(null);
 	}
 }

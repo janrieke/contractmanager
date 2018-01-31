@@ -26,13 +26,13 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.janrieke.contractmanager.gui.parts.ExpensesAnalysisChartPart;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Part;
 import de.willuhn.jameica.gui.input.CheckboxInput;
-import de.willuhn.jameica.gui.input.MultiInput;
 import de.willuhn.jameica.gui.input.SelectInput;
 import de.willuhn.jameica.gui.input.SpinnerInput;
 
@@ -44,7 +44,6 @@ public class ExpensesAnalysisControl extends AbstractControl {
 	private Map<String, Integer> monthNames;
 	private SelectInput monthSelector;
 	private SpinnerInput yearSelector;
-	private MultiInput monthYearSelector;
 	private ExpensesAnalysisChartPart chart = null;
 	private CheckboxInput usePayDayCheckbox;
 
@@ -74,13 +73,6 @@ public class ExpensesAnalysisControl extends AbstractControl {
 			getChartPart();
 		}
 		chart.redraw();
-	}
-
-	public MultiInput getMonthYearSelector() {
-		if (monthYearSelector == null) {
-			monthYearSelector = new MultiInput(getMonthSelector(), getYearSelector());
-		}
-		return monthYearSelector;
 	}
 
 	public SelectInput getMonthSelector() {
@@ -117,5 +109,16 @@ public class ExpensesAnalysisControl extends AbstractControl {
 			usePayDayCheckbox = new CheckboxInput(true);
 		}
 		return usePayDayCheckbox;
+	}
+
+	public void resetToCurrentMonth() {
+		int curMonth = Calendar.getInstance().get(Calendar.MONTH);
+		String currentMonth = monthNames.entrySet().stream()
+				.filter(e -> e.getValue().equals(curMonth))
+				.map(Entry::getKey)
+				.findFirst().orElseGet(monthNames.keySet().iterator()::next);
+		getMonthSelector().setValue(currentMonth);
+
+		getYearSelector().setValue(Calendar.getInstance().get(Calendar.YEAR));
 	}
 }

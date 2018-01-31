@@ -33,7 +33,6 @@ import de.janrieke.contractmanager.gui.parts.IncomeExpensesAnalysisChartPart;
 import de.willuhn.jameica.gui.AbstractControl;
 import de.willuhn.jameica.gui.AbstractView;
 import de.willuhn.jameica.gui.Part;
-import de.willuhn.jameica.gui.input.MultiInput;
 import de.willuhn.jameica.gui.input.SelectInput;
 import de.willuhn.jameica.gui.input.SpinnerInput;
 
@@ -61,7 +60,6 @@ public class IncomeExpensesAnalysisControl extends AbstractControl {
 	private IncomeExpensesAnalysisChartPart chart = null;
 	private SelectInput monthSelector;
 	private SpinnerInput yearSelector;
-	private MultiInput monthYearSelector;
 	private CheckboxInput usePayDayCheckbox;
 
 	public Part getChartPart() {
@@ -76,14 +74,6 @@ public class IncomeExpensesAnalysisControl extends AbstractControl {
 			getChartPart();
 		}
 		chart.redraw();
-	}
-
-	public MultiInput getMonthYearSelector() {
-		if (monthYearSelector == null) {
-			monthYearSelector = new MultiInput(getMonthSelector(),
-					getYearSelector());
-		}
-		return monthYearSelector;
 	}
 
 	public SelectInput getMonthSelector() {
