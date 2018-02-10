@@ -20,6 +20,7 @@ Assume that currently version 0.5.2-SNAPSHOT is in development. Then perform a r
 
  7. Verify that the release works (check both for updates and fresh installations)!
     - Use .jameica-installation-test und then a real installation for this.
+    - Create a backup in .jameica-installation-test after the installation so that we can go back to the state of this release later.
     
  8. git commit, git push.
 
@@ -29,7 +30,7 @@ Assume that currently version 0.5.2-SNAPSHOT is in development. Then perform a r
 
 Now, the release is live.
 
-11. Verify that an update via the updatesite works (use ".jameica-installation-test").
+11. Verify that an update via the updatesite works (again use ".jameica-installation-test").
  
 12. Close the ".jameica-installation-test" Jameica instance. Use the last backup of ".jameica-installation-test" and copy it to "ContractManager Releases".
 
