@@ -26,7 +26,7 @@ Assume that currently version 0.5.2-SNAPSHOT is in development. Then perform a r
 
  9. Upload contractmanager.zip to http://janrieke.de/products/jameica/updates/contractmanager/release/0.5.2/contractmanager.zip.
 
-10. Upload plugin.xml to both http://janrieke.de/products/jameica/updates/contractmanager/release/ und http://janrieke.de/products/jameica/updates/contractmanager/release/0.5.2/.
+10. Upload plugin.xml to both http://janrieke.de/products/jameica/updates/contractmanager/release/ and http://janrieke.de/products/jameica/updates/contractmanager/release/0.5.2/.
 
 Now, the release is live.
 
