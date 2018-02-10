@@ -1,6 +1,6 @@
 Release instructions, exemplary for version 0.5.2
 
-Currently, version 0.5.2-SNAPSHOT is in development.
+Assume that currently version 0.5.2-SNAPSHOT is in development. Then perform a release as follows:
 
  1. Change plugin.xml:
     - <plugin version="0.5.2">
