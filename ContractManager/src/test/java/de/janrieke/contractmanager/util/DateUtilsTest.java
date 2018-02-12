@@ -1,6 +1,7 @@
 package de.janrieke.contractmanager.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -124,5 +125,27 @@ public class DateUtilsTest {
 				.ofLocal(LocalDate.of(2017, 6, 23).atStartOfDay(), ZoneId.systemDefault(), null)
 				.toInstant());
 		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testCalculateNextTermBeginAfter_NullValues() throws RemoteException {
+		Date startDate = Date.from(ZonedDateTime
+				.ofLocal(LocalDate.of(2016, 9, 23).atStartOfDay(), ZoneId.systemDefault(), null)
+				.toInstant());
+
+		ValidRuntimes runtimes = new ValidRuntimes();
+		runtimes.firstMinRuntimeCount = 6;
+		runtimes.firstMinRuntimeType = IntervalType.MONTHS;
+		runtimes.followingMinRuntimeCount = 3;
+		runtimes.followingMinRuntimeType = IntervalType.MONTHS;
+
+		Date result = DateUtils.calculateNextTermBeginAfter(null, startDate, false, runtimes);
+		assertNull(result);
+
+		result = DateUtils.calculateNextTermBeginAfter(now, null, false, runtimes);
+		assertNull(result);
+
+		result = DateUtils.calculateNextTermBeginAfter(now, startDate, false, null);
+		assertNull(result);
 	}
 }

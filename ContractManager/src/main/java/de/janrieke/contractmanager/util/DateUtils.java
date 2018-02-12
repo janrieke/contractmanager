@@ -59,6 +59,9 @@ public class DateUtils {
 		if (after == null) {
 			return null;
 		}
+		if (startDate == null) {
+			return null;
+		}
 		if (runtimes == null) {
 			return null;
 		}
