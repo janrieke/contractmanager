@@ -3,10 +3,10 @@
 <plugin xmlns="http://www.willuhn.de/schema/jameica-plugin"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.willuhn.de/schema/jameica-plugin http://www.willuhn.de/schema/jameica-plugin-1.3.xsd"
-        name="contractmanager" version="0.5.4-SNAPSHOT" class="de.janrieke.contractmanager.ContractManagerPlugin">
+        name="contractmanager" version="0.5.4" class="de.janrieke.contractmanager.ContractManagerPlugin">
 
   <description>ContractManager for Jameica</description>
-  <url>http://janrieke.de/products/jameica/updates/contractmanager/snapshot/0.5.4-SNAPSHOT/contractmanager.zip</url>
+  <url>http://janrieke.de/products/jameica/updates/contractmanager/release/0.5.4/contractmanager.zip</url>
   <homepage>http://janrieke.de/products/contractmanager</homepage>
   <license>GPL 3.0 - http://www.gnu.org/licenses/gpl-3.0.txt</license>
   <icon>contractmanager-icon-64x64.png</icon>

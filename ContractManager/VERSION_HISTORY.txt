@@ -49,6 +49,10 @@ VERSION HISTORY:
 	- Payment dates
 	- MySQL/MariaDB support
 
+0.5.4:
+	- Fixed exception in contract list
+
+
 ROADMAP:
 
 0.6:
