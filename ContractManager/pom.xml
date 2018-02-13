@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.janrieke</groupId>
 	<artifactId>contractmanager</artifactId>
-	<version>0.5.4</version>
+	<version>0.5.5-SNAPSHOT</version>
 	<name>ContractManager</name>
 	<description>ContractManager for Jameica</description>
 	<properties>
