@@ -11,13 +11,13 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**********************************************************************
  * Kopie aus Hibiscus
- * 
+ *
  * $Source: /cvsroot/hibiscus/hibiscus/src/de/willuhn/jameica/hbci/server/HBCIDBServiceImpl.java,v $
  * $Revision: 1.31 $
  * $Date: 2010-11-02 11:32:09 $
@@ -74,7 +74,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 
 	/**
 	 * Konstruktor mit expliziter Angabe des Treibers.
-	 * 
+	 *
 	 * @param driverClass
 	 *            der zu verwendende Treiber.
 	 * @throws RemoteException
@@ -87,8 +87,9 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 				.getClassLoader();
 		this.setClassloader(cl);
 		this.setClassFinder(cl.getClassFinder());
-		if (driverClass == null)
+		if (driverClass == null) {
 			throw new RemoteException("no driver given");
+		}
 		Logger.info("loading database driver: " + driverClass);
 		try {
 			Class<?> c = cl.load(driverClass);
@@ -102,6 +103,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.datasource.Service#getName()
 	 */
+	@Override
 	public String getName() throws RemoteException {
 		I18N i18n = Application.getPluginLoader()
 				.getPlugin(ContractManagerPlugin.class).getResources()
@@ -112,6 +114,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.datasource.db.DBServiceImpl#getAutoCommit()
 	 */
+	@Override
 	protected boolean getAutoCommit() throws RemoteException {
 		return SETTINGS.getBoolean("autocommit", super.getAutoCommit());
 	}
@@ -119,6 +122,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.datasource.db.DBServiceImpl#getJdbcDriver()
 	 */
+	@Override
 	protected String getJdbcDriver() throws RemoteException {
 		return this.driver.getJdbcDriver();
 	}
@@ -126,6 +130,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.datasource.db.DBServiceImpl#getJdbcPassword()
 	 */
+	@Override
 	protected String getJdbcPassword() throws RemoteException {
 		return this.driver.getJdbcPassword();
 	}
@@ -133,6 +138,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.datasource.db.DBServiceImpl#getJdbcUrl()
 	 */
+	@Override
 	protected String getJdbcUrl() throws RemoteException {
 		return this.driver.getJdbcUrl();
 	}
@@ -140,6 +146,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.datasource.db.DBServiceImpl#getJdbcUsername()
 	 */
+	@Override
 	protected String getJdbcUsername() throws RemoteException {
 		return this.driver.getJdbcUsername();
 	}
@@ -147,6 +154,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.jameica.ContractDBService.rmi.HBCIDBService#checkConsistency()
 	 */
+	@Override
 	public void checkConsistency() throws RemoteException, ApplicationException {
 		Logger.info("init update provider");
 		UpdateProvider provider = new ContractDBUpdateProvider(getConnection(),
@@ -159,6 +167,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.datasource.db.DBServiceImpl#getConnection()
 	 */
+	@Override
 	public Connection getConnection() throws RemoteException {
 		try {
 			return super.getConnection();
@@ -175,6 +184,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.jameica.ContractDBService.rmi.HBCIDBService#install()
 	 */
+	@Override
 	public void install() throws RemoteException {
 		I18N i18n = Application.getPluginLoader()
 				.getPlugin(ContractManagerPlugin.class).getResources()
@@ -193,6 +203,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.jameica.ContractDBService.rmi.HBCIDBService#getSQLTimestamp(java.lang.String)
 	 */
+	@Override
 	public String getSQLTimestamp(String content) throws RemoteException {
 		return this.driver.getSQLTimestamp(content);
 	}
@@ -200,6 +211,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.datasource.db.DBServiceImpl#getInsertWithID()
 	 */
+	@Override
 	protected boolean getInsertWithID() throws RemoteException {
 		return this.driver.getInsertWithID();
 	}
@@ -207,6 +219,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.datasource.db.DBServiceImpl#checkConnection(java.sql.Connection)
 	 */
+	@Override
 	protected void checkConnection(Connection conn) throws SQLException {
 		try {
 			this.driver.checkConnection(conn);
@@ -219,6 +232,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.datasource.db.DBServiceImpl#getTransactionIsolationLevel()
 	 */
+	@Override
 	protected int getTransactionIsolationLevel() throws RemoteException {
 		// BUGZILLA 447
 		return this.driver.getTransactionIsolationLevel();
@@ -227,6 +241,7 @@ public class ContractDBServiceImpl extends DBServiceImpl implements ContractDBSe
 	/**
 	 * @see de.willuhn.jameica.ContractDBService.rmi.HBCIDBService#getDriver()
 	 */
+	@Override
 	public DBSupport getDriver() throws RemoteException {
 		return this.driver;
 	}
