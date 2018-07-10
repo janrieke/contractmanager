@@ -11,8 +11,8 @@
   <license>GPL 3.0 - http://www.gnu.org/licenses/gpl-3.0.txt</license>
   <icon>contractmanager-icon-64x64.png</icon>
 
-  <requires jameica="2.6.4+">
-    <import plugin="hibiscus" version="2.6+" required="false" />
+  <requires jameica="2.8+">
+    <import plugin="hibiscus" version="2.8+" required="false" />
   </requires>
 
   <classfinder>
