@@ -40,11 +40,8 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.TableItem;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
@@ -57,10 +54,8 @@ import de.willuhn.datasource.rmi.DBService;
 import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.dialogs.AbstractDialog;
-import de.willuhn.jameica.gui.formatter.TableFormatter;
 import de.willuhn.jameica.gui.parts.Button;
 import de.willuhn.jameica.gui.parts.ButtonArea;
-import de.willuhn.jameica.gui.parts.TableChangeListener;
 import de.willuhn.jameica.gui.parts.TablePart;
 import de.willuhn.jameica.gui.util.Container;
 import de.willuhn.jameica.gui.util.SimpleContainer;
@@ -130,13 +125,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 		right.addPart(getOpenButton());
 
 		ButtonArea buttons = new ButtonArea();
-		buttons.addButton(Settings.i18n().tr("Close"), new Action() {
-			@Override
-			public void handleAction(Object context)
-					throws ApplicationException {
-				close();
-			}
-		}, null, false, "process-stop.png");
+		buttons.addButton(Settings.i18n().tr("Close"), context -> close(), null, false, "process-stop.png");
 
 		group.addButtonArea(buttons);
 	}
@@ -246,58 +235,47 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 			this.table.addColumn(Settings.i18n().tr("Description"),
 					"description", null, true);
 			this.table.addColumn(Settings.i18n().tr("Local file URI"), "path");
-			table.setFormatter(new TableFormatter() {
-				@Override
-				public void format(TableItem item) {
-					Object o = item.getData();
-					if (o instanceof Storage) {
-						try {
-							if (((Storage) o).getFile() != null) {
-								item.setText(1,
-										Settings.i18n().tr("File in database"));
-								item.setForeground(1,
-										Settings.getNotActiveForegroundColor());
+			table.setFormatter(item -> {
+				Object o = item.getData();
+				if (o instanceof Storage) {
+					try {
+						if (((Storage) o).getFile() != null) {
+							item.setText(1,
+									Settings.i18n().tr("File in database"));
+							item.setForeground(1,
+									Settings.getNotActiveForegroundColor());
+						} else {
+							String path = ((Storage) o).getPath();
+							if (path != null) {
+								item.setText(1, path);
 							} else {
-								String path = ((Storage) o).getPath();
-								if (path != null) {
-									item.setText(1, path);
-								} else {
-									item.setText(1, "invalid entry");
-								}
+								item.setText(1, "invalid entry");
 							}
-						} catch (RemoteException e) {
-							item.setText(1, "Error while reading database");
-							item.setForeground(1, Settings.getErrorColor());
 						}
+					} catch (RemoteException e) {
+						item.setText(1, "Error while reading database");
+						item.setForeground(1, Settings.getErrorColor());
 					}
 				}
 			});
-			table.addSelectionListener(new Listener() {
-				@Override
-				public void handleEvent(Event event) {
-					if (event.type == SWT.Selection
-							&& event.data instanceof Storage) {
-						getRemoveButton().setEnabled(true);
-						getOpenButton().setEnabled(true);
-					}
+			table.addSelectionListener(event -> {
+				if (event.type == SWT.Selection
+						&& event.data instanceof Storage) {
+					getRemoveButton().setEnabled(true);
+					getOpenButton().setEnabled(true);
 				}
 			});
-			table.addChangeListener(new TableChangeListener() {
-
-				@Override
-				public void itemChanged(Object object, String attribute,
-						String newValue) throws ApplicationException {
-					if (object instanceof Storage
-							&& "description".equals(attribute)) {
-						try {
-							((Storage) object).setDescription(newValue);
-							((Storage) object).store();
-						} catch (RemoteException e) {
-							Logger.error("error while setting field", e);
-						}
-					}
-				}
-			});
+			table.addChangeListener((object, attribute, newValue) -> {
+if (object instanceof Storage
+				&& "description".equals(attribute)) {
+			try {
+				((Storage) object).setDescription(newValue);
+				((Storage) object).store();
+			} catch (RemoteException e) {
+				Logger.error("error while setting field", e);
+			}
+}
+});
 		} catch (RemoteException e) {
 			Logger.error("error while getting file list", e);
 		}
@@ -451,9 +429,7 @@ public class DocumentStorageDialog extends AbstractDialog<Contract> {
 							String sql = "INSERT INTO storage (contract_id, description, path, file) VALUES (?, ?, ?, ?)";
 							PreparedStatement stmt = conn.prepareStatement(sql);
 							stmt.setString(1, contract.getID());
-							stmt.setString(2,
-									Settings.i18n()
-											.tr("Enter description here"));
+							stmt.setString(2, localfile.getName());
 
 							int lastDot = localfile.getName().lastIndexOf(".");
 							if (lastDot != -1) {
