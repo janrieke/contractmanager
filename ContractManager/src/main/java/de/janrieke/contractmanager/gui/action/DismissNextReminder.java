@@ -11,13 +11,14 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.janrieke.contractmanager.gui.action;
 
 import java.rmi.RemoteException;
+import java.util.Optional;
 
 import de.janrieke.contractmanager.Settings;
 import de.janrieke.contractmanager.rmi.Contract;
@@ -31,28 +32,36 @@ import de.willuhn.util.ApplicationException;
  */
 public class DismissNextReminder implements Action {
 
-	private TablePart tablePart;
+	private Optional<TablePart> tablePart;
 
 	public DismissNextReminder(TablePart tablePart) {
-		this.tablePart = tablePart;
+		this.tablePart = Optional.ofNullable(tablePart);
 	}
 
 	/**
 	 * @see de.willuhn.jameica.gui.Action#handleAction(java.lang.Object)
 	 */
+	@Override
 	public void handleAction(Object context) throws ApplicationException {
 
 		// check if the context is a contract
-		if (context == null || !(context instanceof Contract))
+		if (context == null || !(context instanceof Contract)) {
 			throw new ApplicationException(Settings.i18n().tr(
 					"Please choose a contract."));
+		}
 
 		Contract c = (Contract) context;
 
 		try {
 			c.doNotRemindAboutNextCancellation();
 			c.store();
-			tablePart.updateItem(c, c);
+			tablePart.ifPresent(tP -> {
+				try {
+					tP.updateItem(c, c);
+				} catch (RemoteException e) {
+					Logger.error("Unable to update contract table.", e);
+				}
+			});
 		} catch (RemoteException e) {
 			Logger.error("error while dismissing reminder", e);
 			throw new ApplicationException(Settings.i18n().tr(

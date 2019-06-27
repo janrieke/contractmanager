@@ -572,41 +572,7 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 
 	@Override
 	public boolean hasValidRuntimeInformation() throws RemoteException {
-		return getValidRuntimes() != null;
-	}
-
-	/**
-	 * Convenience method to find out whether all necessary info is available
-	 * to calculate terms and cancellation information.
-	 * @return a ValidRuntimes object if all info is available, or null otherwise
-	 */
-	private ValidRuntimes getValidRuntimes() throws RemoteException {
-		ValidRuntimes result = new ValidRuntimes();
-
-		result.firstMinRuntimeType = getFirstMinRuntimeType();
-		result.firstMinRuntimeCount = getFirstMinRuntimeCount();
-		result.followingMinRuntimeType = getFollowingMinRuntimeType();
-		result.followingMinRuntimeCount = getFollowingMinRuntimeCount();
-		result.fixedTerms = getFixedTerms();
-
-		// if one of the runtime definition is invalid, use the other one
-		if (result.firstMinRuntimeType == null || result.firstMinRuntimeCount == null
-				|| result.firstMinRuntimeCount <= 0) {
-			result.firstMinRuntimeCount = result.followingMinRuntimeCount;
-			result.firstMinRuntimeType = result.followingMinRuntimeType;
-		}
-		if (result.followingMinRuntimeType == null || result.followingMinRuntimeCount == null
-				|| result.followingMinRuntimeCount <= 0) {
-			result.followingMinRuntimeCount = result.firstMinRuntimeCount;
-			result.followingMinRuntimeType = result.firstMinRuntimeType;
-		}
-		// do nothing if both are invalid
-		if (result.followingMinRuntimeType == null || result.followingMinRuntimeCount == null
-				|| result.followingMinRuntimeCount <= 0) {
-			return null;
-		}
-
-		return result;
+		return ValidRuntimes.getValidRuntimes(this) != null;
 	}
 
 	/**
@@ -620,7 +586,8 @@ public class ContractImpl extends AbstractDBObject implements Contract {
 	private Date calculateNextTermBegin(Date after, boolean excludeFirstTerm)
 			throws RemoteException {
 
-		Date nextTermBegin = calculateNextTermBeginAfter(after, getStartDate(), excludeFirstTerm, getValidRuntimes());
+		Date nextTermBegin = calculateNextTermBeginAfter(after, getStartDate(), excludeFirstTerm,
+				ValidRuntimes.getValidRuntimes(this));
 
 		if (nextTermBegin == null) {
 			return null;

@@ -17,6 +17,8 @@
  */
 package de.janrieke.contractmanager.gui.control;
 
+import static de.janrieke.contractmanager.util.DateUtils.calculateNextTermBeginAfter;
+
 import java.rmi.RemoteException;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -38,7 +40,7 @@ import de.janrieke.contractmanager.gui.input.DateDialogInputAutoCompletion.Valid
 import de.janrieke.contractmanager.gui.input.PositiveIntegerInput;
 import de.janrieke.contractmanager.gui.menu.ContractListMenu;
 import de.janrieke.contractmanager.gui.menu.CostsListMenu;
-import de.janrieke.contractmanager.gui.parts.ContractListTablePart;
+import de.janrieke.contractmanager.gui.parts.ContractListTreePart;
 import de.janrieke.contractmanager.gui.parts.CostsListTablePart;
 import de.janrieke.contractmanager.gui.parts.SizeableTablePart;
 import de.janrieke.contractmanager.gui.view.ContractDetailView;
@@ -47,6 +49,7 @@ import de.janrieke.contractmanager.rmi.Contract;
 import de.janrieke.contractmanager.rmi.Costs;
 import de.janrieke.contractmanager.rmi.IntervalType;
 import de.janrieke.contractmanager.rmi.Transaction;
+import de.janrieke.contractmanager.util.ValidRuntimes;
 import de.willuhn.datasource.GenericIterator;
 import de.willuhn.datasource.pseudo.PseudoIterator;
 import de.willuhn.datasource.rmi.DBIterator;
@@ -57,7 +60,7 @@ import de.willuhn.jameica.gui.GUI;
 import de.willuhn.jameica.gui.dialogs.CalendarDialog;
 import de.willuhn.jameica.gui.formatter.CurrencyFormatter;
 import de.willuhn.jameica.gui.formatter.DateFormatter;
-import de.willuhn.jameica.gui.formatter.TableFormatter;
+import de.willuhn.jameica.gui.formatter.TreeFormatter;
 import de.willuhn.jameica.gui.input.CheckboxInput;
 import de.willuhn.jameica.gui.input.Input;
 import de.willuhn.jameica.gui.input.IntegerInput;
@@ -78,7 +81,7 @@ import de.willuhn.util.ApplicationException;
 public class ContractControl extends AbstractControl {
 
 	// list of all contracts
-	private ContractListTablePart contractList;
+	private ContractListTreePart contractTree;
 	// list of all contracts with cancellation warnings
 	private SizeableTablePart contractListWarnings;
 
@@ -153,13 +156,15 @@ public class ContractControl extends AbstractControl {
 	private final ValidationProvider endDateValidationProvider = time -> {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(time);
-		calendar.add(Calendar.DAY_OF_MONTH, -2); // a little tolerance
+		calendar.add(Calendar.DAY_OF_MONTH, -5); // a little tolerance
 		try {
 			Date startDate = getContract().getStartDate();
 			if (startDate == null) {
 				return Optional.empty();
 			}
-			Date nextTermBegin = getContract().getNextTermBeginAfter(startDate);
+			Date nextTermBegin = calculateNextTermBeginAfter(startDate, startDate, false,
+					ValidRuntimes.getValidRuntimes(getContract()));
+
 			if (nextTermBegin == null) {
 				return Optional.empty();
 			}
@@ -677,50 +682,50 @@ public class ContractControl extends AbstractControl {
 	 * @return a table with contracts.
 	 * @throws RemoteException
 	 */
-	public ContractListTablePart getContractsTable() throws RemoteException {
-		if (contractList != null) {
-			return contractList;
+	public ContractListTreePart getContractsTable() throws RemoteException {
+		if (contractTree != null) {
+			return contractTree;
 		}
 
 		GenericIterator<Contract> allContracts = getContracts();
 		Date today = new Date();
 		List<Contract> contracts = new ArrayList<>();
 
-		double total = 0d;
+//		double total = 0d;
 		while (allContracts.hasNext()) {
 			Contract c = allContracts.next();
 			if (c.isActiveInMonth(today)) {
 				// Only add active contracts.
-				total += c.getMoneyPerMonth();
+//				total += c.getMoneyPerMonth();
 				contracts.add(c);
 			}
 		}
 
-		// 4) create the table
-		contractList = new ContractListTablePart(
+		// 4) create the tree
+		contractTree = new ContractListTreePart(
 				contracts,
 				new de.janrieke.contractmanager.gui.action.ShowContractDetailView());
-		contractList.setSum(total);
+//		contractTree.setSum(total);
 
 		// 5) now we have to add some columns.
-		contractList.addColumn(Settings.i18n().tr("Name of Contract"), "name");
-		contractList.addColumn(Settings.i18n().tr("Contract Partner"), Contract.PARTNER_NAME);
-		contractList.addColumn(Settings.i18n().tr("Start Date"), "startdate",
+		contractTree.addColumn(Settings.i18n().tr("Name of Contract"), "name");
+		contractTree.addColumn(Settings.i18n().tr("Contract Partner"), Contract.PARTNER_NAME);
+		contractTree.addColumn(Settings.i18n().tr("Start Date"), "startdate",
 				new DateFormatter(Settings.getNewDateFormat()));
-		contractList.addColumn(Settings.i18n().tr("End Date"), "enddate",
+		contractTree.addColumn(Settings.i18n().tr("End Date"), "enddate",
 				new DateFormatter(Settings.getNewDateFormat()));
-		contractList.addColumn(
+		contractTree.addColumn(
 				Settings.i18n().tr("Next Cancellation Deadline"),
 				Contract.NEXT_CANCELLATION_DEADLINE,
 				new DateFormatter(Settings.getNewDateFormat()));
-		contractList.addColumn(Settings.i18n().tr("Money per Term"),
+		contractTree.addColumn(Settings.i18n().tr("Money per Term"),
 				Contract.MONEY_PER_TERM, new CurrencyFormatter(
 						Settings.CURRENCY, Settings.DECIMALFORMAT), false,
 						Column.ALIGN_RIGHT);
-		contractList.addColumn(Settings.i18n().tr("Money per Month"),
+		contractTree.addColumn(Settings.i18n().tr("Money per Month"),
 				Contract.MONEY_PER_MONTH, new CurrencyFormatter(
 						Settings.CURRENCY, Settings.DECIMALFORMAT));
-		contractList.addColumn(Settings.i18n().tr("Remind?"), "ignore_cancellations", o -> {
+		contractTree.addColumn(Settings.i18n().tr("Remind?"), "ignore_cancellations", o -> {
 			if (o instanceof Integer) {
 				if (((Integer)o).intValue() == 0) {
 					return "\u2611";
@@ -733,9 +738,9 @@ public class ContractControl extends AbstractControl {
 		}, true, Column.ALIGN_LEFT);
 
 		// 7) we are adding a context menu
-		contractList.setContextMenu(new ContractListMenu(contractList, true));
+		contractTree.setContextMenu(new ContractListMenu(null, true));
 
-		TableFormatter formatter = item -> {
+		TreeFormatter formatter = item -> {
 			if (item.getData() instanceof Contract) {
 				Contract contract = (Contract) item.getData();
 				try {
@@ -759,8 +764,8 @@ public class ContractControl extends AbstractControl {
 				}
 			}
 		};
-		contractList.setFormatter(formatter);
-		return contractList;
+		contractTree.setFormatter(formatter);
+		return contractTree;
 	}
 
 	/**
@@ -775,33 +780,29 @@ public class ContractControl extends AbstractControl {
 		activeFilterSwitch.setValue(true);
 		activeFilterSwitch.addListener(event -> {
 			try {
-				System.out.println(event.type);
 				if (event.type != SWT.Selection) {
 					return;
 				}
+				Object selection = contractTree.getSelection();
+				contractTree.removeAll();
 				if ((Boolean)activeFilterSwitch.getValue()) {
 					// Checkbox was active; remove inactive contracts.
 					Date today = new Date();
-					List<Contract> contractsToRemove = new ArrayList<>();
-					for (Object item : contractList.getItems()) {
-						if (!((Contract)item).isActiveInMonth(today)) {
-							contractsToRemove.add((Contract) item);
+					GenericIterator<Contract> contracts = getContracts();
+					List<Contract> activeContracts = new ArrayList<>();
+					while (contracts.hasNext()) {
+						Contract item = contracts.next();
+						if (item.isActiveInMonth(today)) {
+							activeContracts.add(item);
 						}
 					}
-					for (Contract c : contractsToRemove) {
-						contractList.removeItem(c);
-					}
+					contractTree.setList(activeContracts);
 				} else {
 					// Checkbox was inactive; add all contracts.
-					Object selection = contractList.getSelection();
-					contractList.removeAll();
 					GenericIterator<Contract> contracts = getContracts();
-					while (contracts.hasNext()) {
-						contractList.addItem(contracts.next());
-					}
-					contractList.select(selection);
-					contractList.sort();
+					contractTree.setList(contracts);
 				}
+				contractTree.select(selection);
 			} catch (RemoteException e) {
 				Logger.error("Error while repopulating contract table", e);
 			}

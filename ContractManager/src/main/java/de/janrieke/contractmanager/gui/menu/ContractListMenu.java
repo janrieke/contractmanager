@@ -11,7 +11,7 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *   
+ *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,12 +23,10 @@ import de.janrieke.contractmanager.gui.action.DismissNextReminder;
 import de.janrieke.contractmanager.gui.action.GenerateOdfDocument;
 import de.janrieke.contractmanager.gui.action.ShowContractDetailView;
 import de.janrieke.contractmanager.gui.parts.OnlyForContractsWithRemindersContextMenuItem;
-import de.willuhn.jameica.gui.Action;
 import de.willuhn.jameica.gui.parts.CheckedContextMenuItem;
 import de.willuhn.jameica.gui.parts.ContextMenu;
 import de.willuhn.jameica.gui.parts.ContextMenuItem;
 import de.willuhn.jameica.gui.parts.TablePart;
-import de.willuhn.util.ApplicationException;
 
 /**
  * Prepared context menu for project tables.
@@ -36,7 +34,7 @@ import de.willuhn.util.ApplicationException;
 public class ContractListMenu extends ContextMenu {
 	/**
 	 * ct.
-	 * 
+	 *
 	 * @param showNew
 	 */
 	public ContractListMenu(TablePart tablePart, boolean showNew) {
@@ -55,16 +53,9 @@ public class ContractListMenu extends ContextMenu {
 		if (showNew) {
 			// separator
 			addItem(ContextMenuItem.SEPARATOR);
-			
+
 			addItem(new ContextMenuItem(Settings.i18n().tr(
-					"Create a new contract..."), new Action() {
-				public void handleAction(Object context)
-						throws ApplicationException {
-					// we force the context to be null to create a new
-					// project in any case
-					new ShowContractDetailView().handleAction(null);
-				}
-			}, "document-new.png"));
+					"Create a new contract..."), context -> new ShowContractDetailView().handleAction(null), "document-new.png"));
 
 			addItem(ContextMenuItem.SEPARATOR);
 			addItem(new CheckedContextMenuItem(Settings.i18n().tr(

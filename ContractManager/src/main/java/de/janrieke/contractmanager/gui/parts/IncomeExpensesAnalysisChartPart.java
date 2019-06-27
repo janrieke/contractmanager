@@ -18,6 +18,7 @@
 package de.janrieke.contractmanager.gui.parts;
 
 import java.rmi.RemoteException;
+import java.text.NumberFormat;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -47,9 +48,9 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 
     public class ContractIncomeExpensesAnalysisData {
 
-		private float amount;
+		private double amount;
 		private String label;
-		public ContractIncomeExpensesAnalysisData(float amount, String label) {
+		public ContractIncomeExpensesAnalysisData(double amount, String label) {
 			super();
 			this.amount = amount;
 			this.label = label;
@@ -71,7 +72,8 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 		chart.paint(parent);
 	}
 
-    private double sum = 0;
+    private double sumPositive = 0;
+    private double sumNegative = 0;
 	protected void addChartData() throws RemoteException {
 		int month = control.getMonthNumber((String)control.getMonthSelector().getValue());
 		int year = (Integer)control.getYearSelector().getValue();
@@ -81,7 +83,7 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 		monthCal.set(year, month, 1, 0, 0, 0);
 		YearMonth yearMonth = YearMonth.of(year, month+1);
 
-	    sum = 0;
+	    sumPositive = sumNegative = 0;
 		GenericIterator<Contract> contracts = ContractControl.getContracts();
 		while (contracts.hasNext()) {
 			final Contract c = contracts.next();
@@ -90,9 +92,14 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 			}
 
 			List<MonthlyCosts> costsInMonth = c.getCostsInMonth(yearMonth, usePaydays);
-			sum += costsInMonth.stream()
+			sumPositive += costsInMonth.stream()
 				.mapToDouble(MonthlyCosts::getMoney)
+				.filter(d -> (d > 0))
 				.sum();
+			sumNegative += costsInMonth.stream()
+					.mapToDouble(MonthlyCosts::getMoney)
+					.filter(d -> (d < 0))
+					.sum();
 
 			chart.addData(new ChartData() {
 
@@ -115,21 +122,26 @@ public class IncomeExpensesAnalysisChartPart implements Part {
 				public List<?> getData() throws RemoteException {
 					List<ContractIncomeExpensesAnalysisData> list = new ArrayList<>();
 					List<MonthlyCosts> costsInMonth = c.getCostsInMonth(yearMonth, usePaydays);
-					float positiveCosts = (float)costsInMonth.stream()
+					double positiveCosts = (float)costsInMonth.stream()
 							.mapToDouble(MonthlyCosts::getMoney)
 							.filter(d -> (d > 0))
 							.sum();
-					float negativeCosts = (float)costsInMonth.stream()
+					double negativeCosts = (float)costsInMonth.stream()
 							.mapToDouble(MonthlyCosts::getMoney)
 							.filter(d -> (d < 0))
 							.sum();
-					list.add(new ContractIncomeExpensesAnalysisData(positiveCosts, Settings.i18n().tr("Income")));
-					list.add(new ContractIncomeExpensesAnalysisData(-negativeCosts, Settings.i18n().tr("Expenses")));
+
+					String incomeLabel = Settings.i18n().tr("Income") + ": "
+							+ NumberFormat.getCurrencyInstance().format(sumPositive);
+					list.add(new ContractIncomeExpensesAnalysisData(positiveCosts, incomeLabel));
+					String expensesLabel = Settings.i18n().tr("Expenses") + ": "
+							+ NumberFormat.getCurrencyInstance().format(-sumNegative);
+					list.add(new ContractIncomeExpensesAnalysisData(-negativeCosts, expensesLabel));
 					return list;
 				}
 			});
 		}
-		chart.setSum(sum);
+		chart.setSum(sumPositive + sumNegative);
 	}
 
 	public void redraw() {
