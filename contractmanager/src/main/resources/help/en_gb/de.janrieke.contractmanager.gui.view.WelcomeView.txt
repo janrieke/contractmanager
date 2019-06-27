@@ -1,0 +1,9 @@
+<form>
+	<p>
+		<span color="header" font="header">Welcome</span>
+	</p>
+
+	<p>
+	  Welcome to ContractManager, the contract management software for Jameica.
+	</p>
+</form>
