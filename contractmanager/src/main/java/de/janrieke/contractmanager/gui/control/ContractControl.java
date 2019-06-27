@@ -139,7 +139,8 @@ public class ContractControl extends AbstractControl {
 
 	// holds the current Hibiscus category of the selection box (used for
 	// storing to DB on store button click)
-	public String hibiscusCategoryID = null;
+	public String hibiscusCategoryID = getContract() != null ?
+			getContract().getHibiscusCategoryID() : null;
 
 	private Address currentAddress = null;
 
