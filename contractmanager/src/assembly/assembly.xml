@@ -10,7 +10,7 @@
 	<fileSets>
 		<fileSet>
 			<directory>${project.basedir}</directory>
-			<outputDirectory>/</outputDirectory>
+			<outputDirectory></outputDirectory>
 			<includes>
 				<include>README</include>
 				<include>VERSION_HISTORY.txt</include>
@@ -20,14 +20,14 @@
 		</fileSet>
 		<fileSet>
 			<directory>${project.build.directory}/classes</directory>
-			<outputDirectory>/updates/</outputDirectory>
+			<outputDirectory>updates/</outputDirectory>
 			<includes>
 				<include>*.class</include>
 			</includes>
 		</fileSet>
 		<fileSet>
 			<directory>${project.basedir}/lib</directory>
-			<outputDirectory>/lib/</outputDirectory>
+			<outputDirectory>lib/</outputDirectory>
 			<includes>
 				<include>*.xml</include>
 				<include>epl-v10.html</include>
@@ -36,11 +36,11 @@
 		</fileSet>
 		<fileSet>
 			<directory>${project.basedir}/src/main/resources/sql</directory>
-			<outputDirectory>/sql/</outputDirectory>
+			<outputDirectory>sql/</outputDirectory>
 		</fileSet>
 		<fileSet>
 			<directory>${project.basedir}/src/main/resources/templates</directory>
-			<outputDirectory>/templates/</outputDirectory>
+			<outputDirectory>templates/</outputDirectory>
 		</fileSet>
 	</fileSets>
 	<files>

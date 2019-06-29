@@ -62,7 +62,7 @@ public class AboutDialog extends AbstractDialog<Object> {
 		FormTextPart text = new FormTextPart();
 		text.setText("<form>" + "<p><b>" + manifest.getDescription() + "</b></p>"
 				+ "<br/>Licence: GPL 3.0 (http://www.gnu.org/licenses/gpl-3.0.txt)"
-				+ "<br/><p>Copyright by Jan Rieke [it@janrieke.de] 2010-2018</p>" + "<p>"
+				+ "<br/><p>Copyright by Jan Rieke [it@janrieke.de] 2010-2019</p>" + "<p>"
 				+ manifest.getHomepage() + "</p>"
 				+ "<br/><p>Contains code from Jameica, Jameica Example Plugin, Hibiscus, and Syntax; copyright by Olaf Willuhn [info@jameica.org], GPL</p>"
 				+ "<p>http://www.jameica.org</p>" + "</form>");
