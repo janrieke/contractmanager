@@ -27,7 +27,7 @@ VERSION HISTORY:
 
 0.5:
 	- Document storage
-	- SEPA-Mandatsreferenz und -Gläubiger-ID 	 
+	- SEPA-Mandatsreferenz und -Glï¿½ubiger-ID 	 
 	- Improved import dialog (intelligent pre-selection of contract) 	 
 	- Auto-import of new Hibiscus transactions
 	- Added quarterly/semiannually as payment interval
@@ -51,6 +51,11 @@ VERSION HISTORY:
 
 0.5.4:
 	- Fixed exception in contract list
+
+0.5.5:
+	- Shortcut for "New Contract" is now ALT+N (avoid collision on Mac).
+	- Re-saving a contract no longer unsets the Hibiscus category.
+	- Jameica 2.8+ is now required.
 
 
 ROADMAP:
